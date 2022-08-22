@@ -15,6 +15,7 @@
         "redux": "^4.2.0",
         "redux-devtools-extension": "^2.13.9",
         "redux-immutable-state-invariant": "^2.1.0",
+        "redux-middleware": "^0.1.21",
         "web-vitals": "^2.1.4"
     },
     "scripts": {
