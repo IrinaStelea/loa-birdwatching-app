@@ -12,7 +12,7 @@ export default function Map({ data }) {
     const [lng, setLng] = useState(13.41);
     const [lat, setLat] = useState(52.62);
     const [zoom, setZoom] = useState(11);
-
+    let clickCoords = {};
     const showMarkers = (e) => {
         e.stopPropagation();
 
@@ -33,14 +33,6 @@ export default function Map({ data }) {
                 });
             });
         }
-
-        // JSON.parse(
-        //     '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [' +
-        //         d.lng +
-        //         "," +
-        //         d.lat +
-        //         "]}}"
-        // );
 
         updateMap(data);
         console.log("data geosjon", geojsonData);
@@ -63,6 +55,39 @@ export default function Map({ data }) {
                 "circle-color": "green",
                 "circle-stroke-color": "white",
             },
+        });
+
+        //add pop-up with info to each marker
+        map.current.on("click", "sightings", (e) => {
+            //stop propagation to avoid clash with the click event from the user
+            // e.originalEvent.preventDefault();
+            // var coordClick = e.lngLat;
+            // console.log(
+            //     "Lng:",
+            //     coordClick.lng,
+            //     "Lat:",
+            //     coordClick.lat,
+            //     "id",
+            //     e.id
+            // );
+            clickCoords = e.point;
+            console.log("Layer click", clickCoords);
+            // Copy coordinates array.
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const comName = e.features[0].properties.comName;
+            const sciName = e.features[0].properties.sciName;
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            new mapboxgl.Popup({ offset: 25 })
+                .setLngLat(coordinates)
+                .setHTML(`<h2>${comName}</h2><p>${sciName}</p>`)
+                .addTo(map.current);
         });
 
         //add bird data to the map
@@ -110,24 +135,75 @@ export default function Map({ data }) {
         });
     });
 
-    //user click on map -> new marker
-    // useEffect(() => {
-    //     map.current.on("click", function addMarker(event) {
-    //         var coordinates = event.lngLat;
-    //         console.log(
-    //             "Lng:",
-    //             coordinates.lng,
-    //             "Lat:",
-    //             coordinates.lat,
-    //             "id",
-    //             event.id
-    //         );
-
-    //         const userMarker = new mapboxgl.Marker()
-    //             .setLngLat(coordinates)
-    //             .addTo(map.current);
+    // //user click on map -> new marker
+    // const showMyMarkers = () => {
+    //     let geojsonUser = {};
+    //     map.current.addSource("user-sightings", {
+    //         type: "geojson",
+    //         data: {
+    //             type: "FeatureCollection",
+    //             features: geojsonUser,
+    //         },
     //     });
-    //     // marker.setLngLat(coordinates).addTo(map);
+
+    //     map.current.addLayer({
+    //         id: "user-sightings",
+    //         type: "circle",
+    //         source: "user-sightings",
+    //         paint: {
+    //             "circle-radius": 8,
+    //             "circle-stroke-width": 2,
+    //             "circle-color": "red",
+    //             "circle-stroke-color": "white",
+    //         },
+    //     });
+    // };
+
+    useEffect(() => {
+        map.current.on("click", function addMarker(event) {
+            console.log(
+                "event.point.x",
+                event.point.x,
+                "event.point.y",
+                event.point.y
+            );
+            if (
+                clickCoords.x !== event.point.x &&
+                clickCoords.y !== event.point.y
+            ) {
+                console.log("Basemap click", event.point);
+
+                var coordinates = event.lngLat;
+                // console.log(
+                //     "Lng:",
+                //     coordinates.lng,
+                //     "Lat:",
+                //     coordinates.lat,
+                //     "id",
+                //     event.id
+                // );
+
+                // const userMarker =
+                new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
+                clickCoords = {};
+            }
+        });
+    });
+    // map.current.on("click", function addMarker(event) {
+    //     var coordinates = event.lngLat;
+    //     console.log(
+    //         "Lng:",
+    //         coordinates.lng,
+    //         "Lat:",
+    //         coordinates.lat,
+    //         "id",
+    //         event.id
+    //     );
+
+    //     // const userMarker =
+    //     new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
+    // });
+
     //     // Ensure that if the map is zoomed out such that multiple
     //     // copies of the feature are visible, the popup appears
     //     // over the copy being pointed to.
@@ -152,6 +228,12 @@ export default function Map({ data }) {
             </div>
             <button id="show-birds" onClick={showMarkers}>
                 Birds around me
+            </button>
+            <button
+                id="my-sightings"
+                // onClick={showMyMarkers}
+            >
+                My sightings
             </button>
         </>
     );
