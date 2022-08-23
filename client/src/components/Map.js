@@ -15,16 +15,66 @@ export default function Map({ data }) {
 
     const showMarkers = (e) => {
         e.stopPropagation();
-        //add bird data to the map
-        data.forEach(({ comName, sciName, lat, lng }) => {
-            const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-                `<h2>${comName}</h2><p>${sciName}</p>`
-            );
-            const marker = new mapboxgl.Marker()
-                .setLngLat([lng, lat])
-                .setPopup(popup)
-                .addTo(map.current);
+
+        // convert data to geojson
+        var geojsonData = [];
+        function updateMap(data) {
+            data.forEach(function (d) {
+                geojsonData.push({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [d.lng, d.lat],
+                    },
+                    properties: {
+                        comName: d.comName,
+                        sciName: d.sciName,
+                    },
+                });
+            });
+        }
+
+        // JSON.parse(
+        //     '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [' +
+        //         d.lng +
+        //         "," +
+        //         d.lat +
+        //         "]}}"
+        // );
+
+        updateMap(data);
+        console.log("data geosjon", geojsonData);
+
+        map.current.addSource("sightings", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: geojsonData,
+            },
         });
+
+        map.current.addLayer({
+            id: "sightings",
+            type: "circle",
+            source: "sightings",
+            paint: {
+                "circle-radius": 8,
+                "circle-stroke-width": 2,
+                "circle-color": "green",
+                "circle-stroke-color": "white",
+            },
+        });
+
+        //add bird data to the map
+        // data.forEach(({ comName, sciName, lat, lng }) => {
+        //     const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        //         `<h2>${comName}</h2><p>${sciName}</p>`
+        //     );
+        //     const marker = new mapboxgl.Marker()
+        //         .setLngLat([lng, lat])
+        //         .setPopup(popup)
+        //         .addTo(map.current);
+        // });
     };
 
     useEffect(() => {
@@ -61,36 +111,36 @@ export default function Map({ data }) {
     });
 
     //user click on map -> new marker
-    useEffect(() => {
-        map.current.on("click", function addMarker(event) {
-            var coordinates = event.lngLat;
-            console.log(
-                "Lng:",
-                coordinates.lng,
-                "Lat:",
-                coordinates.lat,
-                "id",
-                event.id
-            );
+    // useEffect(() => {
+    //     map.current.on("click", function addMarker(event) {
+    //         var coordinates = event.lngLat;
+    //         console.log(
+    //             "Lng:",
+    //             coordinates.lng,
+    //             "Lat:",
+    //             coordinates.lat,
+    //             "id",
+    //             event.id
+    //         );
 
-            const userMarker = new mapboxgl.Marker()
-                .setLngLat(coordinates)
-                .addTo(map.current);
-        });
-        // marker.setLngLat(coordinates).addTo(map);
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        //     while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
-        //         coordinates[0] +=
-        //             event.lngLat.lng > coordinates[0] ? 360 : -360;
-        //     }
-        //     var popup = new mapboxgl.Popup({ offset: 35 })
-        //         .setLngLat(coordinates)
-        //         .setHTML("MapBox Coordinate<br/>" + coordinates)
-        //         .addTo(map);
-        // });
-    });
+    //         const userMarker = new mapboxgl.Marker()
+    //             .setLngLat(coordinates)
+    //             .addTo(map.current);
+    //     });
+    //     // marker.setLngLat(coordinates).addTo(map);
+    //     // Ensure that if the map is zoomed out such that multiple
+    //     // copies of the feature are visible, the popup appears
+    //     // over the copy being pointed to.
+    //     //     while (Math.abs(event.lngLat.lng - coordinates[0]) > 180) {
+    //     //         coordinates[0] +=
+    //     //             event.lngLat.lng > coordinates[0] ? 360 : -360;
+    //     //     }
+    //     //     var popup = new mapboxgl.Popup({ offset: 35 })
+    //     //         .setLngLat(coordinates)
+    //     //         .setHTML("MapBox Coordinate<br/>" + coordinates)
+    //     //         .addTo(map);
+    //     // });
+    // });
 
     return (
         <>
