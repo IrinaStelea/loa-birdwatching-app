@@ -28,11 +28,10 @@ function App() {
     //     };
     //     let lat = 52.62;
     //     let lng = 13.41;
-    //     //query param "back" sets the time frame (up to 30 days)
-    //     //query param "dist" sets the range (up to 50 km)
+    //     //query params: "back" sets the time frame (up to 30 days), "dist" sets the range (up to 50 km), includeProvisional includes observations that have not been reviewed
     //     (async () => {
     //         const response = await fetch(
-    //             `https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=50`,
+    //             `https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=50&includeProvisional=true`,
     //             requestOptions
     //         );
     //         const data = await response.json();
