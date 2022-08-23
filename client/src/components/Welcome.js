@@ -6,7 +6,7 @@ import {
     BrowserRouter as Router,
     Route,
     Routes,
-    Navigate,
+    // Navigate,
 } from "react-router-dom";
 
 export default function Welcome() {

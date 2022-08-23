@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const db = require("./db.js");
+const data = require("./data.json");
 
 const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");
@@ -85,7 +86,7 @@ app.post("/login.json", (req, res) => {
 //fetch for login
 app.get("/user/id.json", function (req, res) {
     if (req.session.userId) {
-        console.log("cookie exists");
+        console.log("cookie is now set");
         res.json({
             userId: req.session.userId,
         });
@@ -93,6 +94,12 @@ app.get("/user/id.json", function (req, res) {
         console.log("cookie does not exist");
         res.json({});
     }
+});
+
+//serve the json with recent sightings
+app.get("/api/data.json", function (req, res) {
+    // console.log("inside the get request", data);
+    res.json(data);
 });
 
 // All other GET requests not handled before will return our React app

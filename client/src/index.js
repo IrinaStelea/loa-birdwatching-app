@@ -9,6 +9,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { Provider } from "react-redux";
 import rootReducer from "./redux/reducer.js";
 import Welcome from "./components/Welcome";
+import "mapbox-gl/dist/mapbox-gl.css"; //stylesheet for the map
 
 const store = createStore(
     rootReducer,
