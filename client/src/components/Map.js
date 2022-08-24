@@ -4,15 +4,53 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
-export default function Map({ data }) {
+export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     // console.log("data in the map component", data);
 
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [lng, setLng] = useState(13.41);
-    const [lat, setLat] = useState(52.62);
+    const [lng, setLng] = useState(userLng); //13.39
+    const [lat, setLat] = useState(userLat); //52.52
     const [zoom, setZoom] = useState(11);
-    let clickCoords = {};
+    const [click, setClick] = useState(false);
+
+    useEffect(() => {
+        if (map.current) return; // initialize map only once
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: "mapbox://styles/mapbox/outdoors-v11",
+            center: [userLng, userLat],
+            zoom: zoom,
+        });
+        //add marker for user location
+        new mapboxgl.Marker().setLngLat([userLng, userLat]).addTo(map.current);
+
+        map.current.on("click", function addMarker(e) {
+            console.log("click event on main map", e);
+
+            if (e.clickOnLayer !== undefined) {
+                console.log("prevent basemap click", e.clickOnLayer);
+                return;
+            }
+            var coordinates = e.lngLat;
+            console.log("Lng:", coordinates.lng, "Lat:", coordinates.lat);
+
+            // const userMarker =
+            new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
+        });
+
+        //wait for map to be initialised
+        if (!map.current) return;
+        map.current.on("move", () => {
+            setLng(map.current.getCenter().lng.toFixed(4));
+            setLat(map.current.getCenter().lat.toFixed(4));
+            setZoom(map.current.getZoom().toFixed(2));
+        });
+
+        // cleanup function to remove map on unmount
+        return () => map.current.remove();
+    }, []);
+
     const showMarkers = (e) => {
         e.stopPropagation();
 
@@ -70,8 +108,9 @@ export default function Map({ data }) {
             //     "id",
             //     e.id
             // );
-            clickCoords = e.point;
-            console.log("Layer click", clickCoords);
+            e.clickOnLayer = true;
+
+            // console.log("state of click", click);
             // Copy coordinates array.
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
@@ -89,51 +128,10 @@ export default function Map({ data }) {
                 .setHTML(`<h2>${comName}</h2><p>${sciName}</p>`)
                 .addTo(map.current);
         });
-
-        //add bird data to the map
-        // data.forEach(({ comName, sciName, lat, lng }) => {
-        //     const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-        //         `<h2>${comName}</h2><p>${sciName}</p>`
-        //     );
-        //     const marker = new mapboxgl.Marker()
-        //         .setLngLat([lng, lat])
-        //         .setPopup(popup)
-        //         .addTo(map.current);
-        // });
     };
 
-    useEffect(() => {
-        if (map.current) return; // initialize map only once
-        map.current = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: "mapbox://styles/mapbox/outdoors-v11",
-            center: [lng, lat],
-            zoom: zoom,
-        });
-
-        // Add geolocate control to the map
-        map.current.addControl(
-            new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true,
-                },
-                // When active the map will receive updates to the device's location as it changes.
-                trackUserLocation: true,
-                // Draw an arrow next to the location dot to indicate which direction the device is heading.
-                showUserHeading: true,
-            })
-        );
-    });
-
     //set map to a new state when user moves it
-    useEffect(() => {
-        if (!map.current) return; // wait for map to initialize
-        map.current.on("move", () => {
-            setLng(map.current.getCenter().lng.toFixed(4));
-            setLat(map.current.getCenter().lat.toFixed(4));
-            setZoom(map.current.getZoom().toFixed(2));
-        });
-    });
+    // useEffect(() => {});
 
     // //user click on map -> new marker
     // const showMyMarkers = () => {
@@ -159,50 +157,7 @@ export default function Map({ data }) {
     //     });
     // };
 
-    useEffect(() => {
-        map.current.on("click", function addMarker(event) {
-            console.log(
-                "event.point.x",
-                event.point.x,
-                "event.point.y",
-                event.point.y
-            );
-            if (
-                clickCoords.x !== event.point.x &&
-                clickCoords.y !== event.point.y
-            ) {
-                console.log("Basemap click", event.point);
-
-                var coordinates = event.lngLat;
-                // console.log(
-                //     "Lng:",
-                //     coordinates.lng,
-                //     "Lat:",
-                //     coordinates.lat,
-                //     "id",
-                //     event.id
-                // );
-
-                // const userMarker =
-                new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
-                clickCoords = {};
-            }
-        });
-    });
-    // map.current.on("click", function addMarker(event) {
-    //     var coordinates = event.lngLat;
-    //     console.log(
-    //         "Lng:",
-    //         coordinates.lng,
-    //         "Lat:",
-    //         coordinates.lat,
-    //         "id",
-    //         event.id
-    //     );
-
-    //     // const userMarker =
-    //     new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
-    // });
+    // useEffect(() => {
 
     //     // Ensure that if the map is zoomed out such that multiple
     //     // copies of the feature are visible, the popup appears
@@ -238,3 +193,16 @@ export default function Map({ data }) {
         </>
     );
 }
+
+// Add geolocate control to the map
+// map.current.addControl(
+//     new mapboxgl.GeolocateControl({
+//         positionOptions: {
+//             enableHighAccuracy: true,
+//         },
+//         // When active the map will receive updates to the device's location as it changes.
+//         trackUserLocation: true,
+//         // Draw an arrow next to the location dot to indicate which direction the device is heading.
+//         showUserHeading: true,
+//     })
+// );
