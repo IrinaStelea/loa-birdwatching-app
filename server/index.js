@@ -96,11 +96,43 @@ app.get("/user/id.json", function (req, res) {
     }
 });
 
-//serve the json with recent sightings
+//serve the json with API sightings
 app.get("/api/data.json", function (req, res) {
     const data = helpers.convertToGeojson(jsonData);
     // console.log("inside the get request", data);
     res.json(data);
+});
+
+//serve the geojson with user sightings
+app.get("/api/user-data.json", async (req, res) => {
+    console.log("user id", req.session.userId);
+    try {
+        const result = await db.getUserSightings(req.session.userId);
+        console.log("result in get user data", result.rows);
+        let userData = [];
+        for (let item of result.rows) {
+            userData.push(item.sighting);
+        }
+        console.log("user data backend", userData);
+        return res.json(userData);
+    } catch (err) {
+        console.log("error in getting user sightings");
+        return res.json({ message: "Something went wrong, please try again" });
+    }
+});
+
+//add new sighting
+app.post("/api/submit-pin", async (req, res) => {
+    try {
+        const result = await db.addSighting(
+            req.session.userId,
+            req.body.geoJSON
+        );
+        console.log("result from adding pin", result.rows);
+        return res.json({ message: "success" });
+    } catch (error) {
+        console.log("error in adding new pin", error);
+    }
 });
 
 // All other GET requests not handled before will return our React app

@@ -1,0 +1,31 @@
+/* .new-pin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+} */
+
+#new-pin {
+    width: 5vw;
+    position: absolute;
+}
+
+.pop-up {
+    background-color: white;
+    border-radius: 5px;
+    padding: 1vh 2vw 2vh 2vw;
+    transition: 1s;
+    transition-timing-function: cubic-bezier(0.63, -0.33, 0.32, 1.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    z-index: 100;
+    top: 10vh;
+    height: 40vh;
+    width: 70vw;
+}
+
+/* #close-button {
+    align-self: flex-end;
+} */

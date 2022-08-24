@@ -1,18 +1,32 @@
 import "./Map.css";
 import { useRef, useState, useEffect } from "react";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import { useDispatch } from "react-redux";
+import {
+    addUserMarker,
+    resetUserMarker,
+} from "../redux/new-user-marker/slice.js";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
-export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
+export default function Map({
+    data,
+    userData,
+    userLng = 13.39,
+    userLat = 52.52,
+}) {
     // console.log("data in the map component", data);
-
+    const dispatch = useDispatch();
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [lng, setLng] = useState(userLng); //13.39
     const [lat, setLat] = useState(userLat); //52.52
     const [zoom, setZoom] = useState(11);
     const [myPin, setPin] = useState();
+    const [markersLayerVisible, setMarkersLayer] = useState(false);
+    const [markersButtonView, setMarkersButtonView] = useState(1);
+    const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
+    const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
 
     useEffect(() => {
         if (map.current) return; // initialize map only once
@@ -60,22 +74,65 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         //add marker on user click
         map.current.on("click", function addMarker(e) {
+            console.log("e in click", e);
             if (e.clickOnLayer) {
                 console.log("preventing click on basemap");
                 return;
             }
             console.log("click event on main map", e);
-            var coordinates = e.lngLat;
 
+            var coordinates = e.lngLat;
+            map.current.flyTo({
+                center: coordinates,
+                zoom: 13,
+            });
+            dispatch(addUserMarker(coordinates));
             // const userMarker =
-            new mapboxgl.Marker().setLngLat(coordinates).addTo(map.current);
+            // new mapboxgl.Marker()
+            //     .setLngLat(coordinates)
+            //     .addTo(map.current)
+            //     .on("click", (e) => e.target.remove());
+
+            // //pop-up new pin
+            // setTimeout(() => {
+            //     new mapboxgl.Popup({ offset: 25 })
+            //         .setLngLat(coordinates)
+            //         .setHTML(`<h3>Add a new bird sighting</h3>`)
+            //         .addTo(map.current);
+            // }, 1500);
         });
     }, []);
 
+    const toggleMarkersLayer = () => {
+        !markersLayerVisible
+            ? map.current.setLayoutProperty("sightings", "visibility", "none")
+            : map.current.setLayoutProperty(
+                  "sightings",
+                  "visibility",
+                  "visible"
+              );
+        setMarkersLayer(!markersLayerVisible);
+    };
+
+    const toggleMyMarkersLayer = () => {
+        !myMarkersLayerVisible
+            ? map.current.setLayoutProperty(
+                  "user-sightings",
+                  "visibility",
+                  "none"
+              )
+            : map.current.setLayoutProperty(
+                  "user-sightings",
+                  "visibility",
+                  "visible"
+              );
+        setMyMarkersLayer(!myMarkersLayerVisible);
+    };
+
     const showMarkers = (e) => {
         e.stopPropagation();
-        // console.log("data geojson in app", data);
 
+        // console.log("data geojson in app", data);
         map.current.addSource("sightings", {
             type: "geojson",
             data: {
@@ -95,31 +152,36 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 "circle-stroke-color": "white",
             },
         });
+        setMarkersButtonView(2);
     };
 
     // //user click on map -> new marker
-    // const showMyMarkers = () => {
-    //     let geojsonUser = {};
-    //     map.current.addSource("user-sightings", {
-    //         type: "geojson",
-    //         data: {
-    //             type: "FeatureCollection",
-    //             features: geojsonUser,
-    //         },
-    //     });
+    const showMyMarkers = (e) => {
+        e.stopPropagation();
+        // console.log("data geojson in app", data);
 
-    //     map.current.addLayer({
-    //         id: "user-sightings",
-    //         type: "circle",
-    //         source: "user-sightings",
-    //         paint: {
-    //             "circle-radius": 8,
-    //             "circle-stroke-width": 2,
-    //             "circle-color": "red",
-    //             "circle-stroke-color": "white",
-    //         },
-    //     });
-    // };
+        map.current.addSource("user-sightings", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: userData,
+            },
+        });
+
+        map.current.addLayer({
+            id: "user-sightings",
+            type: "circle",
+            source: "user-sightings",
+            paint: {
+                "circle-radius": 8,
+                "circle-stroke-width": 2,
+                "circle-color": "red",
+                "circle-stroke-color": "white",
+            },
+        });
+
+        setMyMarkersButtonView(2);
+    };
 
     // useEffect(() => {
 
@@ -145,15 +207,26 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 </div>
                 <div ref={mapContainer} className="map-container" />
             </div>
-            <button id="show-birds" onClick={showMarkers}>
-                Birds around me
-            </button>
-            <button
-                id="my-sightings"
-                // onClick={showMyMarkers}
-            >
-                My sightings
-            </button>
+            {markersButtonView === 1 && (
+                <button id="show-birds" onClick={showMarkers}>
+                    Birds around me
+                </button>
+            )}
+            {markersButtonView === 2 && (
+                <button id="show-birds" onClick={toggleMarkersLayer}>
+                    Toggle app markers
+                </button>
+            )}
+            {myMarkersButtonView === 1 && (
+                <button id="my-sightings" onClick={showMyMarkers}>
+                    My sightings
+                </button>
+            )}
+            {myMarkersButtonView === 2 && (
+                <button id="my-sightings" onClick={toggleMyMarkersLayer}>
+                    Toggle my sightings
+                </button>
+            )}
         </>
     );
 }

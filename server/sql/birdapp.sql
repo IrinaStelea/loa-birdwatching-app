@@ -8,3 +8,86 @@ CREATE TABLE users(
     password VARCHAR NOT NULL CHECK (password != ''),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE sightings(
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sighting jsonb NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- user 1 sightings
+
+
+{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                13.466653,
+                52.625122
+            ]
+        },
+        "properties": {
+            "comName": "Great Spotted Woodpecker",
+            "sciName": "Dendrocopos major"
+        }
+    }
+
+
+
+{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                13.471460,
+                52.627709
+            ]
+        },
+        "properties": {
+            "comName": "Common Wood-Pigeon",
+            "sciName": "Columba palumbus"
+        }
+    }
+
+
+{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                13.469544,
+                52.624955
+            ]
+        },
+        "properties": {
+            "comName": "Mandarin Duck",
+            "sciName": "Aix galericulata"
+        }
+    }
+
+
+{
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                13.457460,
+                52.620164
+            ]
+        },
+        "properties": {
+            "comName": "Black-headed Gull",
+            "sciName": "Chroicocephalus ridibundus"
+        }
+    }
+
+
+    INSERT INTO sightings (user_id, sighting) 
+    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.466653, 52.625122]},"properties": {"comName": "Great Spotted Woodpecker", "sciName": "Dendrocopos major"}}');
+
+    INSERT INTO sightings (user_id, sighting) 
+    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.471460, 52.627709]},"properties": {"comName": "Common Wood-Pigeon", "sciName": "Columba palumbus"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.469544, 52.624955]},"properties": {"comName": "Mandarin Duck", "sciName": "Aix galericulata"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.457460, 52.620164]},"properties": {"comName": "Black-headed Gull", "sciName": "Chroicocephalus ridibundus"}}');

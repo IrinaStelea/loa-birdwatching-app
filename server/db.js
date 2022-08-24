@@ -78,3 +78,14 @@ module.exports.validateUser = (email, inputPass) => {
             });
         });
 };
+
+module.exports.getUserSightings = (id) => {
+    return db.query(`SELECT sighting FROM sightings WHERE user_id=$1`, [id]);
+};
+
+module.exports.addSighting = (id, sighting) => {
+    return db.query(
+        `INSERT INTO sightings (user_id, sighting) VALUES($1, ($2)::jsonb) RETURNING *`,
+        [id, JSON.stringify(sighting)]
+    );
+};
