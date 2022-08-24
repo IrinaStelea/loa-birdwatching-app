@@ -8,3 +8,21 @@ module.exports.cleanString = (string) => {
         .map((item) => item[0].toUpperCase() + item.slice(1).toLowerCase())
         .join(" ");
 };
+
+module.exports.convertToGeojson = (data) => {
+    var geojsonData = [];
+    data.forEach(function (d) {
+        geojsonData.push({
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [d.lng, d.lat],
+            },
+            properties: {
+                comName: d.comName,
+                sciName: d.sciName,
+            },
+        });
+    });
+    return geojsonData;
+};

@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const db = require("./db.js");
-const data = require("./data.json");
+const jsonData = require("./data.json");
 
 const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");
@@ -98,6 +98,7 @@ app.get("/user/id.json", function (req, res) {
 
 //serve the json with recent sightings
 app.get("/api/data.json", function (req, res) {
+    const data = helpers.convertToGeojson(jsonData);
     // console.log("inside the get request", data);
     res.json(data);
 });

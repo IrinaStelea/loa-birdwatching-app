@@ -49,27 +49,3 @@ export default function App() {
         </>
     );
 }
-
-//fetch to eBird API
-// React.useEffect(() => {
-//     let myHeaders = new Headers();
-//     myHeaders.append("X-eBirdApiToken", "roeouv9euh7o");
-
-//     let requestOptions = {
-//         method: "GET",
-//         headers: myHeaders,
-//         redirect: "follow",
-//     };
-//     let lat = 52.62;
-//     let lng = 13.41;
-//     //query params: "back" sets the time frame (up to 30 days), "dist" sets the range (up to 50 km), includeProvisional includes observations that have not been reviewed
-//     (async () => {
-//         const response = await fetch(
-//             `https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=50&includeProvisional=true`,
-//             requestOptions
-//         );
-//         const data = await response.json();
-//         console.log("data from fetch", data);
-//         setData(data);
-//     })();
-// }, []);
