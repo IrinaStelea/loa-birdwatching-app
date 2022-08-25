@@ -27,6 +27,7 @@ export default function Map({
     const [markersButtonView, setMarkersButtonView] = useState(1);
     const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
     const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
+    const [birdImg, setBirdImage] = useState();
 
     useEffect(() => {
         if (map.current) return; // initialize map only once
@@ -53,13 +54,63 @@ export default function Map({
 
     //user adds own markers
     useEffect(() => {
-        //add pop-up with info to each marker
+        //add pop-up with info to each API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
             const sciName = e.features[0].properties.sciName;
+            const date = e.features[0].properties.date;
+            // const birdImg = birdData.find(
+            //     (bird) => bird.sciName === e.features[0].properties.sciName
+            // );
+
+            (async () => {
+                const birdImg = await fetch(`/api/birddata/${sciName}`)
+                    .then((resp) => resp.json())
+                    .then((res) => {
+                        console.log("response fetch bird data", res);
+                        setBirdImage(res.image);
+                    });
+            })();
+
+            //fetch bird image
+            // fetch(`/api/birddata/${sciName}`)
+            //     .then((res) => res.json())
+            //     .then((response) => {
+            //         // console.log("response from server, bird data", birdData);
+            //         console.log("response fetch bird data", response);
+            //         setBirdImage(response.image);
+            //     });
+
+            // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+            console.log("bird img after click", birdImg);
+            //set marker
+
+            new mapboxgl.Popup({ offset: 25 })
+                .setLngLat(coordinates)
+                .setHTML(
+                    `<h2>${comName}</h2><p>${sciName}</p><img id="bird-thumbnail" src=${birdImg} /><p>Spotted on ${date
+                        .slice(0, 10)
+                        .split("-")
+                        .reverse()
+                        .join("-")} at ${date.slice(11, 19)}</p>`
+                )
+                .addTo(map.current);
+        });
+
+        //add pop-up with info to each existing user marker
+        map.current.on("click", "user-sightings", (e) => {
+            e.clickOnLayer = true;
+            // get coordinates of click + bird info
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const comName = e.features[0].properties.comName;
+            const sciName = e.features[0].properties.sciName;
+            const date = e.features[0].properties.date;
             // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -68,11 +119,17 @@ export default function Map({
             //set marker
             new mapboxgl.Popup({ offset: 25 })
                 .setLngLat(coordinates)
-                .setHTML(`<h2>${comName}</h2><p>${sciName}</p>`)
+                .setHTML(
+                    `<h2>${comName}</h2><p>${sciName}</p><p>Spotted by you on ${date
+                        .slice(0, 10)
+                        .split("-")
+                        .reverse()
+                        .join("-")} at ${date.slice(11, 17)}</p>`
+                )
                 .addTo(map.current);
         });
 
-        //add marker on user click
+        //add new pin on user click
         map.current.on("click", function addMarker(e) {
             console.log("e in click", e);
             if (e.clickOnLayer) {
@@ -80,11 +137,11 @@ export default function Map({
                 return;
             }
             console.log("click event on main map", e);
-
+            console.log("zoom on click", Math.max(zoom, 18));
             var coordinates = e.lngLat;
             map.current.flyTo({
                 center: coordinates,
-                zoom: 13,
+                zoom: Math.max(18, zoom),
             });
             dispatch(addUserMarker(coordinates));
             // const userMarker =
@@ -102,6 +159,7 @@ export default function Map({
             // }, 1500);
         });
     }, []);
+    // });
 
     const toggleMarkersLayer = () => {
         !markersLayerVisible
@@ -181,7 +239,30 @@ export default function Map({
         });
 
         setMyMarkersButtonView(2);
+        // var layers = map.current.getStyle().layers;
+        // var layer = layers.filter((layer) => layer.id === "user-sightings");
+        // console.log("map layers", layer);
+
+        // layer.addData()
     };
+
+    // const userMarkers = map.current.getSource("user-sightings");
+    // userMarkers.setData({
+    //     type: "FeatureCollection",
+    //     features: [
+    //         {
+    //             type: "Feature",
+    //             geometry: {
+    //                 type: "Point",
+    //                 coordinates: [13.36054, 52.516399],
+    //             },
+    //             properties: {
+    //                 comName: "Great Spotted Woodpecker",
+    //                 sciName: "Dendrocopos major",
+    //             },
+    //         },
+    //     ],
+    // });
 
     // useEffect(() => {
 

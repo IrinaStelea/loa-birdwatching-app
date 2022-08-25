@@ -87,7 +87,7 @@ CREATE TABLE sightings(
 
 
     INSERT INTO sightings (user_id, sighting) 
-    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.466653, 52.625122]},"properties": {"comName": "Great Spotted Woodpecker", "sciName": "Dendrocopos major"}}');
+    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.466653, 52.625122]},"properties": {"comName": "Great Spotted Woodpecker", "sciName": "Dendrocopos major", "date": "23/08/2022, 11:11:12"}}');
 
     INSERT INTO sightings (user_id, sighting) 
-    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.471460, 52.627709]},"properties": {"comName": "Common Wood-Pigeon", "sciName": "Columba palumbus"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.469544, 52.624955]},"properties": {"comName": "Mandarin Duck", "sciName": "Aix galericulata"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.457460, 52.620164]},"properties": {"comName": "Black-headed Gull", "sciName": "Chroicocephalus ridibundus"}}');
+    VALUES (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.471460, 52.627709]},"properties": {"comName": "Common Wood-Pigeon", "sciName": "Columba palumbus", "date": "24/08/2022, 17:22:12"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.469544, 52.624955]},"properties": {"comName": "Mandarin Duck", "sciName": "Aix galericulata", "date": "24/08/2022, 18:09:12"}}'), (1, '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [13.457460, 52.620164]},"properties": {"comName": "Black-headed Gull", "sciName": "Chroicocephalus ridibundus", "date": "24/08/2022, 18:21:33"}}');

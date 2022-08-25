@@ -35,7 +35,7 @@ export default function App() {
         fetch("/api/data.json")
             .then((res) => res.json())
             .then((data) => {
-                console.log("response from server api data, data", data);
+                // console.log("response from server api data, data", data);
                 setData(data);
             });
     }, []);
@@ -44,7 +44,7 @@ export default function App() {
         fetch("/api/user-data.json")
             .then((res) => res.json())
             .then((userData) => {
-                console.log("response from server, user data", userData);
+                // console.log("response from server, user data", userData);
                 setUserData(userData);
             });
     }, []);

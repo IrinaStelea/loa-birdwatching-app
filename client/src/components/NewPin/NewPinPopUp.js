@@ -25,6 +25,9 @@ export default function NewPinPopUp({ togglePopUp, userPin }) {
                     properties: {
                         comName: "Common Swift",
                         sciName: "Apus apus",
+                        date: new Date().toLocaleString("en-GB", {
+                            timeZone: "Europe/Brussels",
+                        }),
                     },
                 },
             }),

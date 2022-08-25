@@ -21,6 +21,7 @@ module.exports.convertToGeojson = (data) => {
             properties: {
                 comName: d.comName,
                 sciName: d.sciName,
+                date: d.obsDt,
             },
         });
     });

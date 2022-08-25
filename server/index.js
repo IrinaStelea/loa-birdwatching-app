@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const db = require("./db.js");
 const jsonData = require("./data.json");
+const birdData = require("./birddata.json");
 
 const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");
@@ -108,17 +109,26 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        console.log("result in get user data", result.rows);
+        // console.log("result in get user data", result.rows);
         let userData = [];
         for (let item of result.rows) {
             userData.push(item.sighting);
         }
-        console.log("user data backend", userData);
+        // console.log("user data backend", userData);
         return res.json(userData);
     } catch (err) {
         console.log("error in getting user sightings");
         return res.json({ message: "Something went wrong, please try again" });
     }
+});
+
+//serve the json with bird data
+app.get("/api/birddata/:id", function (req, res) {
+    let name = req.params.id;
+    console.log("name", name);
+    const bird = birdData.find((bird) => bird.sciName === name);
+    console.log("get bird info single bird", bird);
+    res.json({ image: bird.image });
 });
 
 //add new sighting
