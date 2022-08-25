@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 export default function NewPin({ userPin }) {
     const dispatch = useDispatch();
     const [popUpVisible, setPopUp] = useState(true);
-    const togglePopUp = () => {
+    const togglePinPopUp = () => {
         setPopUp(!popUpVisible);
         dispatch(resetUserMarker());
     };
@@ -18,7 +18,7 @@ export default function NewPin({ userPin }) {
                 <>
                     <img id="new-pin" src="../../newMarker.png" alt="new pin" />
 
-                    <NewPinPopUp userPin={userPin} togglePopUp={togglePopUp} />
+                    <NewPinPopUp userPin={userPin} togglePinPopUp={togglePinPopUp} />
                 </>
             )}
         </>

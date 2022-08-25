@@ -1,16 +1,4 @@
-/* .new-pin-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-items: center;
-} */
-
-#new-pin {
-    width: 5vw;
-    position: absolute;
-}
-
-.new-pin-pop-up {
+.popup {
     background-color: white;
     border-radius: 5px;
     padding: 1vh 2vw 2vh 2vw;
@@ -26,6 +14,10 @@
     width: 70vw;
 }
 
-/* #close-button {
-    align-self: flex-end;
-} */
+#bird-thumbnail {
+    object-fit: cover;
+    width: 30vw;
+    height: 30vw;
+    border: 1px solid transparent;
+    border-radius: 50%;
+}

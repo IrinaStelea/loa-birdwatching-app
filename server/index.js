@@ -123,12 +123,13 @@ app.get("/api/user-data.json", async (req, res) => {
 });
 
 //serve the json with bird data
-app.get("/api/birddata/:id", function (req, res) {
-    let name = req.params.id;
-    console.log("name", name);
-    const bird = birdData.find((bird) => bird.sciName === name);
-    console.log("get bird info single bird", bird);
-    res.json({ image: bird.image });
+app.get("/api/birddata.json", function (req, res) {
+    // let name = req.params.id;
+    // console.log("name", name);
+    // const bird = birdData.find((bird) => bird.sciName === name);
+    // console.log("get bird info single bird", bird);
+    // res.json({ image: bird.image });
+    res.json(birdData);
 });
 
 //add new sighting

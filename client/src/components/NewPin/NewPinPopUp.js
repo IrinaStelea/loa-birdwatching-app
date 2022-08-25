@@ -1,6 +1,6 @@
 import "./NewPin.css";
 import { useState } from "react";
-export default function NewPinPopUp({ togglePopUp, userPin }) {
+export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [sighting, setSighting] = useState("");
     console.log("uesr pin in new pin pop up component", userPin);
 
@@ -10,6 +10,14 @@ export default function NewPinPopUp({ togglePopUp, userPin }) {
     };
 
     const submitPin = (e) => {
+        const date = new Date()
+            .toLocaleString("en-GB", {
+                timeZone: "Europe/Brussels",
+            })
+            .split(",")
+            .join("");
+        console.log("date", date);
+
         fetch("/api/submit-pin", {
             method: "POST",
             headers: {
@@ -25,9 +33,7 @@ export default function NewPinPopUp({ togglePopUp, userPin }) {
                     properties: {
                         comName: "Common Swift",
                         sciName: "Apus apus",
-                        date: new Date().toLocaleString("en-GB", {
-                            timeZone: "Europe/Brussels",
-                        }),
+                        date: date,
                     },
                 },
             }),
@@ -42,8 +48,8 @@ export default function NewPinPopUp({ togglePopUp, userPin }) {
     };
     return (
         <>
-            <div className="pop-up">
-                <h4 id="close-button" onClick={togglePopUp}>
+            <div className="new-pin-pop-up">
+                <h4 id="close-button" onClick={togglePinPopUp}>
                     x
                 </h4>
                 <h4>Add a new bird sighting</h4>

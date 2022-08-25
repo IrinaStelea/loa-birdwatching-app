@@ -1,11 +1,14 @@
 import "./Map.css";
 import { useRef, useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { useDispatch } from "react-redux";
 import {
     addUserMarker,
     resetUserMarker,
 } from "../redux/new-user-marker/slice.js";
+// import Popup from "./Popup/Popup.js";
+import { openPopup } from "../redux/popup/slice.js";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -27,7 +30,9 @@ export default function Map({
     const [markersButtonView, setMarkersButtonView] = useState(1);
     const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
     const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
-    const [birdImg, setBirdImage] = useState();
+    // const [birdImg, setBirdImage] = useState();
+
+    const popUpRef = useRef(new mapboxgl.Popup({ offset: 15 }));
 
     useEffect(() => {
         if (map.current) return; // initialize map only once
@@ -62,18 +67,35 @@ export default function Map({
             const comName = e.features[0].properties.comName;
             const sciName = e.features[0].properties.sciName;
             const date = e.features[0].properties.date;
+            dispatch(openPopup({ coordinates, comName, sciName, date }));
             // const birdImg = birdData.find(
             //     (bird) => bird.sciName === e.features[0].properties.sciName
             // );
 
-            (async () => {
-                const birdImg = await fetch(`/api/birddata/${sciName}`)
-                    .then((resp) => resp.json())
-                    .then((res) => {
-                        console.log("response fetch bird data", res);
-                        setBirdImage(res.image);
-                    });
-            })();
+            // (async () => {
+            //     const image = await fetch(`/api/birddata/${sciName}`).then(
+            //         (resp) => resp.json()
+            //     );
+            //     // .then((res) => {
+            //     //     console.log("response fetch bird data", res);
+            //     //     setBirdImage(res.image);
+            //     // });
+            //     setBirdImage(image.image);
+            // })();
+
+            // const popupNode = document.createElement("div");
+            // ReactDOM.render(
+            //     <Popup
+            //         comName={e.features[0].properties.comName}
+            //         sciName={e.features[0].properties.sciName}
+            //         date={e.features[0].properties.date}
+            //     />,
+            //     popupNode
+            // );
+            // popUpRef.current
+            //     .setLngLat(coordinates)
+            //     .setDOMContent(popupNode)
+            //     .addTo(map.current);
 
             //fetch bird image
             // fetch(`/api/birddata/${sciName}`)
@@ -85,22 +107,22 @@ export default function Map({
             //     });
 
             // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
-            console.log("bird img after click", birdImg);
-            //set marker
+            // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            //     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            // }
+            // console.log("bird img after click", birdImg);
+            // //set marker
 
-            new mapboxgl.Popup({ offset: 25 })
-                .setLngLat(coordinates)
-                .setHTML(
-                    `<h2>${comName}</h2><p>${sciName}</p><img id="bird-thumbnail" src=${birdImg} /><p>Spotted on ${date
-                        .slice(0, 10)
-                        .split("-")
-                        .reverse()
-                        .join("-")} at ${date.slice(11, 19)}</p>`
-                )
-                .addTo(map.current);
+            // new mapboxgl.Popup({ offset: 25 })
+            //     .setLngLat(coordinates)
+            //     .setHTML(
+            //         `<h2>${comName}</h2><p>${sciName}</p><img id="bird-thumbnail" src=${birdImg} /><p>Spotted on ${date
+            //             .slice(0, 10)
+            //             .split("-")
+            //             .reverse()
+            //             .join("-")} at ${date.slice(11, 19)}</p>`
+            //     )
+            //     .addTo(map.current);
         });
 
         //add pop-up with info to each existing user marker
@@ -111,22 +133,23 @@ export default function Map({
             const comName = e.features[0].properties.comName;
             const sciName = e.features[0].properties.sciName;
             const date = e.features[0].properties.date;
-            // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
+            dispatch(openPopup({ coordinates, comName, sciName, date }));
+            // // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
+            // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            //     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            // }
 
-            //set marker
-            new mapboxgl.Popup({ offset: 25 })
-                .setLngLat(coordinates)
-                .setHTML(
-                    `<h2>${comName}</h2><p>${sciName}</p><p>Spotted by you on ${date
-                        .slice(0, 10)
-                        .split("-")
-                        .reverse()
-                        .join("-")} at ${date.slice(11, 17)}</p>`
-                )
-                .addTo(map.current);
+            // //set marker
+            // new mapboxgl.Popup({ offset: 25 })
+            //     .setLngLat(coordinates)
+            //     .setHTML(
+            //         `<h2>${comName}</h2><p>${sciName}</p><p>Spotted by you on ${date
+            //             .slice(0, 10)
+            //             .split("-")
+            //             .reverse()
+            //             .join("-")} at ${date.slice(11, 17)}</p>`
+            //     )
+            //     .addTo(map.current);
         });
 
         //add new pin on user click
