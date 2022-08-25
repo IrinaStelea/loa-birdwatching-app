@@ -1,13 +1,32 @@
 import "./NewPin.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
-    const [sighting, setSighting] = useState("");
-    console.log("uesr pin in new pin pop up component", userPin);
+    const [value, setValue] = useState("");
+    const [birds, setBirds] = useState([]);
 
+    // console.log("uesr pin in new pin pop up component", userPin);
+    const birdList = useSelector(
+        (state) => state.birdData && state.birdData.map((bird) => bird.comName)
+    );
+
+    console.log("bird list in component", birdList);
     const onChange = (e) => {
-        setSighting(e.currentTarget.value);
-        console.log("e target value", e.currentTarget.value);
+        setValue(e.target.value);
+        console.log("e target value", e.target.value);
     };
+
+    // useEffect(() => {
+    //     //   let abort;
+    //     //   console.log("useEffect on mount is running");
+    //     (async () => {
+    //         const data = await fetch(`/api/getbirdlist`).then((response) =>
+    //             response.json()
+    //         );
+    //         //only update user data if abort is falsey
+    //         console.log("data from fetch birds", data);
+    //     })();
+    // }, []);
 
     const submitPin = (e) => {
         const date = new Date()
@@ -53,15 +72,22 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                     x
                 </h4>
                 <h4>Add a new bird sighting</h4>
-                <input
-                    type="text"
-                    name="bird"
-                    placeholder="Bird name"
-                    onChange={onChange}
-                ></input>
-                <button id="save" type="submit" onClick={submitPin}>
-                    Save
-                </button>
+                    <input
+                        type="text"
+                        list="birdlist"
+                        id="birds"
+                        name="birds"
+                        onChange={onChange}
+                    />
+                    <datalist id="birdlist">
+                        {birdList.map((bird) => (
+                            <option key={bird} value={bird}></option>
+                        ))}
+                    </datalist>
+                    <button id="save" type="submit" onClick={submitPin}>
+                        Save
+                    </button>
+               
             </div>
         </>
     );
