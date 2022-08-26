@@ -1,32 +1,29 @@
 import "./NewPin.css";
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-export default function NewPinPopUp({ togglePinPopUp, userPin }) {
-    const [value, setValue] = useState("");
-    const [birds, setBirds] = useState([]);
+import DatalistInput from "react-datalist-input";
+import "react-datalist-input/dist/styles.css";
 
-    // console.log("uesr pin in new pin pop up component", userPin);
+export default function NewPinPopUp({ togglePinPopUp, userPin }) {
+    const [selectedBird, setSelectedBird] = useState(null);
+
     const birdList = useSelector(
-        (state) => state.birdData && state.birdData.map((bird) => bird.comName)
+        (state) =>
+            state.birdData &&
+            state.birdData.map((bird, idx) => ({
+                id: idx,
+                value: bird.comName,
+                sciName: bird.sciName,
+                img: bird.image,
+            }))
     );
 
     console.log("bird list in component", birdList);
-    const onChange = (e) => {
-        setValue(e.target.value);
-        console.log("e target value", e.target.value);
-    };
 
-    // useEffect(() => {
-    //     //   let abort;
-    //     //   console.log("useEffect on mount is running");
-    //     (async () => {
-    //         const data = await fetch(`/api/getbirdlist`).then((response) =>
-    //             response.json()
-    //         );
-    //         //only update user data if abort is falsey
-    //         console.log("data from fetch birds", data);
-    //     })();
-    // }, []);
+    const onSelect = useCallback((bird) => {
+        console.log("selected bird", bird);
+        setSelectedBird(bird);
+    }, []);
 
     const submitPin = (e) => {
         const date = new Date()
@@ -50,8 +47,8 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                         coordinates: [userPin.lng, userPin.lat],
                     },
                     properties: {
-                        comName: "Common Swift",
-                        sciName: "Apus apus",
+                        comName: selectedBird.value,
+                        sciName: selectedBird.sciName,
                         date: date,
                     },
                 },
@@ -65,30 +62,65 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                 console.log("error in fetch add new pin", err);
             });
     };
+
     return (
         <>
             <div className="new-pin-pop-up">
-                <h4 id="close-button" onClick={togglePinPopUp}>
+                {/* <h4 id="close-button" onClick={togglePinPopUp}>
                     x
-                </h4>
+                </h4> */}
                 <h4>Add a new bird sighting</h4>
-                    <input
-                        type="text"
-                        list="birdlist"
-                        id="birds"
-                        name="birds"
-                        onChange={onChange}
-                    />
-                    <datalist id="birdlist">
-                        {birdList.map((bird) => (
-                            <option key={bird} value={bird}></option>
-                        ))}
-                    </datalist>
-                    <button id="save" type="submit" onClick={submitPin}>
-                        Save
-                    </button>
-               
+
+                <DatalistInput
+                    placeholder="Select a bird"
+                    showLabel={false}
+                    items={birdList}
+                    onSelect={onSelect}
+                />
+                {selectedBird && (
+                    <>
+                        <p>{selectedBird.sciName}</p>
+                        <img
+                            id="bird-thumbnail"
+                            src={selectedBird.img}
+                            alt={selectedBird.comName}
+                        />
+                    </>
+                )}
+                <button id="save" type="submit" onClick={submitPin}>
+                    Save
+                </button>
+                <button id="cancel" onClick={togglePinPopUp}>
+                    Cancel
+                </button>
             </div>
         </>
     );
+
+    // return (
+    //     <>
+    //         <div className="new-pin-pop-up">
+    //             <h4 id="close-button" onClick={togglePinPopUp}>
+    //                 x
+    //             </h4>
+    //             <h4>Add a new bird sighting</h4>
+    //                 <input
+    //                     type="text"
+    //                     list="birdlist"
+    //                     id="birds"
+    //                     name="birds"
+    //                     onChange={onChange}
+    //                 />
+    //                 <datalist id="birdlist">
+    //                     {birdList.map((bird) => (
+    //                         <option key={bird} value={bird}></option>
+    //                     ))}
+    //                 </datalist>
+    //                 <button id="save" type="submit" onClick={submitPin}>
+    //                     Save
+    //                 </button>
+
+    //         </div>
+    //     </>
+    // );
 }
