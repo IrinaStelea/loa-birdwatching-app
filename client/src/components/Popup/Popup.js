@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { closePopup } from "../../redux/popup/slice";
 import "./Popup.css";
+import DeleteUserMarker from "./DeleteUserMarker.js";
 
 export default function Popup() {
     //  const [popUpVisible, setPopUp] = useState(true);
@@ -13,7 +14,9 @@ export default function Popup() {
     };
 
     const popup = useSelector((state) => state.popupInfo);
-    console.log("popupinfo in popup componeent", popup);
+    const isUserPopup = useSelector((state) => state.isUserPopup);
+    console.log("popupinfo in popup component", popup);
+    console.log("isUserPopup in popup component", isUserPopup);
     const birdImg = useSelector(
         (state) =>
             state.birdData &&
@@ -40,6 +43,9 @@ export default function Popup() {
                     {popup.date.slice(0, 10).split("-").reverse().join("-")} at{" "}
                     {popup.date.slice(11, 16)}
                 </p>
+                {isUserPopup && (
+                    <DeleteUserMarker info={popup} togglePopUp={togglePopUp} />
+                )}
             </div>
         </>
         // <div className="popup">

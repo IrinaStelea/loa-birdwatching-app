@@ -6,11 +6,12 @@ import NewPin from "./NewPin/NewPin.js";
 import { useSelector, useDispatch } from "react-redux";
 import { receiveBirdData } from "../redux/bird-data/slice";
 import Popup from "./Popup/Popup";
+import { receiveUserData } from "../redux/user-markers/slice";
 
 export default function App() {
     const dispatch = useDispatch();
     const [data, setData] = useState(null);
-    const [userData, setUserData] = useState(null);
+    // const [userData, setUserData] = useState(null);
     const [userLng, setLng] = useState();
     const [userLat, setLat] = useState();
     const [userLocationModal, setUserLocationModal] = useState(true);
@@ -47,8 +48,8 @@ export default function App() {
         fetch("/api/user-data.json")
             .then((res) => res.json())
             .then((userData) => {
-                // console.log("response from server, user data", userData);
-                setUserData(userData);
+                console.log("response from server, user data", userData);
+                dispatch(receiveUserData(userData));
             });
     }, []);
 
@@ -70,12 +71,7 @@ export default function App() {
             <div className="map">
                 {/* <UserLocation setUserLocation={setUserLocation} /> */}
                 {/* {!userLocationModal && ( */}
-                <Map
-                    data={data}
-                    userData={userData}
-                    userLng={userLng}
-                    userLat={userLat}
-                />
+                <Map data={data} userLng={userLng} userLat={userLat} />
                 {/* )} */}
             </div>
             {Object.keys(userPin).length !== 0 && <NewPin userPin={userPin} />}

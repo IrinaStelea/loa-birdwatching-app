@@ -1,12 +1,13 @@
 import "./NewPin.css";
 import { useState, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DatalistInput from "react-datalist-input";
+import { addMarker } from "../../redux/user-markers/slice";
 import "react-datalist-input/dist/styles.css";
 
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);
-
+    const dispatch = useDispatch();
     const birdList = useSelector(
         (state) =>
             state.birdData &&
@@ -57,6 +58,8 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             .then((response) => response.json())
             .then((data) => {
                 console.log("data after add new pin", data);
+                dispatch(addMarker(data));
+                togglePinPopUp();
             })
             .catch((err) => {
                 console.log("error in fetch add new pin", err);
@@ -66,11 +69,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     return (
         <>
             <div className="new-pin-pop-up">
-                {/* <h4 id="close-button" onClick={togglePinPopUp}>
-                    x
-                </h4> */}
                 <h4>Add a new bird sighting</h4>
-
                 <DatalistInput
                     placeholder="Select a bird"
                     showLabel={false}

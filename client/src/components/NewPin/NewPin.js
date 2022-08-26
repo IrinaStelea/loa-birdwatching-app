@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./NewPin.css";
 import NewPinPopUp from "./NewPinPopUp";
 import { resetUserMarker } from "../../redux/new-user-marker/slice";
@@ -18,7 +17,10 @@ export default function NewPin({ userPin }) {
                 <>
                     <img id="new-pin" src="../../newMarker.png" alt="new pin" />
 
-                    <NewPinPopUp userPin={userPin} togglePinPopUp={togglePinPopUp} />
+                    <NewPinPopUp
+                        userPin={userPin}
+                        togglePinPopUp={togglePinPopUp}
+                    />
                 </>
             )}
         </>

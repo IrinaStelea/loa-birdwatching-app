@@ -21,3 +21,11 @@
     border: 1px solid transparent;
     border-radius: 50%;
 }
+
+.popup h2 {
+    text-align: center;
+}
+
+#close {
+    cursor: pointer;
+}

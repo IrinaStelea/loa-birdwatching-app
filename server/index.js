@@ -17,7 +17,6 @@ app.use(
     cookieSession({
         secret: COOKIE_SECRET, //used to generate the 2nd cookie used to verify the integrity of 1st cookie
         maxAge: 1000 * 60 * 60 * 24 * 14,
-        sameSite: true,
     })
 );
 
@@ -31,6 +30,16 @@ app.use(express.static(path.resolve(__dirname, "../client/build")));
 // app.get("/api", (req, res) => {
 //     res.json({ message: "Hello from server!" });
 // });
+
+//https middleware
+if (process.env.NODE_ENV == "production") {
+    app.use((req, res, next) => {
+        if (req.headers["x-forwarded-proto"].startsWith("https")) {
+            return next();
+        }
+        res.redirect(`https://${req.hostname}${req.url}`);
+    });
+}
 
 app.post("/api/register", (req, res) => {
     // console.log("req body", req.body);
@@ -109,13 +118,9 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        // console.log("result in get user data", result.rows);
-        let userData = [];
-        for (let item of result.rows) {
-            userData.push(item.sighting);
-        }
+        console.log("result in get user data", result.rows);
         // console.log("user data backend", userData);
-        return res.json(userData);
+        return res.json(result.rows);
     } catch (err) {
         console.log("error in getting user sightings");
         return res.json({ message: "Something went wrong, please try again" });
@@ -139,10 +144,21 @@ app.post("/api/submit-pin", async (req, res) => {
             req.session.userId,
             req.body.geoJSON
         );
-        console.log("result from adding pin", result.rows);
-        return res.json({ message: "success" });
+        console.log("result from adding pin", result.rows[0]);
+        return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);
+    }
+});
+
+//delete user sighting
+app.post("/api/delete-user-marker", async (req, res) => {
+    try {
+        const result = await db.deleteSighting(req.body.id);
+        // console.log("result deleting sighting", result);
+        return res.json({ message: "success" });
+    } catch (error) {
+        console.log("error in deleting sighting", error);
     }
 });
 
