@@ -53,6 +53,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         //add pop-up with info to each API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
+            e.clickOnFirstLayer = true;
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
@@ -65,6 +66,10 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         //add pop-up with info to each existing user marker
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
+            if (e.clickOnFirstLayer) {
+                console.log("preventing click on user layer");
+                return;
+            }
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
@@ -154,9 +159,9 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             type: "circle",
             source: "sightings",
             paint: {
-                "circle-radius": 8,
+                "circle-radius": 10,
                 "circle-stroke-width": 2,
-                "circle-color": "green",
+                "circle-color": "#353d60",
                 "circle-stroke-color": "white",
             },
         });
@@ -168,6 +173,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const showMyMarkers = (e) => {
         e.stopPropagation();
         // console.log("data geojson in app", data);
+        let hoveredStateId = null;
         let userMarkers = userData.map((marker) => {
             return { ...marker.sighting, id: marker.id };
         });
@@ -180,17 +186,68 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             },
         });
 
+        //hover layer
+        map.current.addLayer({
+            id: "user-sightings-hover",
+            type: "circle",
+            source: "user-sightings",
+            paint: {
+                "circle-radius": 10,
+                "circle-stroke-width": 2,
+                "circle-color": "green",
+                "circle-opacity": [
+                    "case",
+                    ["boolean", ["feature-state", "hover"], false],
+                    1,
+                    0,
+                ],
+                "circle-stroke-color": "white",
+            },
+        });
+
         map.current.addLayer({
             id: "user-sightings",
             type: "circle",
             source: "user-sightings",
             paint: {
-                "circle-radius": 8,
+                "circle-radius": 10,
                 "circle-stroke-width": 2,
-                "circle-color": "red",
+                "circle-color": "#f5756a",
                 "circle-stroke-color": "white",
             },
         });
+
+        // When the user moves their mouse over the state-fill layer, we'll update the
+        // feature state for the feature under the mouse.
+        map.current.on("mousemove", "user-sightings-hover", (e) => {
+            console.log("inside mouse move");
+            if (e.features.length > 0) {
+                if (hoveredStateId !== null) {
+                    map.current.setFeatureState(
+                        { source: "user-sightings", id: hoveredStateId },
+                        { hover: false }
+                    );
+                }
+                hoveredStateId = e.features[0].id;
+                console.log(e.features[0].id);
+                map.current.setFeatureState(
+                    { source: "user-sightings", id: hoveredStateId },
+                    { hover: true }
+                );
+            }
+        });
+
+        map.current.on("mouseleave", "user-sightings-hover", () => {
+            console.log("inside mouse leave");
+            if (hoveredStateId !== null) {
+                map.current.setFeatureState(
+                    { source: "user-sightings", id: hoveredStateId },
+                    { hover: false }
+                );
+            }
+            hoveredStateId = null;
+        });
+
         setUserMarkersLayer(map.current.getSource("user-sightings"));
         // console.log("user markers layer", userMarkersLayer);
         setMyMarkersButtonView(2);
