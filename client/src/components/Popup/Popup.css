@@ -11,7 +11,7 @@
     /* height: 50vh; */
     width: 80vw;
     gap: 1vh;
-    border: 1px solid #353d60; 
+    border: 1px solid #353d60;
 }
 
 #bird-thumbnail {
@@ -50,7 +50,6 @@
     color: slategray;
     text-decoration: underline;
 }
-
 
 #delete:hover {
     color: darkslategray;

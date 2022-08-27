@@ -7,7 +7,7 @@ import {
     BrowserRouter as Router,
     Route,
     Routes,
-    // Navigate,
+    Redirect,
 } from "react-router-dom";
 
 export default function Welcome() {
@@ -22,9 +22,7 @@ export default function Welcome() {
                             path="/reset-password"
                             component={ResetPassword}
                         ></Route> */}
-                    {/* <Route path="*">
-                    <Navigate to="/" />
-                </Route> */}
+                    <Route path="*" element={<StartScreen />} />
                 </Routes>
             </Router>
         </>

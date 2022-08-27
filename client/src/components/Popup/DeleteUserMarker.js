@@ -1,7 +1,10 @@
 import { useDispatch } from "react-redux";
 import { deleteMarker } from "../../redux/user-markers/slice";
+import { useState } from "react";
 export default function DeleteUserMarker({ info, togglePopUp }) {
     const dispatch = useDispatch();
+    const [confirmation, setConfirmation] = useState(false);
+
     const deleteUserMarker = () => {
         const id = info.id;
         // console.log("id in delete user marker", id);
@@ -25,8 +28,20 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
 
     // console.log("info in delete user marker", info);
     return (
-        <p id="delete" onClick={deleteUserMarker}>
-            Delete this sighting
-        </p>
+        <>
+            <p id="delete" onClick={() => setConfirmation(true)}>
+                Delete this sighting
+            </p>
+            {confirmation && (
+                <>
+                    <p id="delete" onClick={deleteUserMarker}>
+                        Yes, delete
+                    </p>
+                    <p id="delete" onClick={() => setConfirmation(false)}>
+                        Cancel
+                    </p>
+                </>
+            )}
+        </>
     );
 }

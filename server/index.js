@@ -162,6 +162,12 @@ app.post("/api/delete-user-marker", async (req, res) => {
     }
 });
 
+app.get("/logout", (req, res) => {
+    req.session = null;
+    console.log("inside the logout route");
+    return res.json({});
+});
+
 // All other GET requests not handled before will return our React app
 app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client/public", "index.html"));

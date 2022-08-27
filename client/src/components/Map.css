@@ -1,11 +1,12 @@
 .map-container {
     width: 100vw;
     height: 100vh;
+    background-color: beige;
 }
 
 .sidebar {
     background-color: rgba(35, 55, 75, 0.9);
-    color: #fff;
+    color: white;
     padding: 6px 12px;
     font-family: monospace;
     z-index: 1;
@@ -15,43 +16,60 @@
     margin: 12px;
     border-radius: 4px;
 }
-
-#show-birds {
-    background-color: rgba(35, 55, 75, 0.9);
-    color: #fff;
-    padding: 1vw;
-    font-family: monospace;
+.button-container {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 12px;
-    border-radius: 4px;
+    bottom: 4vh;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
-#toggle-layer {
-    background-color: rgba(35, 55, 75, 0.9);
-    color: #fff;
-    padding: 1vw;
-    font-family: monospace;
-    position: absolute;
-    bottom: 0;
-    left: 0;
+#show-birds,
+#my-sightings,
+#show-birds-visible,
+#my-sightings-visible {
+    background-color: rgba(21, 24, 38, 0.8);
+    color: white;
+    padding: 2vw 4vw;
+    font-family: "Work Sans", sans-serif;
+    font-size: 1.2em;
+    font-weight: 600;
     margin: 12px;
-    border-radius: 4px;
+    border-radius: 5px;
+    border: 1px solid rgba(21, 24, 38, 0.8);
 }
 
-#my-sightings {
-    background-color: rgba(35, 55, 75, 0.9);
-    color: #fff;
-    padding: 1vw;
-    font-family: monospace;
-    position: absolute;
-    bottom: 0;
-    right: 0;
+#show-birds-visible {
+    background-color: #758bfd;
+    border: 1px solid #758bfd;
+}
+
+#my-sightings-visible {
+    background-color: #f5756a;
+    border: 1px solid #f5756a;
+}
+#logout {
+    background-color: rgba(21, 24, 38, 0.8);
+    padding: 2vw 4vw;
     margin: 12px;
-    border-radius: 4px;
+    border-radius: 5px;
+    border: 1px solid rgba(21, 24, 38, 0.8);
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+#logout img {
+    width: 7vw;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    object-fit: contain;
 }
 
 .mapboxgl-popup-content {
     text-align: center;
+}
+
+/* IMPORTANT: remove this later on */
+.mapboxgl-ctrl-logo {
+    display: none !important;
 }

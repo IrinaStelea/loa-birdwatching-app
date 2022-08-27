@@ -8,6 +8,8 @@ import { receiveBirdData } from "../redux/bird-data/slice";
 import Popup from "./Popup/Popup";
 import { receiveUserData } from "../redux/user-markers/slice";
 
+import StartScreen from "./StartScreen";
+
 export default function App() {
     const dispatch = useDispatch();
     const [data, setData] = useState(null);

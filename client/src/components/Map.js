@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
+import Logout from "./Logout.js";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -95,8 +96,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 console.log("preventing click on basemap");
                 return;
             }
-            // console.log("click event on main map", e);
-            // console.log("zoom on click", Math.max(zoom, 18));
+
             var coordinates = e.lngLat;
             // map.current.flyTo({
             //     center: coordinates,
@@ -135,28 +135,32 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     }, [zoom]);
 
     const toggleMarkersLayer = () => {
-        !markersLayerVisible
-            ? map.current.setLayoutProperty("sightings", "visibility", "none")
-            : map.current.setLayoutProperty(
-                  "sightings",
-                  "visibility",
-                  "visible"
-              );
+        if (!markersLayerVisible) {
+            map.current.setLayoutProperty("sightings", "visibility", "none");
+            setMarkersButtonView(3);
+        } else {
+            map.current.setLayoutProperty("sightings", "visibility", "visible");
+            setMarkersButtonView(2);
+        }
         setMarkersLayer(!markersLayerVisible);
     };
 
     const toggleMyMarkersLayer = () => {
-        !myMarkersLayerVisible
-            ? map.current.setLayoutProperty(
-                  "user-sightings",
-                  "visibility",
-                  "none"
-              )
-            : map.current.setLayoutProperty(
-                  "user-sightings",
-                  "visibility",
-                  "visible"
-              );
+        if (!myMarkersLayerVisible) {
+            map.current.setLayoutProperty(
+                "user-sightings",
+                "visibility",
+                "none"
+            );
+            setMyMarkersButtonView(3);
+        } else {
+            map.current.setLayoutProperty(
+                "user-sightings",
+                "visibility",
+                "visible"
+            );
+            setMyMarkersButtonView(2);
+        }
         setMyMarkersLayer(!myMarkersLayerVisible);
     };
 
@@ -302,26 +306,45 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 </div>
                 <div ref={mapContainer} className="map-container" />
             </div>
-            {markersButtonView === 1 && (
-                <button id="show-birds" onClick={showMarkers}>
-                    Birds around me
-                </button>
-            )}
-            {markersButtonView === 2 && (
-                <button id="show-birds" onClick={toggleMarkersLayer}>
-                    Toggle app markers
-                </button>
-            )}
-            {myMarkersButtonView === 1 && (
-                <button id="my-sightings" onClick={showMyMarkers}>
-                    My sightings
-                </button>
-            )}
-            {myMarkersButtonView === 2 && (
-                <button id="my-sightings" onClick={toggleMyMarkersLayer}>
-                    Toggle my sightings
-                </button>
-            )}
+            <div className="button-container">
+                {markersButtonView === 1 && (
+                    <button id="show-birds" onClick={showMarkers}>
+                        All birds
+                    </button>
+                )}
+                {markersButtonView === 2 && (
+                    <button
+                        id="show-birds-visible"
+                        onClick={toggleMarkersLayer}
+                    >
+                        All birds
+                    </button>
+                )}
+                {markersButtonView === 3 && (
+                    <button id="show-birds" onClick={toggleMarkersLayer}>
+                        All birds
+                    </button>
+                )}
+                {myMarkersButtonView === 1 && (
+                    <button id="my-sightings" onClick={showMyMarkers}>
+                        My sightings
+                    </button>
+                )}
+                {myMarkersButtonView === 2 && (
+                    <button
+                        id="my-sightings-visible"
+                        onClick={toggleMyMarkersLayer}
+                    >
+                        My sightings
+                    </button>
+                )}
+                {myMarkersButtonView === 3 && (
+                    <button id="my-sightings" onClick={toggleMyMarkersLayer}>
+                        My sightings
+                    </button>
+                )}{" "}
+                <Logout />
+            </div>
         </>
     );
 }

@@ -10,11 +10,13 @@ export default function Login() {
     return (
         <>
             <div className="container">
-                <img
-                    id="logo"
-                    src="../../Loa-logo_transparent.png"
-                    alt="Loa logo"
-                />
+                <a href="/">
+                    <img
+                        id="logo"
+                        src="../../Loa-logo_transparent.png"
+                        alt="Loa logo"
+                    />
+                </a>
                 {error && <p className="error">{error}</p>}
                 <h2>Login to start using Loa:</h2>
                 <form

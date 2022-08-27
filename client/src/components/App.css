@@ -41,7 +41,7 @@ body {
 }
 
 #footnote {
-    font-size: 1em;
+    font-size: 1.4em;
     font-weight: 400;
     margin-top: 3vh;
     color: white;
@@ -52,6 +52,13 @@ body {
 }
 #footnote a:visited {
     color: white;
+}
+.form-container label {
+    font-size: 1.2em;
+}
+
+.form-container input:not(:last-of-type) {
+    font-size: 1.2em;
 }
 
 .form-container input:last-of-type {

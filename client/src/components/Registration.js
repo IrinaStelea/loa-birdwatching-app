@@ -11,13 +11,15 @@ export default function Registration() {
     return (
         <>
             <div className="container">
-                <img
-                    id="logo"
-                    src="../../Loa-logo_transparent.png"
-                    alt="Loa logo"
-                />
+                <a href="/">
+                    <img
+                        id="logo"
+                        src="../../Loa-logo_transparent.png"
+                        alt="Loa logo"
+                    />
+                </a>
                 {error && <p className="error">{error}</p>}
-                <h2>Register to start using the app:</h2>
+                <h2>Register to start using Loa:</h2>
                 <form
                     id="registration"
                     className="form-container"

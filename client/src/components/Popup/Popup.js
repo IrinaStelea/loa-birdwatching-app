@@ -31,13 +31,13 @@ export default function Popup() {
                     x
                 </h4>
                 <h2>{popup.comName}</h2>
-                <p class="sci-name">{popup.sciName}</p>
+                <p className="sci-name">{popup.sciName}</p>
                 <img
                     id="bird-thumbnail"
                     src={birdImg[0].image}
                     alt={popup.comName}
                 />
-                <p class="date">
+                <p className="date">
                     Seen on{" "}
                     {popup.date.slice(0, 10).split("-").reverse().join("-")} at{" "}
                     {popup.date.slice(11, 16)}
@@ -46,6 +46,7 @@ export default function Popup() {
                     <DeleteUserMarker info={popup} togglePopUp={togglePopUp} />
                 )}
             </div>
+
         </>
         // <div className="popup">
         //     <h2 className="comName">{comName}</h2>
