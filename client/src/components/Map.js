@@ -22,8 +22,10 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
     const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
     const userData = useSelector((state) => state.userData);
-    console.log("user data in map component", userData);
+    // console.log("user data in map component", userData);
     const [userMarkersLayer, setUserMarkersLayer] = useState();
+
+    const popup = useSelector((state) => state.popupInfo);
 
     useEffect(() => {
         if (map.current) return; // initialize map only once
@@ -64,12 +66,14 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         });
 
         //add pop-up with info to each existing user marker
+
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
             if (e.clickOnFirstLayer) {
-                console.log("preventing click on user layer");
+                // console.log("preventing click on user layer");
                 return;
             }
+
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
@@ -86,34 +90,49 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         //add new pin on user click
         map.current.on("click", function addMarker(e) {
-            console.log("e in click", e);
+            // console.log("e in click", e);
             if (e.clickOnLayer) {
                 console.log("preventing click on basemap");
                 return;
             }
-            console.log("click event on main map", e);
-            console.log("zoom on click", Math.max(zoom, 18));
+            // console.log("click event on main map", e);
+            // console.log("zoom on click", Math.max(zoom, 18));
             var coordinates = e.lngLat;
-            map.current.flyTo({
-                center: coordinates,
-                zoom: Math.max(18, zoom),
-            });
+            // map.current.flyTo({
+            //     center: coordinates,
+            //     // zoom: Math.max(18, zoom),
+            // });
             dispatch(addUserMarker(coordinates));
-            // const userMarker =
-            // new mapboxgl.Marker()
-            //     .setLngLat(coordinates)
-            //     .addTo(map.current)
-            //     .on("click", (e) => e.target.remove());
-
-            // //pop-up new pin
-            // setTimeout(() => {
-            //     new mapboxgl.Popup({ offset: 25 })
-            //         .setLngLat(coordinates)
-            //         .setHTML(`<h3>Add a new bird sighting</h3>`)
-            //         .addTo(map.current);
-            // }, 1500);
         });
     }, []);
+
+    //when clicking on the basemap, zoom in to 18 or more
+    useEffect(() => {
+        map.current.on("click", function flexibleZoom(e) {
+            if (typeof map.current.getLayer("sightings") !== "undefined") {
+                let features = map.current.queryRenderedFeatures(e.point, {
+                    layers: ["sightings"],
+                });
+                if (features.length !== 0) {
+                    return;
+                }
+            }
+
+            if (typeof map.current.getLayer("user-sightings") !== "undefined") {
+                let features = map.current.queryRenderedFeatures(e.point, {
+                    layers: ["user-sightings"],
+                });
+                if (features.length !== 0) {
+                    return;
+                }
+            }
+            // console.log("e in zoom funtion", e);
+            map.current.flyTo({
+                center: e.lngLat,
+                zoom: Math.max(18, zoom),
+            });
+        });
+    }, [zoom]);
 
     const toggleMarkersLayer = () => {
         !markersLayerVisible
@@ -141,6 +160,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setMyMarkersLayer(!myMarkersLayerVisible);
     };
 
+    //user click on ALL BIRDS => show general bird data
     const showMarkers = (e) => {
         e.stopPropagation();
 
@@ -169,39 +189,19 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setMarkersButtonView(2);
     };
 
-    // //user click on map -> new marker
+    // //user click on MY BIRDS => show user sightings
     const showMyMarkers = (e) => {
         e.stopPropagation();
         // console.log("data geojson in app", data);
-        let hoveredStateId = null;
         let userMarkers = userData.map((marker) => {
             return { ...marker.sighting, id: marker.id };
         });
-        console.log("user markers mapped", userMarkers);
+        // console.log("user markers mapped", userMarkers);
         map.current.addSource("user-sightings", {
             type: "geojson",
             data: {
                 type: "FeatureCollection",
                 features: userMarkers,
-            },
-        });
-
-        //hover layer
-        map.current.addLayer({
-            id: "user-sightings-hover",
-            type: "circle",
-            source: "user-sightings",
-            paint: {
-                "circle-radius": 10,
-                "circle-stroke-width": 2,
-                "circle-color": "green",
-                "circle-opacity": [
-                    "case",
-                    ["boolean", ["feature-state", "hover"], false],
-                    1,
-                    0,
-                ],
-                "circle-stroke-color": "white",
             },
         });
 
@@ -216,53 +216,72 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 "circle-stroke-color": "white",
             },
         });
-
-        // When the user moves their mouse over the state-fill layer, we'll update the
-        // feature state for the feature under the mouse.
-        map.current.on("mousemove", "user-sightings-hover", (e) => {
-            console.log("inside mouse move");
-            if (e.features.length > 0) {
-                if (hoveredStateId !== null) {
-                    map.current.setFeatureState(
-                        { source: "user-sightings", id: hoveredStateId },
-                        { hover: false }
-                    );
-                }
-                hoveredStateId = e.features[0].id;
-                console.log(e.features[0].id);
-                map.current.setFeatureState(
-                    { source: "user-sightings", id: hoveredStateId },
-                    { hover: true }
-                );
-            }
-        });
-
-        map.current.on("mouseleave", "user-sightings-hover", () => {
-            console.log("inside mouse leave");
-            if (hoveredStateId !== null) {
-                map.current.setFeatureState(
-                    { source: "user-sightings", id: hoveredStateId },
-                    { hover: false }
-                );
-            }
-            hoveredStateId = null;
-        });
-
+        //store the layer in a variable to be able to add/remove user pins
         setUserMarkersLayer(map.current.getSource("user-sightings"));
         // console.log("user markers layer", userMarkersLayer);
         setMyMarkersButtonView(2);
     };
 
     useEffect(() => {
+        if (
+            typeof map.current.getLayer("selected-pin") !== "undefined" &&
+            Object.keys(popup).length === 0
+        ) {
+            console.log("inside the double if");
+            map.current.removeLayer("selected-pin");
+            map.current.removeSource("selected-pin");
+        }
+
+        map.current.on("click", "user-sightings", (e) => {
+            //highlight selected pin
+            if (typeof map.current.getLayer("user-sightings") === "undefined") {
+                return;
+            }
+
+            var features = map.current.queryRenderedFeatures(e.point, {
+                layers: ["user-sightings"],
+            });
+
+            if (!features.length) {
+                return;
+            }
+            if (typeof map.current.getLayer("selected-pin") !== "undefined") {
+                console.log("inside the simple if");
+                map.current.removeLayer("selected-pin");
+                map.current.removeSource("selected-pin");
+            }
+
+            var feature = features[0];
+
+            // console.log(feature.toJSON());
+            map.current.addSource("selected-pin", {
+                type: "geojson",
+                data: feature.toJSON(),
+            });
+            map.current.addLayer({
+                id: "selected-pin",
+                type: "circle",
+                source: "selected-pin",
+                paint: {
+                    "circle-radius": 10,
+                    "circle-stroke-width": 2,
+                    "circle-color": "green",
+                    "circle-stroke-color": "white",
+                },
+            });
+        });
+    }, [popup]);
+
+    useEffect(() => {
         if (userMarkersLayer === undefined) {
-            console.log(
-                "inside the return in use effect for updating the map, userMarkersLayer",
-                userMarkersLayer
-            );
+            // console.log(
+            //     "inside the return in use effect for updating the map, userMarkersLayer",
+            //     userMarkersLayer
+            // );
             return;
         }
         let updatedUserMarkers = userData.map((marker) => {
-            console.log("inside updated user markers");
+            // console.log("inside updated user markers");
             return { ...marker.sighting, id: marker.id };
         });
         userMarkersLayer.setData({

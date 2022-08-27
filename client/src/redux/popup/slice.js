@@ -1,10 +1,10 @@
 export default function PopupReducer(popup = {}, action) {
     switch (action.type) {
         case "popup/receive":
-            console.log("popup info in main reducer", action.payload);
+            // console.log("popup info in main reducer", action.payload);
             return action.payload;
         case "popup/close":
-            console.log("reset info in main reducer", action.payload);
+            // console.log("reset info in main reducer", action.payload);
             return {};
         default:
             return popup;

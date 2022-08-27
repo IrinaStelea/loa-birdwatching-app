@@ -4,6 +4,7 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
     const dispatch = useDispatch();
     const deleteUserMarker = () => {
         const id = info.id;
+        // console.log("id in delete user marker", id);
         fetch("/api/delete-user-marker", {
             method: "POST",
             headers: {
@@ -22,7 +23,7 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
             });
     };
 
-    console.log("info in delete user marker", info);
+    // console.log("info in delete user marker", info);
     return (
         <input
             type="submit"

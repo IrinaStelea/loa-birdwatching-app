@@ -1,7 +1,7 @@
 export default function UserDataReducer(userData = [], action) {
     if (action.type === "user-data/receive") {
         userData = action.payload;
-        console.log("user data in main reducer", userData);
+        // console.log("user data in main reducer", userData);
     }
 
     if (action.type === "user-data/delete") {
@@ -11,7 +11,7 @@ export default function UserDataReducer(userData = [], action) {
 
     if (action.type === "user-data/add") {
         userData = [...userData, action.payload];
-        console.log("adding user data in main reducer", userData);
+        // console.log("adding user data in main reducer", userData);
     }
 
     return userData;

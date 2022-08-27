@@ -48,7 +48,7 @@ export default function App() {
         fetch("/api/user-data.json")
             .then((res) => res.json())
             .then((userData) => {
-                console.log("response from server, user data", userData);
+                // console.log("response from server, user data", userData);
                 dispatch(receiveUserData(userData));
             });
     }, []);
@@ -57,15 +57,15 @@ export default function App() {
         fetch("/api/birddata.json")
             .then((res) => res.json())
             .then((birdData) => {
-                console.log("bird data from server", birdData);
+                // console.log("bird data from server", birdData);
                 dispatch(receiveBirdData(birdData));
             });
     });
 
     const userPin = useSelector((state) => state.pinCoordinates);
-    console.log("user pin length in main app", Object.keys(userPin).length);
+    // console.log("user pin length in main app", Object.keys(userPin).length);
     const popupCoord = useSelector((state) => state.popupInfo.coordinates);
-    console.log("pop up coord in app", popupCoord);
+    // console.log("pop up coord in app", popupCoord);
     return (
         <>
             <div className="map">

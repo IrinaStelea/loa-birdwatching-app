@@ -118,7 +118,7 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        console.log("result in get user data", result.rows);
+        // console.log("result in get user data", result.rows);
         // console.log("user data backend", userData);
         return res.json(result.rows);
     } catch (err) {

@@ -15,15 +15,15 @@ export default function Popup() {
 
     const popup = useSelector((state) => state.popupInfo);
     const isUserPopup = useSelector((state) => state.isUserPopup);
-    console.log("popupinfo in popup component", popup);
-    console.log("isUserPopup in popup component", isUserPopup);
+    // console.log("popupinfo in popup component", popup);
+    // console.log("isUserPopup in popup component", isUserPopup);
     const birdImg = useSelector(
         (state) =>
             state.birdData &&
             state.birdData.filter((bird) => bird.sciName === popup.sciName)
     );
     // const singleBird = birdInfo.find((bird) => bird.sciName === sciName);
-    console.log("img url", birdImg[0].image);
+    // console.log("img url", birdImg[0].image);
 
     return (
         <>
