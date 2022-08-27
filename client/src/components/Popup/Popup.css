@@ -2,30 +2,57 @@
     background-color: white;
     border-radius: 5px;
     padding: 1vh 2vw 2vh 2vw;
-    transition: 1s;
-    transition-timing-function: cubic-bezier(0.63, -0.33, 0.32, 1.4);
     display: flex;
     flex-direction: column;
     align-items: center;
     position: fixed;
     z-index: 100;
     top: 10vh;
-    height: 40vh;
-    width: 70vw;
+    /* height: 50vh; */
+    width: 80vw;
+    gap: 1vh;
+    border: 1px solid #353d60; 
 }
 
 #bird-thumbnail {
     object-fit: cover;
-    width: 30vw;
-    height: 30vw;
+    width: 40vw;
+    height: 40vw;
     border: 1px solid transparent;
     border-radius: 50%;
+    margin: 2vh 0;
 }
 
 .popup h2 {
+    font-family: "Oswald", sans-serif;
+    font-size: 2em;
     text-align: center;
+    line-height: 1.1em;
 }
 
 #close {
     cursor: pointer;
+}
+
+.sci-name {
+    font-style: italic;
+    font-size: 1.2em;
+}
+
+.date {
+    font-size: 1em;
+    font-weight: 400;
+}
+
+#delete {
+    margin-top: 2vh;
+    cursor: pointer;
+    color: slategray;
+    text-decoration: underline;
+}
+
+
+#delete:hover {
+    color: darkslategray;
+    text-decoration: underline;
 }

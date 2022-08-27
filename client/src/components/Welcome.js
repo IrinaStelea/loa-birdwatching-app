@@ -1,6 +1,7 @@
 // import { useState, useEffect } from "react";
 import Registration from "./Registration.js";
 import Login from "./Login.js";
+import StartScreen from "./StartScreen.js";
 
 import {
     BrowserRouter as Router,
@@ -14,7 +15,8 @@ export default function Welcome() {
         <>
             <Router>
                 <Routes>
-                    <Route exact path="/" element={<Registration />} />
+                    <Route exact path="/" element={<StartScreen />} />
+                    <Route path="/register" element={<Registration />} />
                     <Route path="/login" element={<Login />} />
                     {/* <Route
                             path="/reset-password"

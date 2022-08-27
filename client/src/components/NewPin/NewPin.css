@@ -11,7 +11,7 @@
 }
 
 .new-pin-pop-up {
-    background-color: white;
+    background-color: #f5756a;
     padding: 1vh 2vw 2vh 2vw;
     display: flex;
     flex-direction: column;
@@ -19,8 +19,17 @@
     position: fixed;
     z-index: 100;
     top: 10vh;
-    height: 40vh;
-    width: 70vw;
+    width: 80vw;
+    border-radius: 5px;
+    gap: 2vh;
+    border: 1px solid #353d60;
+}
+
+.new-pin-pop-up h4 {
+    font-size: 1.6em;
+    font-family: "Oswald", sans-serif;
+    text-align: center;
+    color: white;
 }
 
 /* #close-button {
@@ -39,4 +48,53 @@
 #birdlist {
     width: 100%;
     text-align: center;
+}
+
+.react-datalist-input__container {
+    width: 90% !important;
+}
+
+mark {
+    background-color: mistyrose !important;
+    color: marktext;
+}
+
+.sciname {
+    font-style: italic;
+    color: white;
+    font-weight: bolder;
+    margin-top: 2vh;
+}
+
+#bird-img {
+    object-fit: cover;
+    width: 40vw;
+    height: 40vw;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    margin: 2vh 0;
+    border: 1px solid white;
+}
+
+.react-datalist-input__textbox {
+    font-size: 1.1em !important;
+}
+
+.react-datalist-input__listbox {
+    max-height: 60vh;
+    overflow: hidden;
+}
+
+#save {
+    margin-top: 1vh;
+    cursor: pointer;
+    color: white;
+    text-decoration: underline;
+    font-size: 1.2em;
+}
+
+#cancel {
+    margin-top: 1vh;
+    cursor: pointer;
+    color: white;
 }

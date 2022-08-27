@@ -25,11 +25,8 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
 
     // console.log("info in delete user marker", info);
     return (
-        <input
-            type="submit"
-            id="delete"
-            value="Delete"
-            onClick={deleteUserMarker}
-        ></input>
+        <p id="delete" onClick={deleteUserMarker}>
+            Delete this sighting
+        </p>
     );
 }

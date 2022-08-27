@@ -181,7 +181,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             paint: {
                 "circle-radius": 10,
                 "circle-stroke-width": 2,
-                "circle-color": "#353d60",
+                "circle-color": "#758bfd",
                 "circle-stroke-color": "white",
             },
         });
@@ -222,6 +222,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setMyMarkersButtonView(2);
     };
 
+    //highlights for user pins
     useEffect(() => {
         if (
             typeof map.current.getLayer("selected-pin") !== "undefined" &&
@@ -232,16 +233,19 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             map.current.removeSource("selected-pin");
         }
 
-        map.current.on("click", "user-sightings", (e) => {
+        map.current.on("click", (e) => {
             //highlight selected pin
-            if (typeof map.current.getLayer("user-sightings") === "undefined") {
+            if (
+                typeof map.current.getLayer("user-sightings") === "undefined" ||
+                typeof map.current.getLayer("sightings") === "undefined"
+            ) {
                 return;
             }
 
             var features = map.current.queryRenderedFeatures(e.point, {
-                layers: ["user-sightings"],
+                layers: ["user-sightings", "sightings"],
             });
-
+            console.log("features", features);
             if (!features.length) {
                 return;
             }
@@ -265,7 +269,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 paint: {
                     "circle-radius": 10,
                     "circle-stroke-width": 2,
-                    "circle-color": "green",
+                    "circle-color": "#353d60",
                     "circle-stroke-color": "white",
                 },
             });

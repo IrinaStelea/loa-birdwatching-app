@@ -9,10 +9,14 @@ export default function Login() {
 
     return (
         <>
-            <h1>Welcome</h1>
             <div className="container">
+                <img
+                    id="logo"
+                    src="../../Loa-logo_transparent.png"
+                    alt="Loa logo"
+                />
                 {error && <p className="error">{error}</p>}
-                <h4>Login:</h4>
+                <h2>Login to start using Loa:</h2>
                 <form
                     className="form-container"
                     id="login"
@@ -42,7 +46,7 @@ export default function Login() {
                     ></input>
                     <input type="submit" id="submit" value="Login"></input>
                 </form>
-                <p>
+                <p id="footnote">
                     No login yet? <Link to="/">Register</Link>
                 </p>
             </div>

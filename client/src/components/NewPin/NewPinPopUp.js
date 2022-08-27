@@ -71,27 +71,27 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             <div className="new-pin-pop-up">
                 <h4>Add a new bird sighting</h4>
                 <DatalistInput
-                    placeholder="Select a bird"
+                    placeholder="Start typing a bird name"
                     showLabel={false}
                     items={birdList}
                     onSelect={onSelect}
                 />
                 {selectedBird && (
                     <>
-                        <p>{selectedBird.sciName}</p>
+                        <p class="sciname">{selectedBird.sciName}</p>
                         <img
-                            id="bird-thumbnail"
+                            id="bird-img"
                             src={selectedBird.img}
                             alt={selectedBird.comName}
                         />
+                        <p id="save" onClick={submitPin}>
+                            Save
+                        </p>
                     </>
                 )}
-                <button id="save" type="submit" onClick={submitPin}>
-                    Save
-                </button>
-                <button id="cancel" onClick={togglePinPopUp}>
+                <p id="cancel" onClick={togglePinPopUp}>
                     Cancel
-                </button>
+                </p>
             </div>
         </>
     );

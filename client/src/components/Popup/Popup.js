@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { closePopup } from "../../redux/popup/slice";
@@ -32,14 +31,14 @@ export default function Popup() {
                     x
                 </h4>
                 <h2>{popup.comName}</h2>
-                <p>{popup.sciName}</p>
+                <p class="sci-name">{popup.sciName}</p>
                 <img
                     id="bird-thumbnail"
                     src={birdImg[0].image}
                     alt={popup.comName}
                 />
-                <p>
-                    Spotted on{" "}
+                <p class="date">
+                    Seen on{" "}
                     {popup.date.slice(0, 10).split("-").reverse().join("-")} at{" "}
                     {popup.date.slice(11, 16)}
                 </p>

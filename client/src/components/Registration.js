@@ -10,10 +10,14 @@ export default function Registration() {
 
     return (
         <>
-            <h1>Welcome</h1>
             <div className="container">
+                <img
+                    id="logo"
+                    src="../../Loa-logo_transparent.png"
+                    alt="Loa logo"
+                />
                 {error && <p className="error">{error}</p>}
-                <h4>Register to find and report bird sightings around you:</h4>
+                <h2>Register to start using the app:</h2>
                 <form
                     id="registration"
                     className="form-container"
@@ -64,7 +68,7 @@ export default function Registration() {
                     <input type="submit" id="submit" value="Register"></input>
                 </form>
 
-                <p>
+                <p id="footnote">
                     Already a member? <Link to="/login">Log in</Link>
                 </p>
             </div>
