@@ -16,6 +16,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                 value: bird.comName,
                 sciName: bird.sciName,
                 img: bird.image,
+                url: bird.url,
             }))
     );
 
@@ -78,7 +79,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                 />
                 {selectedBird && (
                     <>
-                        <p class="sciname">{selectedBird.sciName}</p>
+                        <p className="sciname">{selectedBird.sciName}</p>
                         <img
                             id="bird-img"
                             src={selectedBird.img}

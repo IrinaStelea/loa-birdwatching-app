@@ -4,8 +4,8 @@
     background-color: beige;
 }
 
-.sidebar {
-    background-color: rgba(35, 55, 75, 0.9);
+/* .sidebar {
+    background-color: rgba(53, 61, 96, 0.8);
     color: white;
     padding: 6px 12px;
     font-family: monospace;
@@ -15,54 +15,72 @@
     left: 0;
     margin: 12px;
     border-radius: 4px;
-}
-.button-container {
+} */
+
+.button-container-bottom {
     position: absolute;
-    bottom: 4vh;
+    display: flex;
+    justify-content: flex-start;
+    width: 90%;
+    bottom: 0;
+}
+
+.button-container-top {
+    position: absolute;
+    z-index: 1;
     display: flex;
     justify-content: space-between;
     width: 100%;
+    top: 0;
 }
 
 #show-birds,
 #my-sightings,
 #show-birds-visible,
 #my-sightings-visible {
-    background-color: rgba(21, 24, 38, 0.8);
+    background-color: rgba(53, 61, 96, 0.8);
     color: white;
-    padding: 2vw 4vw;
+    padding: 1vw 3vw;
     font-family: "Work Sans", sans-serif;
-    font-size: 1.2em;
-    font-weight: 600;
+    font-size: 1.1em;
+    font-weight: 500;
     margin: 12px;
     border-radius: 5px;
-    border: 1px solid rgba(21, 24, 38, 0.8);
+    border: 1px solid rgba(53, 61, 96, 0.8);
 }
 
 #show-birds-visible {
-    background-color: #758bfd;
+    background-color: rgba(117, 139, 253, 0.9);
     border: 1px solid #758bfd;
 }
 
 #my-sightings-visible {
-    background-color: #f5756a;
+    background-color: rgba(245, 117, 106, 0.9);
     border: 1px solid #f5756a;
 }
-#logout {
-    background-color: rgba(21, 24, 38, 0.8);
+#logout,
+#geolocate {
+    background-color: rgba(53, 61, 96, 0.8);
     padding: 2vw 4vw;
     margin: 12px;
     border-radius: 5px;
-    border: 1px solid rgba(21, 24, 38, 0.8);
+    border: 1px solid rgba(53, 61, 96, 0.8);
     padding: 0;
     display: flex;
     align-items: center;
 }
 #logout img {
-    width: 7vw;
+    width: 6vw;
     padding-left: 1vw;
     padding-right: 1vw;
     object-fit: contain;
+}
+
+#geolocate img {
+    width: 10vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    /* object-fit: contain; */
 }
 
 .mapboxgl-popup-content {
@@ -72,4 +90,23 @@
 /* IMPORTANT: remove this later on */
 .mapboxgl-ctrl-logo {
     display: none !important;
+}
+
+.top-icon {
+    margin: 12px;
+    width: 5vh;
+    height: 5vh;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+}
+
+.top-icon img {
+    width: 80%;
+    object-fit: contain;
+    padding: 2px;
 }

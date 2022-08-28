@@ -14,15 +14,17 @@ export default function Popup() {
 
     const popup = useSelector((state) => state.popupInfo);
     const isUserPopup = useSelector((state) => state.isUserPopup);
-    // console.log("popupinfo in popup component", popup);
+
     // console.log("isUserPopup in popup component", isUserPopup);
-    const birdImg = useSelector(
+    const selBird = useSelector(
         (state) =>
             state.birdData &&
             state.birdData.filter((bird) => bird.sciName === popup.sciName)
     );
+
     // const singleBird = birdInfo.find((bird) => bird.sciName === sciName);
     // console.log("img url", birdImg[0].image);
+    console.log("sel bird", selBird);
 
     return (
         <>
@@ -32,11 +34,32 @@ export default function Popup() {
                 </h4>
                 <h2>{popup.comName}</h2>
                 <p className="sci-name">{popup.sciName}</p>
-                <img
-                    id="bird-thumbnail"
-                    src={birdImg[0].image}
-                    alt={popup.comName}
-                />
+                <div className="pin-images">
+                    <img
+                        id="bird-thumbnail"
+                        src={
+                            selBird.length !== 0
+                                ? selBird[0].image
+                                : "https://www.inaturalist.org/assets/iconic_taxa/aves-75px.png"
+                        }
+                        alt={popup.comName}
+                    />
+                    <a
+                        href={
+                            selBird.length !== 0
+                                ? selBird[0].url
+                                : "https://en.wikipedia.org/wiki/Main_Page"
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <img
+                            id="info-icon"
+                            src="../../info_icon.png"
+                            alt="info icon"
+                        />
+                    </a>
+                </div>
                 <p className="date">
                     Seen on{" "}
                     {popup.date.slice(0, 10).split("-").reverse().join("-")} at{" "}
@@ -46,7 +69,6 @@ export default function Popup() {
                     <DeleteUserMarker info={popup} togglePopUp={togglePopUp} />
                 )}
             </div>
-
         </>
         // <div className="popup">
         //     <h2 className="comName">{comName}</h2>

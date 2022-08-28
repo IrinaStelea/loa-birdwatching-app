@@ -37,7 +37,7 @@
 } */
 
 #save {
-    margin-top: 3vh;
+    margin-top: 2vh;
 }
 
 /* #birdlist {
@@ -63,7 +63,7 @@ mark {
     font-style: italic;
     color: white;
     font-weight: bolder;
-    margin-top: 2vh;
+    margin-top: 1vh;
 }
 
 #bird-img {
@@ -72,7 +72,7 @@ mark {
     height: 40vw;
     border: 1px solid transparent;
     border-radius: 50%;
-    margin: 2vh 0;
+    margin: 1vh 0;
     border: 1px solid white;
 }
 
@@ -80,9 +80,13 @@ mark {
     font-size: 1.1em !important;
 }
 
+.react-datalist-input__textbox:focus-visible {
+    border: 1px solid #353d60; 
+}
+
 .react-datalist-input__listbox {
-    max-height: 60vh;
-    overflow: hidden;
+    max-height: 40vh;
+    overflow-y: scroll;
 }
 
 #save {

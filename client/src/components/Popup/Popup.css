@@ -14,18 +14,30 @@
     border: 1px solid #353d60;
 }
 
-#bird-thumbnail {
-    object-fit: cover;
+.pin-images {
+    position: relative;
     width: 40vw;
     height: 40vw;
+    margin: 1vh 0;
+}
+#info-icon {
+    position: absolute;
+    width: 20%;
+    top: 1vh;
+    right: 0;
+}
+
+#bird-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border: 1px solid transparent;
     border-radius: 50%;
-    margin: 2vh 0;
 }
 
 .popup h2 {
     font-family: "Oswald", sans-serif;
-    font-size: 2em;
+    font-size: 1.8em;
     text-align: center;
     line-height: 1.1em;
 }
@@ -36,7 +48,7 @@
 
 .sci-name {
     font-style: italic;
-    font-size: 1.2em;
+    font-size: 1em;
 }
 
 .date {
@@ -45,7 +57,7 @@
 }
 
 #delete {
-    margin-top: 2vh;
+    margin-top: 1vh;
     cursor: pointer;
     color: slategray;
     text-decoration: underline;

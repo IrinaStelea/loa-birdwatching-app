@@ -8,33 +8,33 @@ import { receiveBirdData } from "../redux/bird-data/slice";
 import Popup from "./Popup/Popup";
 import { receiveUserData } from "../redux/user-markers/slice";
 
-import StartScreen from "./StartScreen";
-
 export default function App() {
     const dispatch = useDispatch();
     const [data, setData] = useState(null);
     // const [userData, setUserData] = useState(null);
+
+    //set user location
     const [userLng, setLng] = useState();
     const [userLat, setLat] = useState();
-    const [userLocationModal, setUserLocationModal] = useState(true);
-    let latitude;
-    let longitude;
-    const setUserLocation = () => {
-        console.log("click on my location");
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                latitude = position.coords.latitude;
-                longitude = position.coords.longitude;
-            });
-        }
+    // const [userLocationModal, setUserLocationModal] = useState(true);
+    // let latitude;
+    // let longitude;
+    // const setUserLocation = () => {
+    //     console.log("click on my location");
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition(function (position) {
+    //             latitude = position.coords.latitude;
+    //             longitude = position.coords.longitude;
+    //         });
+    //     }
 
-        setTimeout(() => {
-            setLng(longitude);
-            setLat(latitude);
-            // console.log("user lat and long", userLat, userLng);
-            setUserLocationModal(!userLocationModal);
-        }, 3000);
-    };
+    //     setTimeout(() => {
+    //         setLng(longitude);
+    //         setLat(latitude);
+    //         // console.log("user lat and long", userLat, userLng);
+    //         setUserLocationModal(!userLocationModal);
+    //     }, 3000);
+    // };
     //fetch api data stored in back-end
     useEffect(() => {
         //fetch the json with the recent sightings

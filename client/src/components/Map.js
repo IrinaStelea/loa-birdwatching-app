@@ -37,7 +37,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             zoom: zoom,
         });
         //add marker for user location
-        new mapboxgl.Marker().setLngLat([userLng, userLat]).addTo(map.current);
+        // new mapboxgl.Marker().setLngLat([userLng, userLat]).addTo(map.current);
 
         //wait for map to be initialised
         if (!map.current) return;
@@ -46,6 +46,20 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             setLat(map.current.getCenter().lat.toFixed(4));
             setZoom(map.current.getZoom().toFixed(2));
         });
+
+        //add geolocation
+        map.current.addControl(
+            new mapboxgl.GeolocateControl({
+                fitBoundsOptions: { maxZoom: 10 },
+                positionOptions: {
+                    enableHighAccuracy: true,
+                },
+                // When active the map will receive updates to the device's location as it changes.
+                trackUserLocation: true,
+                // Draw an arrow next to the location dot to indicate which direction the device is heading.
+                showUserHeading: true,
+            })
+        );
 
         // cleanup function to remove map on unmount
         return () => map.current.remove();
@@ -282,10 +296,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
     useEffect(() => {
         if (userMarkersLayer === undefined) {
-            // console.log(
-            //     "inside the return in use effect for updating the map, userMarkersLayer",
-            //     userMarkersLayer
-            // );
             return;
         }
         let updatedUserMarkers = userData.map((marker) => {
@@ -300,13 +310,24 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
     return (
         <>
-            <div>
-                <div className="sidebar">
-                    Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+            <div className="button-container-top">
+                <div className="top-icon">
+                    <img src="../../Loa-logo_icon.png" alt="Loa logo" />
                 </div>
+                {/* <div
+                    id="geolocate"
+                >
+                    <img src="../../location.png" alt="location icon" />
+                </div> */}
+            </div>
+            <div>
+                {/* <div className="sidebar">
+                    Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+                </div> */}
+
                 <div ref={mapContainer} className="map-container" />
             </div>
-            <div className="button-container">
+            <div className="button-container-bottom">
                 {markersButtonView === 1 && (
                     <button id="show-birds" onClick={showMarkers}>
                         All birds
@@ -348,16 +369,3 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         </>
     );
 }
-
-// Add geolocate control to the map
-// map.current.addControl(
-//     new mapboxgl.GeolocateControl({
-//         positionOptions: {
-//             enableHighAccuracy: true,
-//         },
-//         // When active the map will receive updates to the device's location as it changes.
-//         trackUserLocation: true,
-//         // Draw an arrow next to the location dot to indicate which direction the device is heading.
-//         showUserHeading: true,
-//     })
-// );
