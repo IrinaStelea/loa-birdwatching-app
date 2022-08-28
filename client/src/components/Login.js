@@ -49,7 +49,7 @@ export default function Login() {
                     <input type="submit" id="submit" value="Login"></input>
                 </form>
                 <p id="footnote">
-                    No login yet? <Link to="/">Register</Link>
+                    No login yet? <Link to="/register">Register</Link>
                 </p>
             </div>
         </>

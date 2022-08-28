@@ -7,7 +7,9 @@ export default function Logout() {
             .then((data) => {
                 console.log("data after logout", data);
                 //redirect to login
-                window.location.assign("/login");
+                window.history.pushState("", "", "/login");
+                window.location.reload();
+                // window.location.assign("/login");
             })
             .catch((err) => {
                 console.log(err);
