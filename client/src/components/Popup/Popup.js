@@ -40,25 +40,23 @@ export default function Popup() {
                         src={
                             selBird.length !== 0
                                 ? selBird[0].image
-                                : "https://www.inaturalist.org/assets/iconic_taxa/aves-75px.png"
+                                : "../../default_pic.png"
                         }
                         alt={popup.comName}
                     />
-                    <a
-                        href={
-                            selBird.length !== 0
-                                ? selBird[0].url
-                                : "https://en.wikipedia.org/wiki/Main_Page"
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <img
-                            id="info-icon"
-                            src="../../info_icon.png"
-                            alt="info icon"
-                        />
-                    </a>
+                    {selBird.length !== 0 && (
+                        <a
+                            href={selBird[0].url}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <img
+                                id="info-icon"
+                                src="../../info_icon.png"
+                                alt="info icon"
+                            />
+                        </a>
+                    )}
                 </div>
                 <p className="date">
                     Seen on{" "}

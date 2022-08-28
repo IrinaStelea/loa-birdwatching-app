@@ -80,11 +80,24 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                 {selectedBird && (
                     <>
                         <p className="sciname">{selectedBird.sciName}</p>
-                        <img
-                            id="bird-img"
-                            src={selectedBird.img}
-                            alt={selectedBird.comName}
-                        />
+                        <div className="pin-images">
+                            <img
+                                id="bird-img"
+                                src={selectedBird.img}
+                                alt={selectedBird.comName}
+                            />
+                            <a
+                                href={selectedBird.url}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <img
+                                    id="info-icon"
+                                    src="../../info_icon.png"
+                                    alt="info icon"
+                                />
+                            </a>
+                        </div>
                         <p id="save" onClick={submitPin}>
                             Save
                         </p>

@@ -7,6 +7,7 @@ import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
 import Logout from "./Logout.js";
+import { closePopup } from "../redux/popup/slice";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -116,6 +117,9 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             //     center: coordinates,
             //     // zoom: Math.max(18, zoom),
             // });
+            //close other popups if open
+            dispatch(closePopup());
+            //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
         });
     }, []);
