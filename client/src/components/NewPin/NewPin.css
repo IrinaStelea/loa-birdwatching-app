@@ -18,10 +18,10 @@
     align-items: center;
     position: fixed;
     z-index: 100;
-    top: 10vh;
+    top: 8vh;
     width: 80vw;
     border-radius: 5px;
-    gap: 2vh;
+    gap: 1vh;
     border: 1px solid #353d60;
 }
 
@@ -81,7 +81,7 @@ mark {
 }
 
 .react-datalist-input__textbox:focus-visible {
-    border: 1px solid #353d60; 
+    border: 1px solid #353d60;
 }
 
 .react-datalist-input__listbox {

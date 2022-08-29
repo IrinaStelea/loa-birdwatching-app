@@ -27,46 +27,54 @@ export default function Registration() {
                     method="post"
                     action="/register"
                 >
-                    <label htmlFor="firstName">First name</label>
-                    <input
-                        type="text"
-                        name="firstName"
-                        placeholder="First name"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.firstName ? "errorfield" : ""
-                        // }
-                    ></input>
-                    <label htmlFor="lastName">Last name</label>
-                    <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Last name"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.lastName ? "errorfield" : ""
-                        // }
-                    ></input>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.email ? "errorfield" : ""
-                        // }
-                    ></input>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Min 6 characters"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.password ? "errorfield" : ""
-                        // }
-                    ></input>
+                    <div className="form-entry">
+                        <input
+                            type="text"
+                            name="firstName"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.firstName ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="firstName">First name</label>
+                    </div>
+                    <div className="form-entry">
+                        <input
+                            type="text"
+                            name="lastName"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.lastName ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="lastName">Last name</label>
+                    </div>
+                    <div className="form-entry">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.email ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="email">Email</label>
+                    </div>
+                    <div className="form-entry">
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.password ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="password">Password</label>
+                    </div>
                     <input type="submit" id="submit" value="Register"></input>
                 </form>
 

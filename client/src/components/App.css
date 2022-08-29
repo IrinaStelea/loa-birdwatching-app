@@ -22,7 +22,42 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vh;
+    gap: 5vh;
+    margin-top: 1vh;
+}
+.form-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+.form-entry label {
+    position: absolute;
+    left: 0;
+    color: white;
+    cursor: text;
+    transform-origin: 0 0;
+    font-size: 1.1em;
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out;
+}
+
+/* .form-upload input { */
+.form-entry input {
+    outline: none;
+    border: none;
+    color: #353d60;
+    background-color: #f5756a;
+    font-weight: bolder;
+    border-bottom: 0.5px solid white;
+    font-size: 1em;
+}
+
+/* .form-upload input:focus + label, */
+input:focus + label,
+input:not(:placeholder-shown) + label {
+    color: white;
+    transform: translateY(-1.1em) scale(0.8);
 }
 
 .container {
@@ -53,15 +88,12 @@ body {
 #footnote a:visited {
     color: white;
 }
-.form-container label {
-    font-size: 1.2em;
-}
 
 .form-container input:not(:last-of-type) {
     font-size: 1.2em;
 }
 
-.form-container input:last-of-type {
+.form-container #submit {
     font-family: "Work Sans", sans-serif;
     color: white;
     font-size: 1.2em;

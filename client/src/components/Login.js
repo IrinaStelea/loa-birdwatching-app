@@ -26,26 +26,30 @@ export default function Login() {
                     method="post"
                     action="/login"
                 >
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.email ? "errorfield" : ""
-                        // }
-                    ></input>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Min 6 characters"
-                        onChange={onFormInputChange}
-                        // className={
-                        //     this.state.errors.password ? "errorfield" : ""
-                        // }
-                    ></input>
+                    <div className="form-entry">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.email ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="email">Email</label>
+                    </div>
+                    <div className="form-entry">
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder=" "
+                            onChange={onFormInputChange}
+                            // className={
+                            //     this.state.errors.password ? "errorfield" : ""
+                            // }
+                        ></input>
+                        <label htmlFor="password">Password</label>
+                    </div>
                     <input type="submit" id="submit" value="Login"></input>
                 </form>
                 <p id="footnote">

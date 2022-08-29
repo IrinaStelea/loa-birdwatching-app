@@ -7,10 +7,9 @@
     align-items: center;
     position: fixed;
     z-index: 100;
-    top: 10vh;
+    top: 8vh;
     /* height: 50vh; */
     width: 80vw;
-    gap: 1vh;
     border: 1px solid #353d60;
 }
 
@@ -44,6 +43,9 @@
 
 #close {
     cursor: pointer;
+    font-family: "Work Sans", sans-serif;
+    font-size: 1.8em;
+    font-weight: 300;
 }
 
 .sci-name {

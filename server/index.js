@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
 const db = require("./db.js");
-const jsonData = require("./data.json");
+const jsonData = require("./apidata.json");
 const birdData = require("./birddata.json");
 
 const PORT = process.env.PORT || 3001;
