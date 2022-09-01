@@ -93,7 +93,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                             >
                                 <img
                                     id="info-icon"
-                                    src="../../info_icon.png"
+                                    src="../../info_icon_white.png"
                                     alt="info icon"
                                 />
                             </a>

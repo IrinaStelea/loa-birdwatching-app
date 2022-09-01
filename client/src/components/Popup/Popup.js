@@ -15,7 +15,7 @@ export default function Popup() {
     const popup = useSelector((state) => state.popupInfo);
     const isUserPopup = useSelector((state) => state.isUserPopup);
 
-    // console.log("isUserPopup in popup component", isUserPopup);
+    console.log("popup info in component", popup);
     const selBird = useSelector(
         (state) =>
             state.birdData &&
@@ -52,7 +52,7 @@ export default function Popup() {
                         >
                             <img
                                 id="info-icon"
-                                src="../../info_icon.png"
+                                src="../../info_icon_pink.png"
                                 alt="info icon"
                             />
                         </a>

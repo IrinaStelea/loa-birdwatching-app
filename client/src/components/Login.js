@@ -30,6 +30,7 @@ export default function Login() {
                         <input
                             type="email"
                             name="email"
+                            id="email"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={
@@ -42,6 +43,7 @@ export default function Login() {
                         <input
                             type="password"
                             name="password"
+                            id="password"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={

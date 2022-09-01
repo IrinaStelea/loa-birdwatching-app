@@ -10,8 +10,11 @@ export default function StartScreen() {
                     src="../../Loa-logo_transparent.png"
                     alt="Loa logo"
                 />
-                <h1>A birdwatching app</h1>
-                <h2>View &#38; keep track of bird sightings around you</h2>
+                <h1>Birdwatching app</h1>
+                <span id="tagline">
+                    Discover local bird species and keep track of bird sightings
+                    around you
+                </span>
                 <span id="start-span">
                     <Link to="/register">Register</Link>
                     <p>or</p>

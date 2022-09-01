@@ -8,18 +8,28 @@
     width: 100%;
     height: 100%;
     font-family: "Work Sans", sans-serif;
+    padding: 2vh 5vw;
 }
 
 #logo {
-    width: 80vw;
+    width: 70vw;
     justify-self: center;
 }
 
 h1 {
     font-family: "Oswald";
     text-align: center;
-    color: white; 
+    color: white;
 }
+
+#tagline {
+    font-weight: 400;
+    color: #353d60;
+    font-family: "Work Sans", sans-serif;
+    text-align: center;
+    font-size: 1.3em;
+}
+
 h2 {
     font-weight: 400;
     color: #353d60;

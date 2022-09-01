@@ -21,6 +21,7 @@ export default function Registration() {
                 {error && <p className="error">{error}</p>}
                 <h2>Register to start using Loa:</h2>
                 <form
+                    // always add an id to match the label otherwise clicking on the label won't work
                     id="registration"
                     className="form-container"
                     onSubmit={onSubmit}
@@ -31,6 +32,7 @@ export default function Registration() {
                         <input
                             type="text"
                             name="firstName"
+                            id="firstName"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={
@@ -43,6 +45,7 @@ export default function Registration() {
                         <input
                             type="text"
                             name="lastName"
+                            id="lastName"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={
@@ -55,6 +58,7 @@ export default function Registration() {
                         <input
                             type="email"
                             name="email"
+                            id="email"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={
@@ -67,6 +71,7 @@ export default function Registration() {
                         <input
                             type="password"
                             name="password"
+                            id="password"
                             placeholder=" "
                             onChange={onFormInputChange}
                             // className={

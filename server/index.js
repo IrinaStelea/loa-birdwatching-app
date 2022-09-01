@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const db = require("./db.js");
 const jsonData = require("./apidata.json");
-const birdData = require("./birddata.json");
+const birdData = require("./birddata_imgwiki.json");
 
 const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");

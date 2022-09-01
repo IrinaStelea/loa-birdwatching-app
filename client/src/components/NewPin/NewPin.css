@@ -56,7 +56,7 @@
 
 mark {
     background-color: mistyrose !important;
-    color: marktext;
+    /* color: marktext; */
 }
 
 .sciname {
@@ -68,11 +68,11 @@ mark {
 
 #bird-img {
     object-fit: cover;
-    width: 40vw;
-    height: 40vw;
+    width: 38vw;
+    height: 38vw;
     border: 1px solid transparent;
-    border-radius: 50%;
-    margin: 1vh 0;
+    /* border-radius: 50%; */
+    margin: 3vh 0 0 0;
     border: 1px solid white;
 }
 
