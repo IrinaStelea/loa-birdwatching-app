@@ -29,9 +29,14 @@
     position: absolute;
     z-index: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
     top: 0;
+    align-items: flex-start;
+}
+
+#filter {
+    margin-top: 10px;
 }
 
 #show-birds,
@@ -93,7 +98,7 @@
 }
 
 .top-icon {
-    margin: 12px;
+    margin: 10px;
     width: 5vh;
     height: 5vh;
     background-color: white;
@@ -109,4 +114,15 @@
     width: 80%;
     object-fit: contain;
     padding: 2px;
+}
+
+.close-top {
+    margin-top: 10px;
+    background-color: white;
+    border: 0.5px solid transparent;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+    border-radius: 5px;
+    font-size: 1.5em;
+    font-weight: 300;
+    padding: 0 2vw;
 }

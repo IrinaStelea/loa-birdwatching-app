@@ -4,6 +4,7 @@ import BirdDataReducer from "./bird-data/slice";
 import PopupReducer from "./popup/slice";
 import IsUserPopupReducer from "./user-popup/slice";
 import UserDataReducer from "./user-markers/slice";
+import BirdsFilterReducer from "./birds-filter/slice";
 
 const rootReducer = combineReducers({
     pinCoordinates: NewUserMarkerReducer,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
     userData: UserDataReducer,
     popupInfo: PopupReducer,
     isUserPopup: IsUserPopupReducer,
+    availableBirds: BirdsFilterReducer,
 });
 
 export default rootReducer;

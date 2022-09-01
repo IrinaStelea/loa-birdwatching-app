@@ -1,13 +1,16 @@
 import "./Map.css";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { useDispatch } from "react-redux";
 import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
+import { receiveAvailableBirds } from "../redux/birds-filter/slice";
+import { resetAvailableBirds } from "../redux/birds-filter/slice";
 import Logout from "./Logout.js";
 import { closePopup } from "../redux/popup/slice";
+import { DatalistInput, useComboboxControls } from "react-datalist-input";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -23,9 +26,69 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const [markersButtonView, setMarkersButtonView] = useState(1);
     const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
     const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
+    const { value, setValue } = useComboboxControls({
+        initialValue: "",
+    });
     const userData = useSelector((state) => state.userData);
     // console.log("user data in map component", userData);
     const [userMarkersLayer, setUserMarkersLayer] = useState();
+
+    const [searchedBird, setSearchedBird] = useState(null);
+
+    //define the list of birds in the search box
+    const searchableBirds = useSelector(
+        (state) =>
+            state.availableBirds &&
+            state.availableBirds.map((bird, idx) => ({
+                id: idx,
+                value: bird,
+            }))
+    );
+
+    console.log("searchable birds", searchableBirds);
+
+    //on select function for the filter
+    const onSelect = useCallback((sel) => {
+        console.log("selected bird", sel);
+        setValue(sel.value);
+        setSearchedBird(sel.value);
+        var features = map.current.queryRenderedFeatures({
+            layers: ["user-sightings", "sightings"],
+        });
+        if (!features.length) {
+            return;
+        }
+        let selection = features.filter(
+            (bird) => bird.properties.comName === sel.value
+        );
+
+        console.log("selection", selection);
+
+        map.current.addSource("search-results", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: selection,
+            },
+        });
+        map.current.addLayer({
+            id: "search-results",
+            type: "circle",
+            source: "search-results",
+            paint: {
+                "circle-radius": 10,
+                "circle-stroke-width": 2,
+                "circle-color": "green",
+                "circle-stroke-color": "white",
+            },
+        });
+    }, []);
+
+    const resetSearch = () => {
+        map.current.removeLayer("search-results");
+        map.current.removeSource("search-results");
+        setValue("");
+    };
 
     const popup = useSelector((state) => state.popupInfo);
 
@@ -89,7 +152,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 // console.log("preventing click on user layer");
                 return;
             }
-
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
@@ -121,6 +183,29 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             dispatch(closePopup());
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
+        });
+
+        map.current.on("movestart", () => {
+            dispatch(resetAvailableBirds());
+        });
+        map.current.on("moveend", () => {
+            if (
+                typeof map.current.getLayer("sightings") === "undefined" &&
+                typeof map.current.getLayer("user-sightings")
+            ) {
+                return;
+            }
+
+            let allPins = map.current.queryRenderedFeatures({
+                layers: ["user-sightings", "sightings"],
+            });
+
+            let birdNames = allPins.map((pin) => pin.properties.comName);
+            // console.log("features", features);
+
+            let uniqueBirdNames = [...new Set(birdNames)].sort();
+
+            dispatch(receiveAvailableBirds(uniqueBirdNames));
         });
     }, []);
 
@@ -218,6 +303,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         let userMarkers = userData.map((marker) => {
             return { ...marker.sighting, id: marker.id };
         });
+        console.log("user markers", userMarkers);
         // console.log("user markers mapped", userMarkers);
         map.current.addSource("user-sightings", {
             type: "geojson",
@@ -244,13 +330,36 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setMyMarkersButtonView(2);
     };
 
+    //user search for birds
+    // useEffect(() => {
+    //     map.current.on("movestart", () => {
+    //         dispatch(resetAvailableBirds());
+    //     });
+    //     map.current.on("moveend", () => {
+    //         if (
+    //             typeof map.current.getLayer("sightings") === "undefined" &&
+    //             typeof map.current.getLayer("user-sightings")
+    //         ) {
+    //             return;
+    //         }
+
+    //         let allPins = map.current.queryRenderedFeatures({
+    //             layers: ["user-sightings", "sightings"],
+    //         });
+
+    //         // console.log("features", features);
+
+    //         dispatch(receiveAvailableBirds(allPins));
+    //     });
+    // }, []);
+
     //highlights for user pins
     useEffect(() => {
         if (
             typeof map.current.getLayer("selected-pin") !== "undefined" &&
             Object.keys(popup).length === 0
         ) {
-            console.log("inside the double if");
+            // console.log("inside the double if");
             map.current.removeLayer("selected-pin");
             map.current.removeSource("selected-pin");
         }
@@ -267,7 +376,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             var features = map.current.queryRenderedFeatures(e.point, {
                 layers: ["user-sightings", "sightings"],
             });
-            console.log("features", features);
+
             if (!features.length) {
                 return;
             }
@@ -276,6 +385,8 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 map.current.removeLayer("selected-pin");
                 map.current.removeSource("selected-pin");
             }
+
+            console.log("features inisde highlight", features);
 
             var feature = features[0];
 
@@ -318,6 +429,20 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 <div className="top-icon">
                     <img src="../../Loa-logo_icon.png" alt="Loa logo" />
                 </div>
+                <div id="filter">
+                    <DatalistInput
+                        placeholder="Search for a bird"
+                        showLabel={false}
+                        value={value}
+                        items={searchableBirds}
+                        onSelect={onSelect}
+                    />
+                </div>
+                {searchedBird && (
+                    <span className="close-top" onClick={resetSearch}>
+                        X
+                    </span>
+                )}
                 {/* <div
                     id="geolocate"
                 >
