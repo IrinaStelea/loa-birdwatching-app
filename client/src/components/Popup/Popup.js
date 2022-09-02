@@ -15,7 +15,7 @@ export default function Popup() {
     const popup = useSelector((state) => state.popupInfo);
     const isUserPopup = useSelector((state) => state.isUserPopup);
 
-    console.log("popup info in component", popup);
+    // console.log("popup info in component", popup);
     const selBird = useSelector(
         (state) =>
             state.birdData &&
@@ -24,7 +24,7 @@ export default function Popup() {
 
     // const singleBird = birdInfo.find((bird) => bird.sciName === sciName);
     // console.log("img url", birdImg[0].image);
-    console.log("sel bird", selBird);
+    // console.log("sel bird", selBird);
 
     return (
         <>

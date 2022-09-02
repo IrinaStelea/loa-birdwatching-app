@@ -11,6 +11,7 @@ import { resetAvailableBirds } from "../redux/birds-filter/slice";
 import Logout from "./Logout.js";
 import { closePopup } from "../redux/popup/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
+// const userHotspotImage = require("../../hotspot_user.png");
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -45,11 +46,11 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             }))
     );
 
-    console.log("searchable birds", searchableBirds);
+    // console.log("searchable birds", searchableBirds);
 
     //on select function for the filter
     const onSelect = useCallback((sel) => {
-        console.log("selected bird", sel);
+        // console.log("selected bird in filter", sel);
         setValue(sel.value);
         setSearchedBird(sel.value);
         var features = map.current.queryRenderedFeatures({
@@ -62,7 +63,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             (bird) => bird.properties.comName === sel.value
         );
 
-        console.log("selection", selection);
+        // console.log("selection in filter", selection);
 
         map.current.addSource("search-results", {
             type: "geojson",
@@ -85,9 +86,11 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     }, []);
 
     const resetSearch = () => {
-        map.current.removeLayer("search-results");
-        map.current.removeSource("search-results");
-        setValue("");
+        if (typeof map.current.getLayer("search-results") !== "undefined") {
+            map.current.removeLayer("search-results");
+            map.current.removeSource("search-results");
+            setValue("");
+        }
     };
 
     const popup = useSelector((state) => state.popupInfo);
@@ -136,12 +139,20 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             e.clickOnLayer = true;
             e.clickOnFirstLayer = true;
             // get coordinates of click + bird info
+            console.log("click on simple", e.features);
             const coordinates = e.features[0].geometry.coordinates.slice();
             const comName = e.features[0].properties.comName;
             const sciName = e.features[0].properties.sciName;
             const date = e.features[0].properties.date;
             dispatch(openPopup({ coordinates, comName, sciName, date }));
             dispatch(receiveUserPopup(false));
+        });
+
+        map.current.on("click", "hotspots-sightings", (e) => {
+            e.clickOnLayer = true;
+            e.clickOnFirstLayer = true;
+            // get coordinates of click + bird info
+            console.log("click on hotspots", e.features);
         });
 
         //add pop-up with info to each existing user marker
@@ -187,6 +198,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.on("movestart", () => {
             dispatch(resetAvailableBirds());
+            resetSearch();
         });
         map.current.on("moveend", () => {
             if (
@@ -240,9 +252,19 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const toggleMarkersLayer = () => {
         if (!markersLayerVisible) {
             map.current.setLayoutProperty("sightings", "visibility", "none");
+            map.current.setLayoutProperty(
+                "hotspots-sightings",
+                "visibility",
+                "none"
+            );
             setMarkersButtonView(3);
         } else {
             map.current.setLayoutProperty("sightings", "visibility", "visible");
+            map.current.setLayoutProperty(
+                "hotspots-sightings",
+                "visibility",
+                "visible"
+            );
             setMarkersButtonView(2);
         }
         setMarkersLayer(!markersLayerVisible);
@@ -271,20 +293,36 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const showMarkers = (e) => {
         e.stopPropagation();
 
-        // console.log("data geojson in app", data);
-
+        // Add a data source containing one point feature.
         map.current.addSource("sightings", {
             type: "geojson",
             data: {
                 type: "FeatureCollection",
                 features: data,
             },
+            cluster: true,
+            clusterMaxZoom: 14,
+            clusterRadius: 1,
         });
 
+        // hotspots layer
+        map.current.addLayer({
+            id: "hotspots-sightings",
+            type: "circle",
+            source: "sightings",
+            filter: ["has", "point_count"],
+            paint: {
+                "circle-color": "#758bfd",
+                "circle-radius": ["step", ["get", "point_count"], 14, 10, 16],
+                "circle-opacity": 0.7,
+            },
+        });
+        //single bird sightings layer
         map.current.addLayer({
             id: "sightings",
             type: "circle",
             source: "sightings",
+            filter: ["!", ["has", "point_count"]],
             paint: {
                 "circle-radius": 10,
                 "circle-stroke-width": 2,
@@ -330,29 +368,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setMyMarkersButtonView(2);
     };
 
-    //user search for birds
-    // useEffect(() => {
-    //     map.current.on("movestart", () => {
-    //         dispatch(resetAvailableBirds());
-    //     });
-    //     map.current.on("moveend", () => {
-    //         if (
-    //             typeof map.current.getLayer("sightings") === "undefined" &&
-    //             typeof map.current.getLayer("user-sightings")
-    //         ) {
-    //             return;
-    //         }
-
-    //         let allPins = map.current.queryRenderedFeatures({
-    //             layers: ["user-sightings", "sightings"],
-    //         });
-
-    //         // console.log("features", features);
-
-    //         dispatch(receiveAvailableBirds(allPins));
-    //     });
-    // }, []);
-
     //highlights for user pins
     useEffect(() => {
         if (
@@ -386,7 +401,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 map.current.removeSource("selected-pin");
             }
 
-            console.log("features inisde highlight", features);
+            // console.log("features inisde highlight", features);
 
             var feature = features[0];
 
