@@ -12,8 +12,8 @@ export default function StartScreen() {
                 />
                 <h1>Birdwatching app</h1>
                 <span id="tagline">
-                    Discover local bird species and keep track of bird sightings
-                    around you
+                    Discover local bird species and track your own bird
+                    sightings
                 </span>
                 <span id="start-span">
                     <Link to="/register">Register</Link>

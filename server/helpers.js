@@ -27,3 +27,30 @@ module.exports.convertToGeojson = (data) => {
     });
     return geojsonData;
 };
+
+module.exports.randomizeIdenticalCoordinates = (data) => {
+    let latArray = [];
+    let lngArray = [];
+
+    data = data.map(function (entry) {
+        if (latArray.includes(entry.lat) && lngArray.includes(entry.lng)) {
+            return {
+                ...entry,
+                lat:
+                    entry.lat +
+                    (Math.random() > 0.5 ? 0.0001 : -0.0001) +
+                    Math.random() * 0.00008,
+                lng:
+                    entry.lng +
+                    (Math.random() > 0.5 ? 0.0001 : -0.0001) +
+                    Math.random() * 0.00003,
+            };
+        } else {
+            latArray.push(entry.lat);
+            lngArray.push(entry.lng);
+            return { ...entry };
+        }
+    });
+
+    return data;
+};

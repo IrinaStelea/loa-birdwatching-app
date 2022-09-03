@@ -108,8 +108,13 @@ app.get("/user/id.json", function (req, res) {
 
 //serve the json with API sightings
 app.get("/api/data.json", function (req, res) {
-    const data = helpers.convertToGeojson(jsonData);
+    //check data for duplicate coordinates and offset by a bit
+    let dataUniqueCoord = helpers.randomizeIdenticalCoordinates(jsonData);
+
+    //convert to geoJson
+    let data = helpers.convertToGeojson(dataUniqueCoord);
     // console.log("inside the get request", data);
+
     res.json(data);
 });
 

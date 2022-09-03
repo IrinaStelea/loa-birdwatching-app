@@ -148,13 +148,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             dispatch(receiveUserPopup(false));
         });
 
-        map.current.on("click", "hotspots-sightings", (e) => {
-            e.clickOnLayer = true;
-            e.clickOnFirstLayer = true;
-            // get coordinates of click + bird info
-            console.log("click on hotspots", e.features);
-        });
-
         //add pop-up with info to each existing user marker
 
         map.current.on("click", "user-sightings", (e) => {
@@ -252,19 +245,9 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const toggleMarkersLayer = () => {
         if (!markersLayerVisible) {
             map.current.setLayoutProperty("sightings", "visibility", "none");
-            map.current.setLayoutProperty(
-                "hotspots-sightings",
-                "visibility",
-                "none"
-            );
             setMarkersButtonView(3);
         } else {
             map.current.setLayoutProperty("sightings", "visibility", "visible");
-            map.current.setLayoutProperty(
-                "hotspots-sightings",
-                "visibility",
-                "visible"
-            );
             setMarkersButtonView(2);
         }
         setMarkersLayer(!markersLayerVisible);
@@ -300,29 +283,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 type: "FeatureCollection",
                 features: data,
             },
-            cluster: true,
-            clusterMaxZoom: 14,
-            clusterRadius: 1,
         });
 
-        // hotspots layer
-        map.current.addLayer({
-            id: "hotspots-sightings",
-            type: "circle",
-            source: "sightings",
-            filter: ["has", "point_count"],
-            paint: {
-                "circle-color": "#758bfd",
-                "circle-radius": ["step", ["get", "point_count"], 14, 10, 16],
-                "circle-opacity": 0.7,
-            },
-        });
-        //single bird sightings layer
         map.current.addLayer({
             id: "sightings",
             type: "circle",
             source: "sightings",
-            filter: ["!", ["has", "point_count"]],
             paint: {
                 "circle-radius": 10,
                 "circle-stroke-width": 2,
@@ -474,7 +440,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             <div className="button-container-bottom">
                 {markersButtonView === 1 && (
                     <button id="show-birds" onClick={showMarkers}>
-                        All birds
+                        All obs.
                     </button>
                 )}
                 {markersButtonView === 2 && (
@@ -482,17 +448,17 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                         id="show-birds-visible"
                         onClick={toggleMarkersLayer}
                     >
-                        All birds
+                        All obs.
                     </button>
                 )}
                 {markersButtonView === 3 && (
                     <button id="show-birds" onClick={toggleMarkersLayer}>
-                        All birds
+                        All obs.
                     </button>
                 )}
                 {myMarkersButtonView === 1 && (
                     <button id="my-sightings" onClick={showMyMarkers}>
-                        My sightings
+                        My obs.
                     </button>
                 )}
                 {myMarkersButtonView === 2 && (
@@ -500,12 +466,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                         id="my-sightings-visible"
                         onClick={toggleMyMarkersLayer}
                     >
-                        My sightings
+                        My obs.
                     </button>
                 )}
                 {myMarkersButtonView === 3 && (
                     <button id="my-sightings" onClick={toggleMyMarkersLayer}>
-                        My sightings
+                        My obs.
                     </button>
                 )}{" "}
                 <Logout />

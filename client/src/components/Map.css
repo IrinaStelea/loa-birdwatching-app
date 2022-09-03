@@ -66,11 +66,10 @@
 #logout,
 #geolocate {
     background-color: rgba(53, 61, 96, 0.8);
-    padding: 2vw 4vw;
+    padding: 2vw 3vw;
     margin: 12px;
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
-    padding: 0;
     display: flex;
     align-items: center;
 }
