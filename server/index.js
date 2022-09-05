@@ -149,7 +149,7 @@ app.post("/api/submit-pin", async (req, res) => {
             req.session.userId,
             req.body.geoJSON
         );
-        console.log("result from adding pin", result.rows[0]);
+        // console.log("result from adding pin", result.rows[0]);
         return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);

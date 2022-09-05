@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import DatalistInput from "react-datalist-input";
 import { addMarker } from "../../redux/user-markers/slice";
 import "react-datalist-input/dist/styles.css";
+import { addAvailableBird } from "../../redux/birds-filter/slice";
 
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);
@@ -23,7 +24,6 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     console.log("bird list in component", birdList);
 
     const onSelect = useCallback((bird) => {
-        console.log("selected bird", bird);
         setSelectedBird(bird);
     }, []);
 
@@ -34,7 +34,6 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             })
             .split(",")
             .join("");
-        console.log("date", date);
 
         fetch("/api/submit-pin", {
             method: "POST",
@@ -58,8 +57,13 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("data after add new pin", data);
+                // console.log("data after add new pin", data);
                 dispatch(addMarker(data));
+                dispatch(
+                    addAvailableBird({
+                        [data.id]: data.sighting.properties.comName,
+                    })
+                );
                 togglePinPopUp();
             })
             .catch((err) => {

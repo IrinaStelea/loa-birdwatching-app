@@ -38,21 +38,23 @@ export default function App() {
     //fetch api data stored in back-end
     useEffect(() => {
         //fetch the json with the recent sightings
-        fetch("/api/data.json")
-            .then((res) => res.json())
-            .then((data) => {
-                // console.log("response from server api data, data", data);
-                setData(data);
-            });
+        const fetchAPIData = async () => {
+            const res = await fetch("/api/data.json");
+            const data = await res.json();
+
+            setData(data);
+        };
+        fetchAPIData();
     }, []);
+
     //fetch user sightings
     useEffect(() => {
-        fetch("/api/user-data.json")
-            .then((res) => res.json())
-            .then((userData) => {
-                // console.log("response from server, user data", userData);
-                dispatch(receiveUserData(userData));
-            });
+        const fetchUserData = async () => {
+            const res = await fetch("/api/user-data.json");
+            const userData = await res.json();
+            dispatch(receiveUserData(userData));
+        };
+        fetchUserData();
     }, []);
 
     useEffect(() => {

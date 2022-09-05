@@ -11,8 +11,9 @@ module.exports.cleanString = (string) => {
 
 module.exports.convertToGeojson = (data) => {
     var geojsonData = [];
-    data.forEach(function (d) {
+    data.forEach(function (d, idx) {
         geojsonData.push({
+            id: idx,
             type: "Feature",
             geometry: {
                 type: "Point",
@@ -29,11 +30,13 @@ module.exports.convertToGeojson = (data) => {
 };
 
 module.exports.randomizeIdenticalCoordinates = (data) => {
-    let latArray = [];
-    let lngArray = [];
-
+    //look for identical lat & long and store them in an object as key-value pairs
+    let coordObj = {};
     data = data.map(function (entry) {
-        if (latArray.includes(entry.lat) && lngArray.includes(entry.lng)) {
+        if (
+            Object.keys(coordObj).includes(`${entry.lat}`) &&
+            coordObj[entry.lat] === entry.lng
+        ) {
             return {
                 ...entry,
                 lat:
@@ -46,8 +49,7 @@ module.exports.randomizeIdenticalCoordinates = (data) => {
                     Math.random() * 0.00003,
             };
         } else {
-            latArray.push(entry.lat);
-            lngArray.push(entry.lng);
+            coordObj[entry.lat] = entry.lng;
             return { ...entry };
         }
     });

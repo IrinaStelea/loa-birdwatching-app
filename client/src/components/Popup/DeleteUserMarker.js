@@ -1,13 +1,14 @@
 import { useDispatch } from "react-redux";
 import { deleteMarker } from "../../redux/user-markers/slice";
 import { useState } from "react";
+import { deleteAvailableBird } from "../../redux/birds-filter/slice";
 export default function DeleteUserMarker({ info, togglePopUp }) {
     const dispatch = useDispatch();
     const [confirmation, setConfirmation] = useState(false);
 
     const deleteUserMarker = () => {
         const id = info.id;
-        // console.log("id in delete user marker", id);
+        console.log("info in delete", info);
         fetch("/api/delete-user-marker", {
             method: "POST",
             headers: {
@@ -19,6 +20,7 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
             .then((data) => {
                 console.log("response from delete", data);
                 dispatch(deleteMarker(id));
+                dispatch(deleteAvailableBird({ [info.id]: info.comName }));
                 togglePopUp();
             })
             .catch((err) => {

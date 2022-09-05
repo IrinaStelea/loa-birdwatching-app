@@ -1,100 +1,62 @@
-import "./Map.css";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
-import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { useDispatch } from "react-redux";
+
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import "./Map.css";
+
 import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
 import { receiveAvailableBirds } from "../redux/birds-filter/slice";
 import { resetAvailableBirds } from "../redux/birds-filter/slice";
-import Logout from "./Logout.js";
 import { closePopup } from "../redux/popup/slice";
+import Logout from "./Logout.js";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
 // const userHotspotImage = require("../../hotspot_user.png");
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
 export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
-    // console.log("data in the map component", data);
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [lng, setLng] = useState(userLng); //13.39
     const [lat, setLat] = useState(userLat); //52.52
     const [zoom, setZoom] = useState(11);
-    const [markersLayerVisible, setMarkersLayer] = useState(false);
+
+    const [markersLayerVisible, setMarkersLayer] = useState(true);
     const [markersButtonView, setMarkersButtonView] = useState(1);
-    const [myMarkersLayerVisible, setMyMarkersLayer] = useState(false);
-    const [myMarkersButtonView, setMyMarkersButtonView] = useState(1);
+    const [userMarkersLayerVisible, setUserMarkersLayer] = useState(true);
+    const [userMarkersButtonView, setUserMarkersButtonView] = useState(1);
+    const [userCurrentMarkersLayer, setUserCurrentMarkersLayer] = useState();
+    const [searchedBird, setSearchedBird] = useState(null);
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
-    const userData = useSelector((state) => state.userData);
-    // console.log("user data in map component", userData);
-    const [userMarkersLayer, setUserMarkersLayer] = useState();
 
-    const [searchedBird, setSearchedBird] = useState(null);
+    const userData = useSelector((state) => state.userData);
 
     //define the list of birds in the search box
     const searchableBirds = useSelector(
         (state) =>
             state.availableBirds &&
-            state.availableBirds.map((bird, idx) => ({
-                id: idx,
-                value: bird,
-            }))
+            state.availableBirds.map((bird) =>
+                bird[Object.keys(bird)].split("-").join(" ")
+            )
     );
 
-    // console.log("searchable birds", searchableBirds);
-
-    //on select function for the filter
-    const onSelect = useCallback((sel) => {
-        // console.log("selected bird in filter", sel);
-        setValue(sel.value);
-        setSearchedBird(sel.value);
-        var features = map.current.queryRenderedFeatures({
-            layers: ["user-sightings", "sightings"],
-        });
-        if (!features.length) {
-            return;
-        }
-        let selection = features.filter(
-            (bird) => bird.properties.comName === sel.value
-        );
-
-        // console.log("selection in filter", selection);
-
-        map.current.addSource("search-results", {
-            type: "geojson",
-            data: {
-                type: "FeatureCollection",
-                features: selection,
-            },
-        });
-        map.current.addLayer({
-            id: "search-results",
-            type: "circle",
-            source: "search-results",
-            paint: {
-                "circle-radius": 10,
-                "circle-stroke-width": 2,
-                "circle-color": "green",
-                "circle-stroke-color": "white",
-            },
-        });
-    }, []);
-
-    const resetSearch = () => {
-        if (typeof map.current.getLayer("search-results") !== "undefined") {
-            map.current.removeLayer("search-results");
-            map.current.removeSource("search-results");
-            setValue("");
-        }
-    };
+    let uniqueSearchableBirds = [...new Set(searchableBirds)]
+        .sort()
+        .map((bird, idx) => ({
+            id: idx,
+            value: bird,
+        }));
 
     const popup = useSelector((state) => state.popupInfo);
+    console.log("pop up info", popup);
 
+    //initialize map
     useEffect(() => {
         if (map.current) return; // initialize map only once
         map.current = new mapboxgl.Map({
@@ -103,9 +65,8 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             center: [userLng, userLat],
             zoom: zoom,
         });
-        //add marker for user location
-        // new mapboxgl.Marker().setLngLat([userLng, userLat]).addTo(map.current);
 
+        //read coordinates on map move
         //wait for map to be initialised
         if (!map.current) return;
         map.current.on("move", () => {
@@ -132,57 +93,114 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         return () => map.current.remove();
     }, []);
 
-    //click events for markers
+    const initAPILayer = () => {
+        map.current.addSource("sightings", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: data,
+            },
+        });
+
+        map.current.addLayer({
+            id: "sightings",
+            type: "circle",
+            source: "sightings",
+            paint: {
+                "circle-radius": 10,
+                "circle-stroke-width": 2,
+                "circle-color": "#758bfd",
+                "circle-stroke-color": "white",
+            },
+        });
+    };
+
+    const initUserLayer = () => {
+        // console.log("inside inituserlayer");
+        let userMarkers = userData.map((marker) => {
+            return { ...marker.sighting, id: marker.id };
+        });
+
+        map.current.addSource("user-sightings", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: userMarkers,
+            },
+        });
+
+        map.current.addLayer({
+            id: "user-sightings",
+            type: "circle",
+            source: "user-sightings",
+            paint: {
+                "circle-radius": 10,
+                "circle-stroke-width": 2,
+                "circle-color": "#f5756a",
+                "circle-stroke-color": "white",
+            },
+        });
+        //store the layer in a variable to be able to add/remove user pins
+        setUserCurrentMarkersLayer(map.current.getSource("user-sightings"));
+
+        setUserMarkersButtonView(1);
+    };
+
+    //add layer of API pins
+    useEffect(() => {
+        if (!map.current) return;
+        map.current.once("load", () => {
+            if (typeof map.current.getLayer("sightings") !== "undefined")
+                return;
+            if (data) {
+                initAPILayer();
+            }
+        });
+    }, [data]);
+
+    //add layer of user pins
+    useEffect(() => {
+        if (!map.current) return;
+        map.current.once("load", () => {
+            if (typeof map.current.getLayer("user-sightings") !== "undefined")
+                return;
+            if (userData.length !== 0) {
+                initUserLayer();
+            }
+        });
+    }, [userData]);
+
+    //map events
     useEffect(() => {
         //add pop-up with info to each API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
-            e.clickOnFirstLayer = true;
-            // get coordinates of click + bird info
-            console.log("click on simple", e.features);
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const comName = e.features[0].properties.comName;
-            const sciName = e.features[0].properties.sciName;
-            const date = e.features[0].properties.date;
-            dispatch(openPopup({ coordinates, comName, sciName, date }));
+            const id = e.features[0].id;
+            const coordinates = e.features[0].geometry.coordinates;
+            const { comName, sciName, date } = e.features[0].properties;
+            dispatch(openPopup({ id, coordinates, comName, sciName, date }));
             dispatch(receiveUserPopup(false));
         });
 
-        //add pop-up with info to each existing user marker
-
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
-            if (e.clickOnFirstLayer) {
-                // console.log("preventing click on user layer");
-                return;
-            }
+
             // get coordinates of click + bird info
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const comName = e.features[0].properties.comName;
-            const sciName = e.features[0].properties.sciName;
-            const date = e.features[0].properties.date;
+            const coordinates = e.features[0].geometry.coordinates;
+            const { comName, sciName, date } = e.features[0].properties;
             const id = e.features[0].id;
             dispatch(openPopup({ coordinates, comName, sciName, date, id }));
             dispatch(receiveUserPopup(true));
-            // // if map is zoomed out and multiple copies of the feature are visible, the popup appears over the copy being pointed to
-            // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            //     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            // }
         });
 
         //add new pin on user click
         map.current.on("click", function addMarker(e) {
-            // console.log("e in click", e);
             if (e.clickOnLayer) {
-                console.log("preventing click on basemap");
+                // console.log("preventing click on basemap");
                 return;
             }
-
+            console.log("click", e);
             var coordinates = e.lngLat;
-            // map.current.flyTo({
-            //     center: coordinates,
-            //     // zoom: Math.max(18, zoom),
-            // });
             //close other popups if open
             dispatch(closePopup());
             //dispatch coord for user marker
@@ -191,12 +209,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.on("movestart", () => {
             dispatch(resetAvailableBirds());
-            resetSearch();
+            setValue("");
         });
         map.current.on("moveend", () => {
             if (
                 typeof map.current.getLayer("sightings") === "undefined" &&
-                typeof map.current.getLayer("user-sightings")
+                typeof map.current.getLayer("user-sightings") === "undefined"
             ) {
                 return;
             }
@@ -205,12 +223,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 layers: ["user-sightings", "sightings"],
             });
 
-            let birdNames = allPins.map((pin) => pin.properties.comName);
-            // console.log("features", features);
+            console.log("all pins", allPins);
+            let birdNames = allPins.map((pin) => ({
+                [pin.id]: pin.properties.comName,
+            }));
 
-            let uniqueBirdNames = [...new Set(birdNames)].sort();
-
-            dispatch(receiveAvailableBirds(uniqueBirdNames));
+            dispatch(receiveAvailableBirds(birdNames));
         });
     }, []);
 
@@ -234,7 +252,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                     return;
                 }
             }
-            // console.log("e in zoom funtion", e);
             map.current.flyTo({
                 center: e.lngLat,
                 zoom: Math.max(18, zoom),
@@ -243,95 +260,102 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     }, [zoom]);
 
     const toggleMarkersLayer = () => {
-        if (!markersLayerVisible) {
+        if (markersLayerVisible) {
             map.current.setLayoutProperty("sightings", "visibility", "none");
-            setMarkersButtonView(3);
+            setMarkersButtonView(2);
         } else {
             map.current.setLayoutProperty("sightings", "visibility", "visible");
-            setMarkersButtonView(2);
+            setMarkersButtonView(1);
         }
         setMarkersLayer(!markersLayerVisible);
     };
 
-    const toggleMyMarkersLayer = () => {
-        if (!myMarkersLayerVisible) {
+    const toggleUserMarkersLayer = () => {
+        if (userMarkersLayerVisible) {
             map.current.setLayoutProperty(
                 "user-sightings",
                 "visibility",
                 "none"
             );
-            setMyMarkersButtonView(3);
+            setUserMarkersButtonView(2);
         } else {
             map.current.setLayoutProperty(
                 "user-sightings",
                 "visibility",
                 "visible"
             );
-            setMyMarkersButtonView(2);
+            setUserMarkersButtonView(1);
         }
-        setMyMarkersLayer(!myMarkersLayerVisible);
+        setUserMarkersLayer(!userMarkersLayerVisible);
     };
 
-    //user click on ALL BIRDS => show general bird data
-    const showMarkers = (e) => {
-        e.stopPropagation();
+    //on select function for the filter
+    const onSelect = useCallback((sel) => {
+        // console.log("selected bird in filter", sel);
+        setValue(sel.value);
+        setSearchedBird(sel.value);
+        var features = map.current.queryRenderedFeatures({
+            layers: ["user-sightings", "sightings"],
+        });
+        if (!features.length) {
+            return;
+        }
 
-        // Add a data source containing one point feature.
-        map.current.addSource("sightings", {
+        let selection = features.filter(
+            (bird) => bird.properties.comName.split("-").join(" ") === sel.value
+        );
+        console.log("selection", selection);
+
+        if (typeof map.current.getLayer("search-results") !== "undefined") {
+            map.current.removeLayer("search-results");
+            map.current.removeSource("search-results");
+        }
+
+        map.current.addSource("search-results", {
             type: "geojson",
             data: {
                 type: "FeatureCollection",
-                features: data,
+                features: selection,
             },
         });
-
         map.current.addLayer({
-            id: "sightings",
+            id: "search-results",
             type: "circle",
-            source: "sightings",
+            source: "search-results",
             paint: {
                 "circle-radius": 10,
                 "circle-stroke-width": 2,
-                "circle-color": "#758bfd",
+                "circle-color": "green",
                 "circle-stroke-color": "white",
             },
         });
+    }, []);
 
-        setMarkersButtonView(2);
-    };
-
-    // //user click on MY BIRDS => show user sightings
-    const showMyMarkers = (e) => {
-        e.stopPropagation();
-        // console.log("data geojson in app", data);
-        let userMarkers = userData.map((marker) => {
-            return { ...marker.sighting, id: marker.id };
-        });
-        console.log("user markers", userMarkers);
-        // console.log("user markers mapped", userMarkers);
-        map.current.addSource("user-sightings", {
-            type: "geojson",
-            data: {
-                type: "FeatureCollection",
-                features: userMarkers,
-            },
+    //delete search highlight in case user deletes that pin
+    useEffect(() => {
+        if (typeof map.current.getLayer("search-results") === "undefined") {
+            return;
+        }
+        var oldFeatures = map.current.queryRenderedFeatures({
+            layers: ["search-results"],
         });
 
-        map.current.addLayer({
-            id: "user-sightings",
-            type: "circle",
-            source: "user-sightings",
-            paint: {
-                "circle-radius": 10,
-                "circle-stroke-width": 2,
-                "circle-color": "#f5756a",
-                "circle-stroke-color": "white",
-            },
+        let updatedFeatures = oldFeatures.filter(
+            (feature) => feature.id !== popup.id
+        );
+
+        map.current.getSource("search-results").setData({
+            type: "FeatureCollection",
+            features: updatedFeatures,
         });
-        //store the layer in a variable to be able to add/remove user pins
-        setUserMarkersLayer(map.current.getSource("user-sightings"));
-        // console.log("user markers layer", userMarkersLayer);
-        setMyMarkersButtonView(2);
+    }, [popup]);
+
+    const resetSearch = () => {
+        if (typeof map.current.getLayer("search-results") !== "undefined") {
+            map.current.removeLayer("search-results");
+            map.current.removeSource("search-results");
+            setValue("");
+        }
     };
 
     //highlights for user pins
@@ -340,7 +364,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             typeof map.current.getLayer("selected-pin") !== "undefined" &&
             Object.keys(popup).length === 0
         ) {
-            // console.log("inside the double if");
             map.current.removeLayer("selected-pin");
             map.current.removeSource("selected-pin");
         }
@@ -362,16 +385,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 return;
             }
             if (typeof map.current.getLayer("selected-pin") !== "undefined") {
-                console.log("inside the simple if");
+                // console.log("inside the simple if");
                 map.current.removeLayer("selected-pin");
                 map.current.removeSource("selected-pin");
             }
 
-            // console.log("features inisde highlight", features);
-
             var feature = features[0];
-
-            // console.log(feature.toJSON());
             map.current.addSource("selected-pin", {
                 type: "geojson",
                 data: feature.toJSON(),
@@ -391,14 +410,14 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     }, [popup]);
 
     useEffect(() => {
-        if (userMarkersLayer === undefined) {
+        if (userCurrentMarkersLayer === undefined) {
             return;
         }
         let updatedUserMarkers = userData.map((marker) => {
             // console.log("inside updated user markers");
             return { ...marker.sighting, id: marker.id };
         });
-        userMarkersLayer.setData({
+        userCurrentMarkersLayer.setData({
             type: "FeatureCollection",
             features: updatedUserMarkers,
         });
@@ -415,7 +434,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                         placeholder="Search for a bird"
                         showLabel={false}
                         value={value}
-                        items={searchableBirds}
+                        items={uniqueSearchableBirds}
                         onSelect={onSelect}
                     />
                 </div>
@@ -438,42 +457,27 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 <div ref={mapContainer} className="map-container" />
             </div>
             <div className="button-container-bottom">
-                {markersButtonView === 1 && (
-                    <button id="show-birds" onClick={showMarkers}>
-                        All obs.
-                    </button>
-                )}
-                {markersButtonView === 2 && (
-                    <button
-                        id="show-birds-visible"
-                        onClick={toggleMarkersLayer}
-                    >
-                        All obs.
-                    </button>
-                )}
-                {markersButtonView === 3 && (
-                    <button id="show-birds" onClick={toggleMarkersLayer}>
-                        All obs.
-                    </button>
-                )}
-                {myMarkersButtonView === 1 && (
-                    <button id="my-sightings" onClick={showMyMarkers}>
-                        My obs.
-                    </button>
-                )}
-                {myMarkersButtonView === 2 && (
-                    <button
-                        id="my-sightings-visible"
-                        onClick={toggleMyMarkersLayer}
-                    >
-                        My obs.
-                    </button>
-                )}
-                {myMarkersButtonView === 3 && (
-                    <button id="my-sightings" onClick={toggleMyMarkersLayer}>
-                        My obs.
-                    </button>
-                )}{" "}
+                <button
+                    id={
+                        markersButtonView === 1
+                            ? "show-birds-visible"
+                            : "show-birds"
+                    }
+                    onClick={toggleMarkersLayer}
+                >
+                    All obs.
+                </button>
+                <button
+                    id={
+                        userMarkersButtonView === 1
+                            ? "my-sightings-visible"
+                            : "my-sightings"
+                    }
+                    onClick={toggleUserMarkersLayer}
+                >
+                    My obs.
+                </button>
+
                 <Logout />
             </div>
         </>
