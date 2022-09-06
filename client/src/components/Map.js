@@ -95,6 +95,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     const initAPILayer = () => {
         map.current.addSource("sightings", {
             type: "geojson",
+            maxzoom: 24, //this provides more precision for the highlight/select layer
             data: {
                 type: "FeatureCollection",
                 features: data,
@@ -122,6 +123,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.addSource("user-sightings", {
             type: "geojson",
+            maxzoom: 24,
             data: {
                 type: "FeatureCollection",
                 features: userMarkers,
@@ -198,19 +200,37 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 // console.log("preventing click on basemap");
                 return;
             }
-            console.log("click", e);
             var coordinates = e.lngLat;
             //close other popups if open
             dispatch(closePopup());
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
         });
+    }, []);
 
-        map.current.on("movestart", () => {
+    useEffect(() => {
+        let flying = false;
+        map.current.on("flystart", () => {
+            console.log("inside fly start");
+            flying = true;
+        });
+
+        map.current.on("flyend", () => {
+            flying = false;
+        });
+
+        map.current.on("movestart", (e) => {
+            if (flying) {
+                return;
+            }
             dispatch(resetAvailableBirds());
+            console.log("inside move start");
             setValue("");
         });
-        map.current.on("moveend", () => {
+        map.current.on("moveend", (e) => {
+            if (flying) {
+                map.current.fire("flyend");
+            }
             if (
                 typeof map.current.getLayer("sightings") === "undefined" &&
                 typeof map.current.getLayer("user-sightings") === "undefined"
@@ -252,10 +272,12 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             }
             map.current.flyTo({
                 center: e.lngLat,
-                zoom: Math.max(18, zoom),
+                zoom: 22,
             });
+
+            map.current.fire("flystart");
         });
-    }, [zoom]);
+    }, []);
 
     const toggleMarkersLayer = () => {
         if (markersLayerVisible) {
