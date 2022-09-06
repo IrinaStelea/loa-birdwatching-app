@@ -21,8 +21,6 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             }))
     );
 
-    console.log("bird list in component", birdList);
-
     const onSelect = useCallback((bird) => {
         setSelectedBird(bird);
     }, []);

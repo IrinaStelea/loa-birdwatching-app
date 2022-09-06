@@ -56,3 +56,4 @@ module.exports.randomizeIdenticalCoordinates = (data) => {
 
     return data;
 };
+

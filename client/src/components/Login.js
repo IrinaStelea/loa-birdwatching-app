@@ -5,7 +5,11 @@ import "./App.css";
 
 export default function Login() {
     const [values, onFormInputChange] = useStatefulFields();
-    const [error, onFormSubmit] = useAuthSubmit("/login.json", values);
+    const [serverError, errors, onFormSubmit] = useAuthSubmit(
+        "/login.json",
+        ["email", "password"],
+        values
+    );
 
     return (
         <>
@@ -17,7 +21,10 @@ export default function Login() {
                         alt="Loa logo"
                     />
                 </a>
-                {error && <p className="error">{error}</p>}
+                {serverError && <p className="error">{serverError}</p>}
+                {Object.keys(errors).length !== 0 && (
+                    <p className="error">Please complete all fields</p>
+                )}
                 <h2>Login to start using Loa:</h2>
                 <form
                     className="form-container"
@@ -28,14 +35,12 @@ export default function Login() {
                 >
                     <div className="form-entry">
                         <input
-                            type="email"
+                            type="text"
                             name="email"
                             id="email"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.email ? "errorfield" : ""
-                            // }
+                            className={errors.email ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="email">Email</label>
                     </div>
@@ -46,9 +51,7 @@ export default function Login() {
                             id="password"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.password ? "errorfield" : ""
-                            // }
+                            className={errors.password ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="password">Password</label>
                     </div>

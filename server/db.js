@@ -44,19 +44,14 @@ module.exports.insertUser = (first, last, email, password) => {
     });
 };
 
-module.exports.findUser = (email) => {
-    return db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-};
-
 module.exports.validateUser = (email, inputPass) => {
     let userId;
     return db
         .query(`SELECT * FROM users WHERE email = $1`, [email])
         .then((results) => {
-            console.log(
-                "user email exists, here is the entire info",
-                results.rows
-            );
+            if (results.rows.length === 0) {
+                throw new Error("Email not in the database");
+            }
             //get db password
             let dbPass = results.rows[0].password;
 

@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");
 const app = express();
 const cookieSession = require("cookie-session");
+const validateForm = require("./validateForm");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -41,7 +42,7 @@ if (process.env.NODE_ENV == "production") {
     });
 }
 
-app.post("/api/register", (req, res) => {
+app.post("/api/register", validateForm.validateForm, (req, res) => {
     // console.log("req body", req.body);
     //add user to database, cleaning the data
     db.insertUser(
@@ -51,13 +52,11 @@ app.post("/api/register", (req, res) => {
         req.body.password
     )
         .then((results) => {
-            console.log("inserting new user worked");
+            // console.log("inserting new user worked");
             //set the cookie session on the user id to keep track of login
             const userId = results.rows[0].id;
-            // const firstName = results.rows[0].first;
             req.session = {
                 userId,
-                // firstName,
             };
             // console.log("user id cookie assigned", req.session.userId);
             //send success message
@@ -75,7 +74,7 @@ app.post("/api/register", (req, res) => {
 app.post("/login.json", (req, res) => {
     db.validateUser(req.body.email.toLowerCase(), req.body.password)
         .then((result) => {
-            console.log("user id cookie assigned at login", result);
+            // console.log("user id cookie assigned at login", result);
             //set the cookie
             req.session = {
                 userId: result,
@@ -85,7 +84,7 @@ app.post("/login.json", (req, res) => {
             });
         })
         .catch((err) => {
-            console.log("error in validating user", err);
+            // console.log("error in validating user", err);
             return res.json({
                 success: false,
                 message: "Invalid email or password",
@@ -134,11 +133,6 @@ app.get("/api/user-data.json", async (req, res) => {
 
 //serve the json with bird data
 app.get("/api/birddata.json", function (req, res) {
-    // let name = req.params.id;
-    // console.log("name", name);
-    // const bird = birdData.find((bird) => bird.sciName === name);
-    // console.log("get bird info single bird", bird);
-    // res.json({ image: bird.image });
     res.json(birdData);
 });
 

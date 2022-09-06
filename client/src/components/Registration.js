@@ -1,4 +1,4 @@
-// import { useState, useEffect } from "react";
+import { useState } from "react";
 import useStatefulFields from "../hooks/useStatefulFields.js";
 import useAuthSubmit from "../hooks/useAuthSubmit.js";
 import "./App.css";
@@ -6,7 +6,11 @@ import { Link } from "react-router-dom";
 
 export default function Registration() {
     const [values, onFormInputChange] = useStatefulFields();
-    const [error, onSubmit] = useAuthSubmit("/api/register", values);
+    const [serverError, errors, onSubmit] = useAuthSubmit(
+        "/api/register",
+        ["firstName", "lastName", "email", "password"],
+        values
+    );
 
     return (
         <>
@@ -18,7 +22,10 @@ export default function Registration() {
                         alt="Loa logo"
                     />
                 </a>
-                {error && <p className="error">{error}</p>}
+                {serverError && <p className="error">{serverError}</p>}
+                {Object.keys(errors).length !== 0 && (
+                    <p className="error">Please complete all fields</p>
+                )}
                 <h2>Register to start using Loa:</h2>
                 <form
                     // always add an id to match the label otherwise clicking on the label won't work
@@ -35,9 +42,7 @@ export default function Registration() {
                             id="firstName"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.firstName ? "errorfield" : ""
-                            // }
+                            className={errors.firstName ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="firstName">First name</label>
                     </div>
@@ -48,22 +53,18 @@ export default function Registration() {
                             id="lastName"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.lastName ? "errorfield" : ""
-                            // }
+                            className={errors.lastName ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="lastName">Last name</label>
                     </div>
                     <div className="form-entry">
                         <input
-                            type="email"
+                            type="text"
                             name="email"
                             id="email"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.email ? "errorfield" : ""
-                            // }
+                            className={errors.email ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="email">Email</label>
                     </div>
@@ -74,9 +75,7 @@ export default function Registration() {
                             id="password"
                             placeholder=" "
                             onChange={onFormInputChange}
-                            // className={
-                            //     this.state.errors.password ? "errorfield" : ""
-                            // }
+                            className={errors.password ? "errorfield" : ""}
                         ></input>
                         <label htmlFor="password">Password</label>
                     </div>

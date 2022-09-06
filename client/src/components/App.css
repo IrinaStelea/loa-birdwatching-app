@@ -1,5 +1,4 @@
 body {
-    background-color: #f5756a;
     font-family: "Work Sans", sans-serif;
     display: flex;
     flex-direction: column;
@@ -35,11 +34,15 @@ body {
 .form-entry label {
     position: absolute;
     left: 0;
-    color: white;
+    color: #353d60;
     cursor: text;
     transform-origin: 0 0;
     font-size: 1.1em;
     transition: transform 0.1s ease-in-out, color 0.1s ease-in-out;
+}
+
+.form-entry .errorfield {
+    border: 1px solid red !important;
 }
 
 /* .form-upload input { */
@@ -49,14 +52,14 @@ body {
     color: #353d60;
     background-color: unset;
     font-weight: bolder;
-    border-bottom: 0.5px solid white;
+    border-bottom: 0.5px solid #f5756a;
     font-size: 1em;
 }
 
 /* .form-upload input:focus + label, */
 input:focus + label,
 input:not(:placeholder-shown) + label {
-    color: white;
+    color: rgba (53, 61, 96, 0.8);
     transform: translateY(-1.1em) scale(0.8);
 }
 
@@ -66,11 +69,15 @@ input:not(:placeholder-shown) + label {
     align-items: center;
     gap: 2vh;
     padding: 2vh 2vw;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: snow;
 }
 
 .container h2 {
     font-weight: 400;
-    color: white;
+    color: #353d60;
     font-family: "Work Sans", sans-serif;
     text-align: center;
 }
@@ -79,14 +86,14 @@ input:not(:placeholder-shown) + label {
     font-size: 1.4em;
     font-weight: 400;
     margin-top: 3vh;
-    color: white;
+    color: #353d60;
 }
 
 #footnote a {
-    color: white;
+    color: #353d60;
 }
 #footnote a:visited {
-    color: white;
+    color: #353d60;
 }
 
 .form-container input:not(:last-of-type) {
@@ -95,11 +102,17 @@ input:not(:placeholder-shown) + label {
 
 .form-container #submit {
     font-family: "Work Sans", sans-serif;
-    color: white;
+    color: snow;
     font-size: 1.2em;
-    background-color: #353d60;
-    border: 1px solid #353d60;
+    background-color: #f5756a;
+    border: 1px solid #f5756a;
     border-radius: 5px;
-    padding: 1vw;
+    padding: 1vw 3vw;
     margin-top: 2vh;
+}
+
+.error {
+    color: red;
+    white-space: pre-wrap;
+    text-align: center;
 }

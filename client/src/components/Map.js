@@ -54,7 +54,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         }));
 
     const popup = useSelector((state) => state.popupInfo);
-    console.log("pop up info", popup);
 
     //initialize map
     useEffect(() => {
@@ -223,7 +222,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 layers: ["user-sightings", "sightings"],
             });
 
-            console.log("all pins", allPins);
             let birdNames = allPins.map((pin) => ({
                 [pin.id]: pin.properties.comName,
             }));
@@ -304,7 +302,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         let selection = features.filter(
             (bird) => bird.properties.comName.split("-").join(" ") === sel.value
         );
-        console.log("selection", selection);
+        // console.log("selection", selection);
 
         if (typeof map.current.getLayer("search-results") !== "undefined") {
             map.current.removeLayer("search-results");
