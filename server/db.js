@@ -82,7 +82,7 @@ module.exports.getUserSightings = (id) => {
 
 module.exports.addSighting = (id, sighting) => {
     return db.query(
-        `INSERT INTO sightings (user_id, sighting) VALUES($1, ($2)::jsonb) RETURNING id, sighting`,
+        `INSERT INTO sightings (user_id, sighting) VALUES($1, ($2)::jsonb) RETURNING id, sighting, image_url`,
         [id, JSON.stringify(sighting)]
     );
 };

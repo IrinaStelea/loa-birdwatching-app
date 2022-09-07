@@ -8,8 +8,39 @@ export default function useAuthSubmit(url, fieldsArray, values) {
         let errorFields = {};
         for (let field of fieldsArray) {
             if (!values[field]) {
-                errorFields[field] = "Please complete all fields";
+                errorFields[field] = true;
+                errorFields.message = "Please complete all fields \n";
             }
+        }
+
+        //front-end validation for email and password
+        if (values.email !== undefined) {
+            let lastAtPos = values.email.lastIndexOf("@");
+            let lastDotPos = values.email.lastIndexOf(".");
+
+            if (
+                !(
+                    lastAtPos < lastDotPos &&
+                    lastAtPos > 0 &&
+                    values.email.indexOf("@@") === -1 &&
+                    lastDotPos > 2 &&
+                    values.email.length - lastDotPos > 2
+                )
+            ) {
+                errorFields.email = true;
+                errorFields.message
+                    ? (errorFields.message += "Please provide a valid email \n")
+                    : (errorFields.message = "Please provide a valid email \n");
+            }
+        }
+
+        if (values.password !== undefined && values.password.length < 6) {
+            errorFields.password = true;
+            errorFields.message
+                ? (errorFields.message +=
+                      "Password must be 6 or more characters \n")
+                : (errorFields.message =
+                      "Password must be 6 or more characters \n");
         }
 
         if (Object.keys(errorFields).length !== 0) {

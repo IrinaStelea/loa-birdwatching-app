@@ -18,6 +18,13 @@ CREATE TABLE sightings(
 );
 
 
+create TABLE sightings_images (
+   id SERIAL PRIMARY KEY,
+   image_id INTEGER NOT NULL REFERENCES sightings(id) ON DELETE CASCADE,
+   image_url TEXT NOT NULL
+);
+
+
 -- user 1 sightings
 
 

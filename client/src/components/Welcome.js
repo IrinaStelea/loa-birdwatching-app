@@ -17,10 +17,6 @@ export default function Welcome() {
                     <Route exact path="/" element={<StartScreen />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/login" element={<Login />} />
-                    {/* <Route
-                            path="/reset-password"
-                            component={ResetPassword}
-                        ></Route> */}
                     <Route path="*" element={<StartScreen />} />
                 </Routes>
             </Router>

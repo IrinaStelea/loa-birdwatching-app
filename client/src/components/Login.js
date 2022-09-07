@@ -23,7 +23,7 @@ export default function Login() {
                 </a>
                 {serverError && <p className="error">{serverError}</p>}
                 {Object.keys(errors).length !== 0 && (
-                    <p className="error">Please complete all fields</p>
+                    <p className="error">{errors.message}</p>
                 )}
                 <h2>Login to start using Loa:</h2>
                 <form

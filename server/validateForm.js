@@ -1,16 +1,16 @@
 exports.validateForm = (req, res, next) => {
     let errorMessage = ``;
 
-    let lastAtPos = req.body.email.lastIndexOf("@");
-    let lastDotPos = req.body.email.lastIndexOf(".");
-
-    if (req.body.firstName !== undefined && req.body.firstName === 0) {
+    if (req.body.firstName !== undefined && req.body.firstName.length === 0) {
         errorMessage += "Please provide a first name \n";
     }
 
-    if (req.body.lastName !== undefined && req.body.lastName === 0) {
+    if (req.body.lastName !== undefined && req.body.lastName.length === 0) {
         errorMessage += "Please provide a last name \n";
     }
+
+    let lastAtPos = req.body.email.lastIndexOf("@");
+    let lastDotPos = req.body.email.lastIndexOf(".");
 
     if (
         !(

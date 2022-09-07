@@ -9,6 +9,7 @@ const helpers = require("./helpers.js");
 const app = express();
 const cookieSession = require("cookie-session");
 const { validateForm } = require("./validateForm");
+const s3 = require("./s3");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -36,6 +37,13 @@ if (process.env.NODE_ENV == "production") {
         res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
+
+// const runImageUploadMiddleware = (req, res, next) => {
+//     if (req.file) {
+//         return uploader.single("file");
+//     }
+//     return next;
+// };
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
@@ -138,18 +146,22 @@ app.post("/api/submit-pin", async (req, res) => {
             req.session.userId,
             req.body.geoJSON
         );
-        // console.log("result from adding pin", result.rows[0]);
+
+        console.log("result from adding pin", result.rows[0]);
         return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);
     }
 });
 
+app.post("/api/upload-image");
+
 //delete user sighting
 app.post("/api/delete-user-marker", async (req, res) => {
     try {
         const result = await db.deleteSighting(req.body.id);
-        // console.log("result deleting sighting", result);
+        // console.log("result deleting sighting", result)
+
         return res.json({ message: "success" });
     } catch (error) {
         console.log("error in deleting sighting", error);
