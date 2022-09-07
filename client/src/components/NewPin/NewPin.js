@@ -1,8 +1,8 @@
 import { useState } from "react";
-import "./NewPin.css";
+import { useDispatch } from "react-redux";
 import NewPinPopUp from "./NewPinPopUp";
 import { resetUserMarker } from "../../redux/new-user-marker/slice";
-import { useDispatch } from "react-redux";
+import "../../stylesheets/NewPin.css";
 
 export default function NewPin({ userPin }) {
     const dispatch = useDispatch();

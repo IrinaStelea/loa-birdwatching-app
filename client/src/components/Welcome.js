@@ -1,4 +1,3 @@
-// import { useState, useEffect } from "react";
 import Registration from "./Registration.js";
 import Login from "./Login.js";
 import StartScreen from "./StartScreen.js";
@@ -7,7 +6,7 @@ import {
     BrowserRouter as Router,
     Route,
     Routes,
-    Redirect,
+    // Redirect,
 } from "react-router-dom";
 
 export default function Welcome() {

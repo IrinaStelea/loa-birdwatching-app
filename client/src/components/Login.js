@@ -1,7 +1,7 @@
 import useStatefulFields from "../hooks/useStatefulFields.js";
 import useAuthSubmit from "../hooks/useAuthSubmit.js";
 import { Link } from "react-router-dom";
-import "./App.css";
+import "../stylesheets/App.css";
 
 export default function Login() {
     const [values, onFormInputChange] = useStatefulFields();

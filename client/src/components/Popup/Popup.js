@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { closePopup } from "../../redux/popup/slice";
-import "./Popup.css";
 import DeleteUserMarker from "./DeleteUserMarker.js";
+import { closePopup } from "../../redux/popup/slice";
+import "../../stylesheets/Popup.css";
 
 export default function Popup() {
     //  const [popUpVisible, setPopUp] = useState(true);

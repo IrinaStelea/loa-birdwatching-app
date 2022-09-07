@@ -1,7 +1,8 @@
 import { useDispatch } from "react-redux";
-import { deleteMarker } from "../../redux/user-markers/slice";
 import { useState } from "react";
 import { deleteAvailableBird } from "../../redux/birds-filter/slice";
+import { deleteMarker } from "../../redux/user-markers/slice";
+
 export default function DeleteUserMarker({ info, togglePopUp }) {
     const dispatch = useDispatch();
     const [confirmation, setConfirmation] = useState(false);

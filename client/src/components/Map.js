@@ -1,10 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
-import "./Map.css";
-
 import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
@@ -13,7 +10,7 @@ import { resetAvailableBirds } from "../redux/birds-filter/slice";
 import { closePopup } from "../redux/popup/slice";
 import Logout from "./Logout.js";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
-// const userHotspotImage = require("../../hotspot_user.png");
+import "../stylesheets/Map.css";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -65,7 +62,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             zoom: zoom,
         });
 
-        //read coordinates on map move
         //wait for map to be initialised
         if (!map.current) return;
         map.current.on("move", () => {
@@ -81,21 +77,23 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 positionOptions: {
                     enableHighAccuracy: true,
                 },
-                // When active the map will receive updates to the device's location as it changes.
+                // track user location as it changes
                 trackUserLocation: true,
-                // Draw an arrow next to the location dot to indicate which direction the device is heading.
+                // arrow to indicate device direction
                 showUserHeading: true,
             })
         );
 
         // cleanup function to remove map on unmount
         return () => map.current.remove();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const initAPILayer = () => {
         map.current.addSource("sightings", {
             type: "geojson",
-            maxzoom: 24, //this provides more precision for the highlight/select layer
+            maxzoom: 24, //this provides more precision for the highlight/select overlay
             data: {
                 type: "FeatureCollection",
                 features: data,
@@ -116,7 +114,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     };
 
     const initUserLayer = () => {
-        // console.log("inside inituserlayer");
         let userMarkers = userData.map((marker) => {
             return { ...marker.sighting, id: marker.id };
         });
@@ -147,7 +144,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setUserMarkersButtonView(1);
     };
 
-    //add layer of API pins
+    //layer of API pins
     useEffect(() => {
         if (!map.current) return;
         map.current.once("load", () => {
@@ -157,6 +154,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 initAPILayer();
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
 
     //add layer of user pins
@@ -169,6 +167,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 initUserLayer();
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
     //map events
@@ -206,6 +205,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -248,6 +248,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
             dispatch(receiveAvailableBirds(birdNames));
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     //when clicking on the basemap, zoom in to 18 or more
@@ -311,7 +312,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
     //on select function for the filter
     const onSelect = useCallback((sel) => {
-        // console.log("selected bird in filter", sel);
+        console.log("inside on select", sel);
         setValue(sel.value);
         setSearchedBird(sel.value);
         var features = map.current.queryRenderedFeatures({
@@ -324,7 +325,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         let selection = features.filter(
             (bird) => bird.properties.comName.split("-").join(" ") === sel.value
         );
-        // console.log("selection", selection);
 
         if (typeof map.current.getLayer("search-results") !== "undefined") {
             map.current.removeLayer("search-results");
@@ -333,6 +333,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.addSource("search-results", {
             type: "geojson",
+            maxzoom: 24,
             data: {
                 type: "FeatureCollection",
                 features: selection,
@@ -349,6 +350,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
                 "circle-stroke-color": "white",
             },
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     //delete search highlight in case user deletes that pin
@@ -413,6 +415,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             var feature = features[0];
             map.current.addSource("selected-pin", {
                 type: "geojson",
+                maxzoom: 24,
                 data: feature.toJSON(),
             });
             map.current.addLayer({
@@ -434,13 +437,13 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             return;
         }
         let updatedUserMarkers = userData.map((marker) => {
-            // console.log("inside updated user markers");
             return { ...marker.sighting, id: marker.id };
         });
         userCurrentMarkersLayer.setData({
             type: "FeatureCollection",
             features: updatedUserMarkers,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
     return (

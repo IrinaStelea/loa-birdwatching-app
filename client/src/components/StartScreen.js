@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./StartScreen.css";
+import "../stylesheets/StartScreen.css";
 
 export default function StartScreen() {
     return (

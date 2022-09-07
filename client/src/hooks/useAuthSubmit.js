@@ -1,5 +1,3 @@
-//handle the submit button; pass the url and the values of the form as parameters
-
 import { useState } from "react";
 
 export default function useAuthSubmit(url, fieldsArray, values) {
@@ -13,7 +11,7 @@ export default function useAuthSubmit(url, fieldsArray, values) {
                 errorFields[field] = "Please complete all fields";
             }
         }
-        console.log("errorfields", errorFields);
+
         if (Object.keys(errorFields).length !== 0) {
             setErrors(errorFields);
             setServerError("");
@@ -29,7 +27,6 @@ export default function useAuthSubmit(url, fieldsArray, values) {
             return;
         }
 
-        console.log("proceeding to fetch");
         fetch(url, {
             method: "POST",
             headers: {
@@ -39,7 +36,7 @@ export default function useAuthSubmit(url, fieldsArray, values) {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
+                // console.log(data);
                 if (!data.success && data.message) {
                     setErrors({});
                     setServerError(data.message);

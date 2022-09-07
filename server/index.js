@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3001;
 const helpers = require("./helpers.js");
 const app = express();
 const cookieSession = require("cookie-session");
-const validateForm = require("./validateForm");
+const { validateForm } = require("./validateForm");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -27,11 +27,6 @@ app.use(express.urlencoded({ extended: false }));
 // Have Node serve the files for our built React app
 app.use(express.static(path.resolve(__dirname, "../client/build")));
 
-// Handle GET requests to /api route
-// app.get("/api", (req, res) => {
-//     res.json({ message: "Hello from server!" });
-// });
-
 //https middleware
 if (process.env.NODE_ENV == "production") {
     app.use((req, res, next) => {
@@ -42,7 +37,7 @@ if (process.env.NODE_ENV == "production") {
     });
 }
 
-app.post("/api/register", validateForm.validateForm, (req, res) => {
+app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
     //add user to database, cleaning the data
     db.insertUser(

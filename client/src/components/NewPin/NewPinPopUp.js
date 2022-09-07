@@ -1,10 +1,11 @@
-import "./NewPin.css";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import DatalistInput from "react-datalist-input";
 import { addMarker } from "../../redux/user-markers/slice";
-import "react-datalist-input/dist/styles.css";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
+import DatalistInput from "react-datalist-input";
+import "react-datalist-input/dist/styles.css";
+
+import "../../stylesheets/NewPin.css";
 
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);

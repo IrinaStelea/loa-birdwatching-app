@@ -1,8 +1,7 @@
-import { useState } from "react";
 import useStatefulFields from "../hooks/useStatefulFields.js";
 import useAuthSubmit from "../hooks/useAuthSubmit.js";
-import "./App.css";
 import { Link } from "react-router-dom";
+import "../stylesheets/App.css";
 
 export default function Registration() {
     const [values, onFormInputChange] = useStatefulFields();

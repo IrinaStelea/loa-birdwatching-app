@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
-// import logo from "../logo.svg";
-import "./App.css";
-import Map from "./Map.js";
-import NewPin from "./NewPin/NewPin.js";
 import { useSelector, useDispatch } from "react-redux";
-import { receiveBirdData } from "../redux/bird-data/slice";
+import Map from "./Map.js";
 import Popup from "./Popup/Popup";
+import NewPin from "./NewPin/NewPin.js";
+import { receiveBirdData } from "../redux/bird-data/slice";
 import { receiveUserData } from "../redux/user-markers/slice";
+import "../stylesheets/App.css";
 
 export default function App() {
     const dispatch = useDispatch();
     const [data, setData] = useState(null);
     // const [userData, setUserData] = useState(null);
 
-    //set user location
+    //set user location - UNCOMMENT WHEN DEPLOYING
     const [userLng, setLng] = useState();
     const [userLat, setLat] = useState();
     // const [userLocationModal, setUserLocationModal] = useState(true);
@@ -35,6 +34,7 @@ export default function App() {
     //         setUserLocationModal(!userLocationModal);
     //     }, 3000);
     // };
+
     //fetch api data stored in back-end
     useEffect(() => {
         //fetch the json with the recent sightings
@@ -55,21 +55,20 @@ export default function App() {
             dispatch(receiveUserData(userData));
         };
         fetchUserData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         fetch("/api/birddata.json")
             .then((res) => res.json())
             .then((birdData) => {
-                // console.log("bird data from server", birdData);
                 dispatch(receiveBirdData(birdData));
             });
     });
 
     const userPin = useSelector((state) => state.pinCoordinates);
-    // console.log("user pin length in main app", Object.keys(userPin).length);
     const popupCoord = useSelector((state) => state.popupInfo.coordinates);
-    // console.log("pop up coord in app", popupCoord);
+
     return (
         <>
             <div className="map">
