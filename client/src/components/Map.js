@@ -125,8 +125,6 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             };
         });
 
-        console.log("user markers", userMarkers);
-
         map.current.addSource("user-sightings", {
             type: "geojson",
             maxzoom: 24,

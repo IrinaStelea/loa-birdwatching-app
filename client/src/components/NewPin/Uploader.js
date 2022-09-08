@@ -2,63 +2,83 @@ import { useEffect, useState } from "react";
 import "../../stylesheets/Uploader.css";
 
 export default function Uploader({ toggleUploader, setView }) {
-    const [file, setFile] = useState(null);
-    const [fileDataURL, setFileDataURL] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
+    const [images, setImages] = useState([]);
     const [error, setError] = useState("");
 
     const handleImageInput = (e) => {
-        const file = e.target.files[0];
-        // do file validation here
+        const { files } = e.target;
+        const validImageFiles = [];
         // //file validation: check the file extension
         const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
-        if (!file.type.match(imageMimeType)) {
-            setError("Please upload a valid image file");
+        for (let file of files) {
+            if (file.type.match(imageMimeType)) {
+                validImageFiles.push(file);
+            }
+        }
+        if (validImageFiles.length !== 0) {
+            setImageFiles(validImageFiles);
             return;
         }
-        setFile(file);
+        setError("Please upload a valid image file");
     };
 
     //preview of the uploaded file
     useEffect(() => {
-        let fileReader = false;
+        let fileReaders = [];
+        let images = [];
         let isCancel = false;
-        if (file) {
-            fileReader = new FileReader();
-            fileReader.onload = (e) => {
-                const { result } = e.target;
-                if (result && !isCancel) {
-                    setFileDataURL(result);
-                }
-            };
-            fileReader.readAsDataURL(file);
+        if (imageFiles.length) {
+            imageFiles.forEach((file) => {
+                const fileReader = new FileReader();
+                fileReaders.push(fileReader);
+                fileReader.onload = (e) => {
+                    let { result } = e.target;
+                    if (result) {
+                        images.push(result);
+                    }
+                    if (images.length === imageFiles.length && !isCancel) {
+                        setImages(images);
+                    }
+                };
+                fileReader.readAsDataURL(file);
+            });
         }
+
         //if the read process is incomplete when the component rerenders or unmounts, abort
         return () => {
             isCancel = true;
-            if (fileReader && fileReader.readyState === 1) {
-                fileReader.abort();
+            for (let fileReader of fileReaders) {
+                if (fileReader.readyState === 1) {
+                    fileReader.abort();
+                }
             }
         };
-    }, [file]);
+    }, [imageFiles]);
 
     const onImageSubmit = (e) => {
         e.preventDefault();
 
         //image validation
-        const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
+        // const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
 
-        if (!file) {
-            setError("Please upload an image first");
-            return;
-        }
-        if (!file.type.match(imageMimeType)) {
-            setError("Please upload a valid image file");
-            return;
-        }
+        // if (!file) {
+        //     setError("Please upload an image first");
+        //     return;
+        // }
+        // if (!file.type.match(imageMimeType)) {
+        //     setError("Please upload a valid image file");
+        //     return;
+        // }
 
         const formData = new FormData();
-        formData.append("file", file);
-
+        for (let file of imageFiles) {
+            formData.append("file", file);
+        }
+        for (const pair of formData.entries()) {
+            console.log(`${pair[0]}, ${pair[1]}`);
+        }
+        return;
         fetch("/api/upload-image", {
             method: "post",
             body: formData,
@@ -82,8 +102,12 @@ export default function Uploader({ toggleUploader, setView }) {
                     <p className="error">{this.state.errorMessage}</p>
                 )} */}
             {error && <p className="error-uploader">{error}</p>}
-            {fileDataURL && (
-                <img id="bird-img" src={fileDataURL} alt="preview" />
+            {images.length > 0 && (
+                <>
+                    {images.map((img, idx) => (
+                        <img key={idx} id="bird-img" src={img} alt="preview" />
+                    ))}
+                </>
             )}
             <form
                 id="upload-image"
@@ -94,8 +118,9 @@ export default function Uploader({ toggleUploader, setView }) {
                 <input
                     type="file"
                     accept="image/*"
-                    name="file"
+                    name="files"
                     onChange={handleImageInput}
+                    multiple
                 />
                 <input
                     type="submit"

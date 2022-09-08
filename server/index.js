@@ -148,9 +148,7 @@ app.post("/api/submit-pin", async (req, res) => {
         );
         const sighting_id = result.rows[0].id;
         //store sighting id in cookie session in case user wants to add picture
-        console.log("results after adding image", result.rows[0]);
         req.session = { ...req.session, sighting_id };
-        console.log("req session after adding pin", req.session);
         return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);
@@ -159,7 +157,7 @@ app.post("/api/submit-pin", async (req, res) => {
 
 app.post(
     "/api/upload-image",
-    uploader.single("file"),
+    uploader.array("files"),
     s3.upload,
     async (req, res) => {
         //get the full URL of the image (amazon url + filename)
