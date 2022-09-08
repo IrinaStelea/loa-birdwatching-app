@@ -38,7 +38,9 @@ export default function Popup() {
                     <img
                         id="bird-thumbnail"
                         src={
-                            selBird.length !== 0
+                            popup.imageUrl
+                                ? popup.imageUrl
+                                : selBird.length !== 0
                                 ? selBird[0].image
                                 : "../../default_pic.png"
                         }

@@ -10,6 +10,7 @@ const app = express();
 const cookieSession = require("cookie-session");
 const { validateForm } = require("./validateForm");
 const s3 = require("./s3");
+const { uploader } = require("./middleware");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -126,7 +127,6 @@ app.get("/api/user-data.json", async (req, res) => {
     try {
         const result = await db.getUserSightings(req.session.userId);
         // console.log("result in get user data", result.rows);
-        // console.log("user data backend", userData);
         return res.json(result.rows);
     } catch (err) {
         console.log("error in getting user sightings");
@@ -146,15 +146,53 @@ app.post("/api/submit-pin", async (req, res) => {
             req.session.userId,
             req.body.geoJSON
         );
-
-        // console.log("result from adding pin", result.rows[0]);
+        const sighting_id = result.rows[0].id;
+        //store sighting id in cookie session in case user wants to add picture
+        console.log("results after adding image", result.rows[0]);
+        req.session = { ...req.session, sighting_id };
+        console.log("req session after adding pin", req.session);
         return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);
     }
 });
 
-app.post("/api/upload-image");
+app.post(
+    "/api/upload-image",
+    uploader.single("file"),
+    s3.upload,
+    async (req, res) => {
+        //get the full URL of the image (amazon url + filename)
+        const imageUrl = path.join(
+            "https://s3.amazonaws.com/ihamspiced",
+            //add the userId & sighting_id for access to subfolder
+            `${req.session.userId}`,
+            `${req.session.sighting_id}`,
+            `${req.file.filename}`
+        );
+
+        try {
+            const result = await db.addImage(
+                req.session.userId,
+                req.session.sighting_id,
+                imageUrl
+            );
+            //clear sighting_id cookie stored
+            req.session.sighting_id = null;
+
+            return res.json({
+                success: true,
+                image: result.rows[0].image_url,
+            });
+        } catch (err) {
+            console.log("error in uploading image", err);
+            return res.json({
+                success: false,
+                message: "Something went wrong, please try again",
+            });
+        }
+    }
+);
 
 //delete user sighting
 app.post("/api/delete-user-marker", async (req, res) => {

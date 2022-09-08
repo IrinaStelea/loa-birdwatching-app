@@ -1,0 +1,31 @@
+#uploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+    margin-top: 2vh;
+}
+
+#upload-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+}
+
+#submit-uploader {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    color: white;
+    text-decoration: underline;
+    font-size: 1.2em;
+    font-family: "Work Sans", sans-serif;
+    cursor: pointer;
+}
+
+.error-uploader {
+    font-style: italic;
+    white-space: pre-wrap;
+    text-align: center;
+}

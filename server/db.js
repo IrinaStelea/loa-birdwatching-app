@@ -75,9 +75,10 @@ module.exports.validateUser = (email, inputPass) => {
 };
 
 module.exports.getUserSightings = (id) => {
-    return db.query(`SELECT id, sighting FROM sightings WHERE user_id=$1`, [
-        id,
-    ]);
+    return db.query(
+        `SELECT sightings.id, sighting, image_url FROM sightings LEFT OUTER JOIN sightings_images ON sightings.id=sightings_images.sighting_id WHERE sightings.user_id=$1`,
+        [id]
+    );
 };
 
 module.exports.addSighting = (id, sighting) => {
@@ -89,4 +90,12 @@ module.exports.addSighting = (id, sighting) => {
 
 module.exports.deleteSighting = (id) => {
     return db.query(`DELETE FROM sightings WHERE id=$1`, [id]);
+};
+
+module.exports.addImage = (userId, sightingId, imageUrl) => {
+    return db.query(
+        `
+    INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, $3) RETURNING image_url`,
+        [userId, sightingId, imageUrl]
+    );
 };

@@ -20,7 +20,8 @@ CREATE TABLE sightings(
 
 create TABLE sightings_images (
    id SERIAL PRIMARY KEY,
-   image_id INTEGER NOT NULL REFERENCES sightings(id) ON DELETE CASCADE,
+   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+   sighting_id INTEGER NOT NULL REFERENCES sightings(id) ON DELETE CASCADE,
    image_url TEXT NOT NULL
 );
 

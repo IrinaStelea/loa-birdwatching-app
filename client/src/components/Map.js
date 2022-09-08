@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
@@ -115,8 +115,17 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
     const initUserLayer = () => {
         let userMarkers = userData.map((marker) => {
-            return { ...marker.sighting, id: marker.id };
+            return {
+                ...marker.sighting,
+                id: marker.id,
+                properties: {
+                    ...marker.sighting.properties,
+                    imageUrl: marker.image_url,
+                },
+            };
         });
+
+        console.log("user markers", userMarkers);
 
         map.current.addSource("user-sightings", {
             type: "geojson",
@@ -184,12 +193,15 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
-
+            console.log("click on user layer", e.features[0]);
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates;
-            const { comName, sciName, date } = e.features[0].properties;
+            const { comName, sciName, date, imageUrl } =
+                e.features[0].properties;
             const id = e.features[0].id;
-            dispatch(openPopup({ coordinates, comName, sciName, date, id }));
+            dispatch(
+                openPopup({ coordinates, comName, sciName, date, id, imageUrl })
+            );
             dispatch(receiveUserPopup(true));
         });
 
@@ -311,8 +323,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
     };
 
     //on select function for the filter
-    const onSelect = useCallback((sel) => {
-        console.log("inside on select", sel);
+    const onSelect = (sel) => {
         setValue(sel.value);
         setSearchedBird(sel.value);
         var features = map.current.queryRenderedFeatures({
@@ -351,7 +362,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             },
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    };
 
     //delete search highlight in case user deletes that pin
     useEffect(() => {
@@ -437,7 +448,11 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             return;
         }
         let updatedUserMarkers = userData.map((marker) => {
-            return { ...marker.sighting, id: marker.id };
+            return {
+                ...marker.sighting,
+                id: marker.id,
+                imageUrl: marker.image_url,
+            };
         });
         userCurrentMarkersLayer.setData({
             type: "FeatureCollection",

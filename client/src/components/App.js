@@ -12,7 +12,7 @@ export default function App() {
     const [data, setData] = useState(null);
     // const [userData, setUserData] = useState(null);
 
-    //set user location - UNCOMMENT WHEN DEPLOYING
+    //UNCOMMENT WHEN DEPLOYING - set user location
     const [userLng, setLng] = useState();
     const [userLat, setLat] = useState();
     // const [userLocationModal, setUserLocationModal] = useState(true);

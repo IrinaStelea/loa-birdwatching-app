@@ -1,14 +1,17 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addMarker } from "../../redux/user-markers/slice";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
 import DatalistInput from "react-datalist-input";
+import Uploader from "./Uploader.js";
 import "react-datalist-input/dist/styles.css";
 
 import "../../stylesheets/NewPin.css";
 
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);
+    const [view, setView] = useState(1);
+    const [uploaderIsVisible, setUploader] = useState(false);
     const dispatch = useDispatch();
     const birdList = useSelector(
         (state) =>
@@ -21,10 +24,21 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                 url: bird.url,
             }))
     );
+    //hide success message after 3 seconds
+    useEffect(() => {
+        if (view === 3) {
+            setTimeout(() => togglePinPopUp(), 1500);
+        }
+        // eslint-disable-next-line
+    }, [view]);
 
-    const onSelect = useCallback((bird) => {
+    const onSelect = (bird) => {
         setSelectedBird(bird);
-    }, []);
+    };
+
+    const toggleUploader = () => {
+        setUploader(!uploaderIsVisible);
+    };
 
     const submitPin = (e) => {
         const date = new Date()
@@ -63,7 +77,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                         [data.id]: data.sighting.properties.comName,
                     })
                 );
-                togglePinPopUp();
+                setView(2);
             })
             .catch((err) => {
                 console.log("error in fetch add new pin", err);
@@ -72,71 +86,70 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
 
     return (
         <>
-            <div className="new-pin-pop-up">
-                <h4>Add a new bird sighting</h4>
-                <DatalistInput
-                    placeholder="Start typing a bird name"
-                    showLabel={false}
-                    items={birdList}
-                    onSelect={onSelect}
-                />
-                {selectedBird && (
-                    <>
-                        <p className="sciname">{selectedBird.sciName}</p>
-                        <div className="pin-images">
-                            <img
-                                id="bird-img"
-                                src={selectedBird.img}
-                                alt={selectedBird.comName}
-                            />
-                            <a
-                                href={selectedBird.url}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
+            {view === 1 && (
+                <div className="new-pin-pop-up">
+                    <h4>Add a new bird sighting</h4>
+                    <DatalistInput
+                        placeholder="Start typing a bird name"
+                        showLabel={false}
+                        items={birdList}
+                        onSelect={onSelect}
+                    />
+                    {selectedBird && (
+                        <>
+                            <p className="sciname">{selectedBird.sciName}</p>
+                            <div className="pin-images">
                                 <img
-                                    id="info-icon"
-                                    src="../../info_icon_white.png"
-                                    alt="info icon"
+                                    id="bird-img"
+                                    src={selectedBird.img}
+                                    alt={selectedBird.comName}
                                 />
-                            </a>
-                        </div>
-                        <p id="save" onClick={submitPin}>
-                            Save
+                                <a
+                                    href={selectedBird.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    <img
+                                        id="info-icon"
+                                        src="../../info_icon_white.png"
+                                        alt="info icon"
+                                    />
+                                </a>
+                            </div>
+                            <p id="save" onClick={submitPin}>
+                                Save
+                            </p>
+                        </>
+                    )}
+                    <p id="cancel" onClick={togglePinPopUp}>
+                        Cancel
+                    </p>
+                </div>
+            )}
+            {view === 2 && (
+                <div className="new-pin-pop-up">
+                    <h4>Add photos for this sighting?</h4>
+                    {uploaderIsVisible && (
+                        <Uploader
+                            toggleUploader={toggleUploader}
+                            setView={setView}
+                        />
+                    )}
+                    {!uploaderIsVisible && (
+                        <p id="save" onClick={toggleUploader}>
+                            Yes
                         </p>
-                    </>
-                )}
-                <p id="cancel" onClick={togglePinPopUp}>
-                    Cancel
-                </p>
-            </div>
+                    )}
+                    <p id="cancel" onClick={togglePinPopUp}>
+                        Cancel
+                    </p>
+                </div>
+            )}
+            {view === 3 && (
+                <div className="new-pin-pop-up">
+                    <h4>Pin added successfully</h4>
+                </div>
+            )}
         </>
     );
-
-    // return (
-    //     <>
-    //         <div className="new-pin-pop-up">
-    //             <h4 id="close-button" onClick={togglePinPopUp}>
-    //                 x
-    //             </h4>
-    //             <h4>Add a new bird sighting</h4>
-    //                 <input
-    //                     type="text"
-    //                     list="birdlist"
-    //                     id="birds"
-    //                     name="birds"
-    //                     onChange={onChange}
-    //                 />
-    //                 <datalist id="birdlist">
-    //                     {birdList.map((bird) => (
-    //                         <option key={bird} value={bird}></option>
-    //                     ))}
-    //                 </datalist>
-    //                 <button id="save" type="submit" onClick={submitPin}>
-    //                     Save
-    //                 </button>
-
-    //         </div>
-    //     </>
-    // );
 }

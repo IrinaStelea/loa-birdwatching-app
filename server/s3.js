@@ -15,13 +15,11 @@ const s3 = new aws.S3({
 });
 
 exports.upload = (req, res, next) => {
-    //if there is no file
     if (!req.file) {
         return res.sendStatus(500);
     }
 
     //boilerplate code - if we get at this point, req.file exists and we pull info from it
-    // console.log("req.file: 	", req.file);
 
     const { filename, mimetype, size, path } = req.file;
 
@@ -29,8 +27,13 @@ exports.upload = (req, res, next) => {
         .putObject({
             Bucket: "ihamspiced",
             ACL: "public-read",
-            // this has access to req.session so I can add the userid to create subfolder on AWS for each user
-            Key: req.session.userId + "/" + filename,
+            // add userid to create subfolder on AWS for each user & for each sighting
+            Key:
+                req.session.userId +
+                "/" +
+                req.session.sighting_id +
+                "/" +
+                filename,
             Body: fs.createReadStream(path),
             ContentType: mimetype,
             ContentLength: size,
@@ -39,7 +42,7 @@ exports.upload = (req, res, next) => {
 
     promise
         .then(() => {
-            console.log("amazon upload successful");
+            // console.log("amazon upload successful");
             next();
             fs.unlink(path, () => {}); //delete the img stored locally
         })
