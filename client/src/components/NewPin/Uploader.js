@@ -5,12 +5,13 @@ export default function Uploader({ toggleUploader, setView }) {
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const [error, setError] = useState("");
+    const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
 
     const handleImageInput = (e) => {
         const { files } = e.target;
         const validImageFiles = [];
         // //file validation: check the file extension
-        const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
+
         for (let file of files) {
             if (file.type.match(imageMimeType)) {
                 validImageFiles.push(file);
@@ -60,39 +61,39 @@ export default function Uploader({ toggleUploader, setView }) {
         e.preventDefault();
 
         //image validation
-        // const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
-
-        // if (!file) {
-        //     setError("Please upload an image first");
-        //     return;
-        // }
-        // if (!file.type.match(imageMimeType)) {
-        //     setError("Please upload a valid image file");
-        //     return;
+        // const validImageFiles = [];
+        // for (let image of imageFiles) {
+        //     if (image.type.match(imageMimeType)) {
+        //         validImageFiles.push(image);
+        //     }
         // }
 
+        // if (!validImageFiles.length) {
+        //     setError("Please upload one or more images first");
+        //     return;
+        // }
+        // console.log("imagefiles inside submit", imageFiles);
         const formData = new FormData();
-        for (let file of imageFiles) {
-            formData.append("file", file);
-        }
+        imageFiles.forEach((file) => formData.append("file", file));
+
         for (const pair of formData.entries()) {
-            console.log(`${pair[0]}, ${pair[1]}`);
+            console.log(pair[0] + ", " + pair[1]);
         }
-        return;
+
         fetch("/api/upload-image", {
-            method: "post",
+            method: "POST",
             body: formData,
         })
             .then((result) => result.json())
             .then((data) => {
-                console.log("response from upload image fetch", data);
-                if (!data.success && data.message) {
-                    setError(data.message);
-                } else {
-                    console.log("image added successfully");
-                    toggleUploader();
-                    setView(3);
-                }
+                console.log("response from upload image fetch");
+                // if (!data.success && data.message) {
+                //     setError(data.message);
+                // } else {
+                //     console.log("image added successfully");
+                //     toggleUploader();
+                //     setView(3);
+                // }
             });
     };
 

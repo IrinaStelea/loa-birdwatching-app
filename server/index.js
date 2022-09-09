@@ -157,7 +157,7 @@ app.post("/api/submit-pin", async (req, res) => {
 
 app.post(
     "/api/upload-image",
-    uploader.array("files"),
+    uploader.single("file"),
     s3.upload,
     async (req, res) => {
         //get the full URL of the image (amazon url + filename)

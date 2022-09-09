@@ -42,7 +42,7 @@ exports.upload = (req, res, next) => {
 
     promise
         .then(() => {
-            // console.log("amazon upload successful");
+            console.log("amazon upload successful");
             next();
             fs.unlink(path, () => {}); //delete the img stored locally
         })
