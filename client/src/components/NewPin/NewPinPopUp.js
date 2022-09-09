@@ -12,6 +12,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);
     const [view, setView] = useState(1);
     const [uploaderIsVisible, setUploader] = useState(false);
+    const [newPin, setNewPin] = useState();
     const dispatch = useDispatch();
     const birdList = useSelector(
         (state) =>
@@ -27,6 +28,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     //hide success message after 3 seconds
     useEffect(() => {
         if (view === 3) {
+            console.log("inside use effect for view");
             setTimeout(() => togglePinPopUp(), 1500);
         }
         // eslint-disable-next-line
@@ -38,6 +40,16 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
 
     const toggleUploader = () => {
         setUploader(!uploaderIsVisible);
+    };
+
+    const savePin = () => {
+        dispatch(addMarker(newPin));
+        dispatch(
+            addAvailableBird({
+                [newPin.id]: newPin.sighting.properties.comName,
+            })
+        );
+        setView(3);
     };
 
     const submitPin = (e) => {
@@ -70,13 +82,8 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
         })
             .then((response) => response.json())
             .then((data) => {
-                // console.log("data after add new pin", data);
-                dispatch(addMarker(data));
-                dispatch(
-                    addAvailableBird({
-                        [data.id]: data.sighting.properties.comName,
-                    })
-                );
+                console.log("data after add new pin", data);
+                setNewPin(data);
                 setView(2);
             })
             .catch((err) => {
@@ -128,21 +135,28 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             )}
             {view === 2 && (
                 <div className="new-pin-pop-up">
-                    <h4>Add photos for this sighting?</h4>
+                    <h4>Add own photos for this bird?</h4>
                     {uploaderIsVisible && (
-                        <Uploader
-                            toggleUploader={toggleUploader}
-                            setView={setView}
-                        />
+                        <>
+                            <Uploader
+                                toggleUploader={toggleUploader}
+                                setView={setView}
+                            />
+                            <p id="cancel" onClick={togglePinPopUp}>
+                                Cancel
+                            </p>
+                        </>
                     )}
                     {!uploaderIsVisible && (
-                        <p id="save" onClick={toggleUploader}>
-                            Yes
-                        </p>
+                        <>
+                            <p id="save" onClick={toggleUploader}>
+                                Yes
+                            </p>
+                            <p id="cancel" onClick={savePin}>
+                                Skip &amp; save
+                            </p>
+                        </>
                     )}
-                    <p id="cancel" onClick={togglePinPopUp}>
-                        Cancel
-                    </p>
                 </div>
             )}
             {view === 3 && (

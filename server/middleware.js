@@ -1,29 +1,76 @@
 const multer = require("multer");
-const uidSafe = require("uid-safe");
+const multerS3 = require("multer-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const uniqid = require("uniqid");
 const path = require("path");
 
-const storage = multer.diskStorage({
-    // where should we store the newly uploaded files?
-    destination: path.join(__dirname, "uploads"),
-    // instructions for setting the file name for each uploaded file
-    filename: (req, file, callback) => {
-        // generate a unique string to ensure no conflicts of file names
-        //24 refers to the byte length (which has implications for the UID length)
-        uidSafe(24).then((uid) => {
-            // get the extension of the original file (eg. .jpg)
-            const extension = path.extname(file.originalname);
-            const newFileName = uid + extension;
-            //first arg of callback is always error, here null bc there is no error
-            callback(null, newFileName);
-        });
+let secrets;
+if (process.env.NODE_ENV == "production") {
+    secrets = process.env;
+} else {
+    secrets = require("../secrets.json");
+}
+
+const s3 = new S3Client({
+    region: "us-east-1",
+    credentials: {
+        accessKeyId: secrets.AWS_KEY,
+        secretAccessKey: secrets.AWS_SECRET,
     },
 });
 
-//using this uploader function as middleware in server.js
-module.exports.uploader = multer({
-    storage,
-    // include some limits to prevent overwhelming our server (e.g. DOS attacks), here: 2mb
+exports.uploadS3 = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "ihamspiced",
+        acl: "public-read",
+        // metadata: function (req, file, cb) {
+        //     cb(null, { fieldName: uniquePath });
+        // },
+        key: function (req, file, cb) {
+            cb(
+                null,
+                req.session.userId +
+                    "/" +
+                    req.session.sighting_id +
+                    "/" +
+                    uniqid() +
+                    path.extname(file.originalname)
+            );
+        },
+        contentType: function (req, file, cb) {
+            cb(null, file.mimetype);
+        },
+        contentLength: function (req, file, cb) {
+            cb(null, file.size);
+        },
+    }),
     limits: {
         fileSize: 2097152,
     },
 });
+
+
+// {
+//     popupimageUrl.length > 0 ? (
+//         <div id="preview-images">
+//             {popupimageUrl.map((img, idx) => (
+//                 <img
+//                     key={idx}
+//                     id="bird-thumbnail"
+//                     src={img}
+//                     alt={popup.comName}
+//                 />
+//             ))}
+//         </div>
+//     ) : (
+//         <img
+//             id="bird-thumbnail"
+//             src={selBird.length !== 0
+//                     ? selBird[0].image
+//                     : "../../default_pic.png"
+//             }
+//             alt={popup.comName}
+//         />
+//     );
+// }

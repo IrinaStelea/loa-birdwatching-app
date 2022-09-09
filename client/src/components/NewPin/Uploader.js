@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { addAvailableBird } from "../../redux/birds-filter/slice";
 import "../../stylesheets/Uploader.css";
+import { addMarker } from "../../redux/user-markers/slice";
 
 export default function Uploader({ toggleUploader, setView }) {
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const [error, setError] = useState("");
     const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
+    const dispatch = useDispatch();
 
     const handleImageInput = (e) => {
         const { files } = e.target;
@@ -86,14 +90,22 @@ export default function Uploader({ toggleUploader, setView }) {
         })
             .then((result) => result.json())
             .then((data) => {
-                console.log("response from upload image fetch");
-                // if (!data.success && data.message) {
-                //     setError(data.message);
-                // } else {
-                //     console.log("image added successfully");
-                //     toggleUploader();
-                //     setView(3);
-                // }
+                if (!data.success && data.message) {
+                    setError(data.message);
+                } else {
+                    console.log("image added successfully, data is", data);
+                    dispatch(
+                        addMarker({
+                            id: data.images[0].id,
+                            sighting: data.images[0].sighting,
+                            image_url: data.images.map(
+                                (image) => image.image_url
+                            ),
+                        })
+                    );
+                    toggleUploader();
+                    setView(3);
+                }
             });
     };
 
@@ -104,11 +116,11 @@ export default function Uploader({ toggleUploader, setView }) {
                 )} */}
             {error && <p className="error-uploader">{error}</p>}
             {images.length > 0 && (
-                <>
+                <div id="preview-images">
                     {images.map((img, idx) => (
                         <img key={idx} id="bird-img" src={img} alt="preview" />
                     ))}
-                </>
+                </div>
             )}
             <form
                 id="upload-image"
@@ -119,14 +131,14 @@ export default function Uploader({ toggleUploader, setView }) {
                 <input
                     type="file"
                     accept="image/*"
-                    name="files"
+                    name="file"
                     onChange={handleImageInput}
                     multiple
                 />
                 <input
                     type="submit"
                     id="submit-uploader"
-                    value="Upload"
+                    value="Upload &amp; save"
                 ></input>
             </form>
         </div>

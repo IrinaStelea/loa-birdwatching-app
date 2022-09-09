@@ -92,10 +92,11 @@ module.exports.deleteSighting = (id) => {
     return db.query(`DELETE FROM sightings WHERE id=$1`, [id]);
 };
 
-module.exports.addImage = (userId, sightingId, imageUrl) => {
+module.exports.addImage = (userId, sightingId, imageUrlArray) => {
     return db.query(
-        `
-    INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, $3) RETURNING image_url`,
-        [userId, sightingId, imageUrl]
+        `WITH "sighting" AS (SELECT * FROM sightings WHERE id = $2), inserted_image as (INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, unnest($3::text[])) RETURNING *) SELECT sighting.id, sighting, inserted_image.image_url FROM "sighting", inserted_image`,
+        [userId, sightingId, imageUrlArray]
     );
 };
+
+`INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, unnest($3::text[])) RETURNING *`;

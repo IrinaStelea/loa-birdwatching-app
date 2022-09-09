@@ -29,3 +29,10 @@
     white-space: pre-wrap;
     text-align: center;
 }
+
+#preview-images {
+    display: flex;
+    gap: 3vh;
+    max-width: 60vw;
+    overflow-x: scroll;
+}

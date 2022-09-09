@@ -9,8 +9,8 @@ const helpers = require("./helpers.js");
 const app = express();
 const cookieSession = require("cookie-session");
 const { validateForm } = require("./validateForm");
-const s3 = require("./s3");
-const { uploader } = require("./middleware");
+// const s3 = require("./s3");
+const { uploadS3 } = require("./middleware");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -126,7 +126,7 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        // console.log("result in get user data", result.rows);
+        console.log("result in get user data", result.rows);
         return res.json(result.rows);
     } catch (err) {
         console.log("error in getting user sightings");
@@ -155,42 +155,35 @@ app.post("/api/submit-pin", async (req, res) => {
     }
 });
 
-app.post(
-    "/api/upload-image",
-    uploader.single("file"),
-    s3.upload,
-    async (req, res) => {
-        //get the full URL of the image (amazon url + filename)
-        const imageUrl = path.join(
-            "https://s3.amazonaws.com/ihamspiced",
-            //add the userId & sighting_id for access to subfolder
-            `${req.session.userId}`,
-            `${req.session.sighting_id}`,
-            `${req.file.filename}`
-        );
-
-        try {
-            const result = await db.addImage(
-                req.session.userId,
-                req.session.sighting_id,
-                imageUrl
-            );
-            //clear sighting_id cookie stored
-            req.session.sighting_id = null;
-
-            return res.json({
-                success: true,
-                image: result.rows[0].image_url,
-            });
-        } catch (err) {
-            console.log("error in uploading image", err);
-            return res.json({
-                success: false,
-                message: "Something went wrong, please try again",
-            });
-        }
+app.post("/api/upload-image", uploadS3.array("file"), async (req, res) => {
+    //get the full URL of the image (amazon url + filename)
+    let fileArray = req.files;
+    let imgUrlArray = [];
+    for (let i = 0; i < fileArray.length; i++) {
+        imgUrlArray.push(fileArray[i].location);
     }
-);
+    console.log("image url array", imgUrlArray);
+    try {
+        const result = await db.addImage(
+            req.session.userId,
+            req.session.sighting_id,
+            imgUrlArray
+        );
+        //clear sighting_id cookie stored
+        req.session.sighting_id = null;
+        console.log("result from adding multiple images", result.rows);
+        return res.json({
+            success: true,
+            images: result.rows,
+        });
+    } catch (err) {
+        console.log("error in uploading image", err);
+        return res.json({
+            success: false,
+            message: "Something went wrong, please try again",
+        });
+    }
+});
 
 //delete user sighting
 app.post("/api/delete-user-marker", async (req, res) => {

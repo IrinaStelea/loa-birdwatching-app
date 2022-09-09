@@ -35,7 +35,27 @@ export default function Popup() {
                 <h2>{popup.comName}</h2>
                 <p className="sci-name">{popup.sciName}</p>
                 <div className="pin-images">
-                    <img
+                    {popup.imageUrl.length > 0 ? (
+        <div id="preview-images">
+            {popup.imageUrl.map((img, idx) => (
+                <img
+                    key={idx}
+                    id="bird-thumbnail"
+                    src={img}
+                    alt={popup.comName}
+                />
+            ))}
+        </div>
+    ) : (
+        <img
+            id="bird-thumbnail"
+            src={selBird.length !== 0
+                    ? selBird[0].image
+                    : "../../default_pic.png"
+            }
+            alt={popup.comName}
+        />)}
+                    {/* <img
                         id="bird-thumbnail"
                         src={
                             popup.imageUrl
@@ -45,7 +65,7 @@ export default function Popup() {
                                 : "../../default_pic.png"
                         }
                         alt={popup.comName}
-                    />
+                    /> */}
                     {selBird.length !== 0 && (
                         <a
                             href={selBird[0].url}

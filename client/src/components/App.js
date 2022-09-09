@@ -52,6 +52,15 @@ export default function App() {
         const fetchUserData = async () => {
             const res = await fetch("/api/user-data.json");
             const userData = await res.json();
+            console.log("user data on mountin", userData);
+            //merge identical values in userdata and create an array of their urls
+            let temp = {};
+            userData.forEach((entry) => {
+                temp.id = entry.id;
+                temp.sighting = entry.sighting;
+                temp.image_url.push(entry.image_url);
+            });
+            console.log(Object.values(temp));
             dispatch(receiveUserData(userData));
         };
         fetchUserData();

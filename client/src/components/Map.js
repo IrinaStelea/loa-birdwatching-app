@@ -445,11 +445,15 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         if (userCurrentMarkersLayer === undefined) {
             return;
         }
+
         let updatedUserMarkers = userData.map((marker) => {
             return {
                 ...marker.sighting,
                 id: marker.id,
-                imageUrl: marker.image_url,
+                properties: {
+                    ...marker.sighting.properties,
+                    imageUrl: marker.image_url,
+                },
             };
         });
         userCurrentMarkersLayer.setData({
