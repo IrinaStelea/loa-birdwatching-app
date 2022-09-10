@@ -57,3 +57,15 @@ module.exports.randomizeIdenticalCoordinates = (data) => {
     return data;
 };
 
+module.exports.mergeIdenticalSightings = (data) => {
+    const temp = data.reduce((a, b) => {
+        const found = a.find((e) => e.id == b.id && e.sighting && b.sighting);
+        return (
+            found
+                ? found.image_url.push(b.image_url)
+                : a.push({ ...b, image_url: [b.image_url] }),
+            a
+        );
+    }, []);
+    return temp;
+};

@@ -118,12 +118,13 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             return {
                 ...marker.sighting,
                 id: marker.id,
-                properties: {
-                    ...marker.sighting.properties,
-                    imageUrl: marker.image_url,
-                },
+                // properties: {
+                //     ...marker.sighting.properties,
+                //     imageUrl: marker.image_url,
+                // },
             };
         });
+        // console.log("user markers", userMarkers);
 
         map.current.addSource("user-sightings", {
             type: "geojson",
@@ -191,7 +192,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
 
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
-            console.log("click on user layer", e.features[0]);
+            // console.log("click on user layer", e.features[0]);
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates;
             const { comName, sciName, date, imageUrl } =

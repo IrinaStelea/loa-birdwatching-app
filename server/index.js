@@ -127,7 +127,9 @@ app.get("/api/user-data.json", async (req, res) => {
     try {
         const result = await db.getUserSightings(req.session.userId);
         console.log("result in get user data", result.rows);
-        return res.json(result.rows);
+        //merge identical sightings with several pictures
+        const mergedResult = helpers.mergeIdenticalSightings(result.rows);
+        return res.json(mergedResult);
     } catch (err) {
         console.log("error in getting user sightings");
         return res.json({ message: "Something went wrong, please try again" });

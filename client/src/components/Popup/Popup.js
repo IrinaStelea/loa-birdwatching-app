@@ -13,6 +13,12 @@ export default function Popup() {
     };
 
     const popup = useSelector((state) => state.popupInfo);
+    const fullUserDataforPopup = useSelector(
+        (state) =>
+            state.userData &&
+            state.userData.filter((bird) => bird.id === popup.id)
+    );
+    const userImages = fullUserDataforPopup[0]?.image_url;
     const isUserPopup = useSelector((state) => state.isUserPopup);
 
     // console.log("popup info in component", popup);
@@ -21,10 +27,6 @@ export default function Popup() {
             state.birdData &&
             state.birdData.filter((bird) => bird.sciName === popup.sciName)
     );
-
-    // const singleBird = birdInfo.find((bird) => bird.sciName === sciName);
-    // console.log("img url", birdImg[0].image);
-    // console.log("sel bird", selBird);
 
     return (
         <>
@@ -35,26 +37,28 @@ export default function Popup() {
                 <h2>{popup.comName}</h2>
                 <p className="sci-name">{popup.sciName}</p>
                 <div className="pin-images">
-                    {popup.imageUrl.length > 0 ? (
-        <div id="preview-images">
-            {popup.imageUrl.map((img, idx) => (
-                <img
-                    key={idx}
-                    id="bird-thumbnail"
-                    src={img}
-                    alt={popup.comName}
-                />
-            ))}
-        </div>
-    ) : (
-        <img
-            id="bird-thumbnail"
-            src={selBird.length !== 0
-                    ? selBird[0].image
-                    : "../../default_pic.png"
-            }
-            alt={popup.comName}
-        />)}
+                    {userImages && userImages[0] ? (
+                        <div id="preview-images">
+                            {userImages.map((img, idx) => (
+                                <img
+                                    key={idx}
+                                    id="bird-thumbnail"
+                                    src={img}
+                                    alt={popup.comName}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <img
+                            id="bird-thumbnail"
+                            src={
+                                selBird.length !== 0
+                                    ? selBird[0].image
+                                    : "../../default_pic.png"
+                            }
+                            alt={popup.comName}
+                        />
+                    )}
                     {/* <img
                         id="bird-thumbnail"
                         src={

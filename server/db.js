@@ -99,4 +99,4 @@ module.exports.addImage = (userId, sightingId, imageUrlArray) => {
     );
 };
 
-`INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, unnest($3::text[])) RETURNING *`;
+// `INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, unnest($3::text[])) RETURNING *`;
