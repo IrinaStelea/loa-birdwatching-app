@@ -6,7 +6,7 @@
 } */
 
 #new-pin {
-    width: 5vw;
+    width: 4vw;
     position: absolute;
 }
 
@@ -102,4 +102,3 @@ mark {
     cursor: pointer;
     color: white;
 }
-

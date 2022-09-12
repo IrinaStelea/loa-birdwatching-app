@@ -14,7 +14,12 @@ import "../stylesheets/Map.css";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
-export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
+export default function Map({
+    data,
+    userLng = 13.39,
+    userLat = 52.52,
+    toggleInfoBox,
+}) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
     const map = useRef(null);
@@ -321,6 +326,18 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         setUserMarkersLayer(!userMarkersLayerVisible);
     };
 
+    // const toggleUserMarkersIfInvisible = () => {
+    //     if (!userMarkersLayerVisible) {
+    //         map.current.setLayoutProperty(
+    //             "user-sightings",
+    //             "visibility",
+    //             "visible"
+    //         );
+    //         setUserMarkersButtonView(1);
+    //         setUserMarkersLayer(!userMarkersLayerVisible);
+    //     }
+    // };
+
     //on select function for the filter
     const onSelect = (sel) => {
         setValue(sel.value);
@@ -461,6 +478,18 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
             type: "FeatureCollection",
             features: updatedUserMarkers,
         });
+
+        //toggle user markers layers if invisible
+        if (!userMarkersLayerVisible) {
+            map.current.setLayoutProperty(
+                "user-sightings",
+                "visibility",
+                "visible"
+            );
+            setUserMarkersButtonView(1);
+            setUserMarkersLayer(!userMarkersLayerVisible);
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
@@ -468,7 +497,7 @@ export default function Map({ data, userLng = 13.39, userLat = 52.52 }) {
         <>
             <div className="button-container-top">
                 <div className="top-icon">
-                    <img src="../../Loa-logo_icon.png" alt="Loa logo" />
+                    <img src="../../Loa-logo_icon.png" alt="Loa logo" onClick={toggleInfoBox} />
                 </div>
                 <div id="filter">
                     <DatalistInput

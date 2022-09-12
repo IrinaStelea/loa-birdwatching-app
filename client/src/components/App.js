@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Map from "./Map.js";
 import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
+import Infobox from "./Infobox.js";
 import { receiveBirdData } from "../redux/bird-data/slice";
 import { receiveUserData } from "../redux/user-markers/slice";
 import "../stylesheets/App.css";
@@ -10,6 +11,7 @@ import "../stylesheets/App.css";
 export default function App() {
     const dispatch = useDispatch();
     const [data, setData] = useState(null);
+    const [isInfoBoxVisible, setInfoBoxVisibility] = useState(false);
     // const [userData, setUserData] = useState(null);
 
     //UNCOMMENT WHEN DEPLOYING - set user location
@@ -71,16 +73,26 @@ export default function App() {
     const userPin = useSelector((state) => state.pinCoordinates);
     const popupCoord = useSelector((state) => state.popupInfo.coordinates);
 
+    const toggleInfoBox = () => {
+        setInfoBoxVisibility(!isInfoBoxVisible);
+    };
+
     return (
         <>
             <div className="map">
                 {/* <UserLocation setUserLocation={setUserLocation} /> */}
                 {/* {!userLocationModal && ( */}
-                <Map data={data} userLng={userLng} userLat={userLat} />
+                <Map
+                    data={data}
+                    userLng={userLng}
+                    userLat={userLat}
+                    toggleInfoBox={toggleInfoBox}
+                />
                 {/* )} */}
             </div>
             {Object.keys(userPin).length !== 0 && <NewPin userPin={userPin} />}
             {popupCoord && popupCoord.length !== 0 && <Popup />}
+            {isInfoBoxVisible && <Infobox toggleInfoBox={toggleInfoBox} />}
         </>
     );
 }

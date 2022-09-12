@@ -1,0 +1,31 @@
+.info-bold {
+    font-weight: 600;
+}
+
+.info-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    max-height: 70vh;
+    overflow-y: scroll;
+    padding: 2vw;
+}
+
+#loa-thumbnail {
+    width: 36vw;
+    height: 36vw;
+    object-fit: cover;
+    align-self: center;
+}
+
+.info-popup ul {
+    padding: 0 0 0 5vw;
+}
+
+.info-popup a,
+a:hover,
+a:visited {
+    cursor: pointer;
+    color: slategray;
+    text-decoration: underline;
+}
