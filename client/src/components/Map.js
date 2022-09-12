@@ -36,6 +36,7 @@ export default function Map({
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
+    const [dataListView, setDataListView] = useState(1);
 
     const userData = useSelector((state) => state.userData);
 
@@ -67,14 +68,6 @@ export default function Map({
             zoom: zoom,
         });
 
-        //wait for map to be initialised
-        if (!map.current) return;
-        map.current.on("move", () => {
-            setLng(map.current.getCenter().lng.toFixed(4));
-            setLat(map.current.getCenter().lat.toFixed(4));
-            setZoom(map.current.getZoom().toFixed(2));
-        });
-
         //add geolocation
         map.current.addControl(
             new mapboxgl.GeolocateControl({
@@ -94,6 +87,20 @@ export default function Map({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    //update lng and lat on map move
+    // useEffect(() => {
+    //     //wait for map to be initialised
+    //     if (!map.current) return;
+    //     map.current.on("move", () => {
+    //         console.log("inside move event");
+    //         setLng(map.current.getCenter().lng.toFixed(4));
+    //         setLat(map.current.getCenter().lat.toFixed(4));
+    //         setZoom(map.current.getZoom().toFixed(2));
+    //     });
+
+    //     console.log("lng and lat", lng, lat);
+    // });
 
     const initAPILayer = () => {
         map.current.addSource("sightings", {
@@ -226,6 +233,7 @@ export default function Map({
 
     useEffect(() => {
         let flying = false;
+
         map.current.on("flystart", () => {
             console.log("inside fly start");
             flying = true;
@@ -235,12 +243,22 @@ export default function Map({
             flying = false;
         });
 
+        map.current.on("move", () => {
+            if (flying) {
+                return;
+            }
+            setLng(map.current.getCenter().lng.toFixed(4));
+            setLat(map.current.getCenter().lat.toFixed(4));
+            setZoom(map.current.getZoom().toFixed(2));
+            // console.log("lat and long", lat, lng);
+        });
+
         map.current.on("movestart", (e) => {
             if (flying) {
                 return;
             }
             dispatch(resetAvailableBirds());
-            console.log("inside move start");
+            // console.log("inside move start");
             setValue("");
         });
         map.current.on("moveend", (e) => {
@@ -497,18 +515,43 @@ export default function Map({
         <>
             <div className="button-container-top">
                 <div className="top-icon">
-                    <img src="../../Loa-logo_icon.png" alt="Loa logo" onClick={toggleInfoBox} />
-                </div>
-                <div id="filter">
-                    <DatalistInput
-                        placeholder="Search for a bird"
-                        showLabel={false}
-                        value={value}
-                        items={uniqueSearchableBirds}
-                        onSelect={onSelect}
+                    <img
+                        src="../../Loa-logo_icon.png"
+                        alt="Loa logo"
+                        onClick={toggleInfoBox}
                     />
                 </div>
-                {searchedBird && (
+
+                {dataListView === 1 && (
+                    <div className="search-icon">
+                        <img
+                            id="search-icon"
+                            src="../../search_icon.png"
+                            alt="search icon"
+                            onClick={() => {
+                                setDataListView(2);
+                                if (!uniqueSearchableBirds) {
+                                    map.current.flyTo({
+                                        zoom: zoom + 0.0001,
+                                    });
+                                }
+                            }}
+                        />
+                    </div>
+                )}
+                {dataListView === 2 && (
+                    <div id="filter">
+                        <DatalistInput
+                            placeholder="Find in the map view"
+                            showLabel={false}
+                            value={value}
+                            items={uniqueSearchableBirds}
+                            onSelect={onSelect}
+                        />
+                    </div>
+                )}
+
+                {dataListView === 2 && (
                     <span className="close-top" onClick={resetSearch}>
                         X
                     </span>

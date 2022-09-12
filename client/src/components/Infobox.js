@@ -48,6 +48,8 @@ export default function Infobox({ toggleInfoBox }) {
                         Contact me at{" "}
                         <a href="mailto:irina.a.stelea@gmail.com">this email</a>
                     </p>
+                    <hr></hr>
+                    <p>Icons via Noun Project</p>
                 </div>
             </div>
         </>

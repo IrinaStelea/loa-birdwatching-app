@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
+    Navigate,
+} from "react-router-dom";
 import Map from "./Map.js";
 import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
@@ -79,17 +85,35 @@ export default function App() {
 
     return (
         <>
-            <div className="map">
-                {/* <UserLocation setUserLocation={setUserLocation} /> */}
-                {/* {!userLocationModal && ( */}
-                <Map
-                    data={data}
-                    userLng={userLng}
-                    userLat={userLat}
-                    toggleInfoBox={toggleInfoBox}
-                />
-                {/* )} */}
-            </div>
+            <Router>
+                <Routes>
+                    {/* <UserLocation setUserLocation={setUserLocation} /> */}
+                    {/* {!userLocationModal && ( */}
+                    <Route
+                        exact
+                        path="/"
+                        element={
+                            <div className="map">
+                                <Map
+                                    data={data}
+                                    userLng={userLng}
+                                    userLat={userLat}
+                                    toggleInfoBox={toggleInfoBox}
+                                />
+                            </div>
+                        }
+                    />
+                    {/* <Map
+                            data={data}
+                            userLng={userLng}
+                            userLat={userLat}
+                            toggleInfoBox={toggleInfoBox}
+                        /> */}
+                    {/* )} */}
+
+                    <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+            </Router>
             {Object.keys(userPin).length !== 0 && <NewPin userPin={userPin} />}
             {popupCoord && popupCoord.length !== 0 && <Popup />}
             {isInfoBoxVisible && <Infobox toggleInfoBox={toggleInfoBox} />}

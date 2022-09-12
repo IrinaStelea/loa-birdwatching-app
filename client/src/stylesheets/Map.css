@@ -96,7 +96,8 @@
     display: none !important;
 }
 
-.top-icon {
+.top-icon,
+.search-icon {
     margin: 10px;
     width: 5vh;
     height: 5vh;
@@ -109,7 +110,8 @@
     box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
 }
 
-.top-icon img {
+.top-icon img,
+.search-icon img {
     width: 80%;
     object-fit: contain;
     padding: 2px;

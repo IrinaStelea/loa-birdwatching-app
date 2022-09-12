@@ -6,7 +6,7 @@ import {
     BrowserRouter as Router,
     Route,
     Routes,
-    // Redirect,
+    Navigate,
 } from "react-router-dom";
 
 export default function Welcome() {
@@ -17,7 +17,7 @@ export default function Welcome() {
                     <Route exact path="/" element={<StartScreen />} />
                     <Route path="/register" element={<Registration />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="*" element={<StartScreen />} />
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </Router>
         </>
