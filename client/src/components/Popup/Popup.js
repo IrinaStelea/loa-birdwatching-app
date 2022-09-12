@@ -59,17 +59,6 @@ export default function Popup() {
                             alt={popup.comName}
                         />
                     )}
-                    {/* <img
-                        id="bird-thumbnail"
-                        src={
-                            popup.imageUrl
-                                ? popup.imageUrl
-                                : selBird.length !== 0
-                                ? selBird[0].image
-                                : "../../default_pic.png"
-                        }
-                        alt={popup.comName}
-                    /> */}
                     {selBird.length !== 0 && (
                         <a
                             href={selBird[0].url}

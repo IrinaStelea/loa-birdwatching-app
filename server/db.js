@@ -89,6 +89,7 @@ module.exports.addSighting = (id, sighting) => {
 };
 
 module.exports.deleteSighting = (id) => {
+    //this will delete the images uploaded by the user for that particular sighting thanks to ON DELETE CASCADE
     return db.query(`DELETE FROM sightings WHERE id=$1`, [id]);
 };
 

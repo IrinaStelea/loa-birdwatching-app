@@ -73,3 +73,9 @@
     color: darkslategray;
     text-decoration: underline;
 }
+
+#confirm {
+    margin-top: 2vh;
+    text-align: center;
+    color: red;
+}

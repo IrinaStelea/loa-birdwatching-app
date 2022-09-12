@@ -9,8 +9,7 @@ const helpers = require("./helpers.js");
 const app = express();
 const cookieSession = require("cookie-session");
 const { validateForm } = require("./validateForm");
-// const s3 = require("./s3");
-const { uploadS3 } = require("./middleware");
+const { uploadS3, deleteS3 } = require("./s3");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -26,8 +25,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Have Node serve the files for our built React app
-app.use(express.static(path.resolve(__dirname, "../client/build")));
+app.use(express.static(path.join(__dirname, "..", "client", "public")));
+// app.use(express.static(path.resolve(__dirname, "../client/build")));
 
 //https middleware
 if (process.env.NODE_ENV == "production") {
@@ -38,13 +37,6 @@ if (process.env.NODE_ENV == "production") {
         res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
-
-// const runImageUploadMiddleware = (req, res, next) => {
-//     if (req.file) {
-//         return uploader.single("file");
-//     }
-//     return next;
-// };
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
@@ -126,7 +118,7 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        console.log("result in get user data", result.rows);
+        // console.log("result in get user data", result.rows);
         //merge identical sightings with several pictures
         const mergedResult = helpers.mergeIdenticalSightings(result.rows);
         return res.json(mergedResult);
@@ -164,7 +156,7 @@ app.post("/api/upload-image", uploadS3.array("file"), async (req, res) => {
     for (let i = 0; i < fileArray.length; i++) {
         imgUrlArray.push(fileArray[i].location);
     }
-    console.log("image url array", imgUrlArray);
+    // console.log("image url array", imgUrlArray);
     try {
         const result = await db.addImage(
             req.session.userId,
@@ -173,7 +165,7 @@ app.post("/api/upload-image", uploadS3.array("file"), async (req, res) => {
         );
         //clear sighting_id cookie stored
         req.session.sighting_id = null;
-        console.log("result from adding multiple images", result.rows);
+        // console.log("result from adding multiple images", result.rows);
         return res.json({
             success: true,
             images: result.rows,
@@ -188,7 +180,7 @@ app.post("/api/upload-image", uploadS3.array("file"), async (req, res) => {
 });
 
 //delete user sighting
-app.post("/api/delete-user-marker", async (req, res) => {
+app.post("/api/delete-user-marker", deleteS3, async (req, res) => {
     try {
         const result = await db.deleteSighting(req.body.id);
         // console.log("result deleting sighting", result)

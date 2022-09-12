@@ -1,5 +1,9 @@
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
+const uniqid = require("uniqid");
+const path = require("path");
 const aws = require("aws-sdk");
-const fs = require("fs");
 
 let secrets;
 if (process.env.NODE_ENV == "production") {
@@ -8,99 +12,87 @@ if (process.env.NODE_ENV == "production") {
     secrets = require("../secrets.json");
 }
 
-//creating new instance of s3 user
-const s3 = new aws.S3({
+const s3 = new S3Client({
+    region: "us-east-1",
+    credentials: {
+        accessKeyId: secrets.AWS_KEY,
+        secretAccessKey: secrets.AWS_SECRET,
+    },
+});
+
+const s3Instance = new aws.S3({
     accessKeyId: secrets.AWS_KEY,
     secretAccessKey: secrets.AWS_SECRET,
 });
 
-exports.upload = (req, res, next) => {
-    if (!req.file) {
-        return res.sendStatus(500);
-    }
-
-    //boilerplate code - if we get at this point, req.file exists and we pull info from it
-
-    const { filename, mimetype, size, path } = req.file;
-
-    const promise = s3
-        .putObject({
-            Bucket: "ihamspiced",
-            ACL: "public-read",
-            // add userid to create subfolder on AWS for each user & for each sighting
-            Key:
+exports.uploadS3 = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "ihamspiced",
+        acl: "public-read",
+        // metadata: function (req, file, cb) {
+        //     cb(null, { fieldName: uniquePath });
+        // },
+        key: function (req, file, cb) {
+            cb(
+                null,
                 req.session.userId +
-                "/" +
-                req.session.sighting_id +
-                "/" +
-                filename,
-            Body: fs.createReadStream(path),
-            ContentType: mimetype,
-            ContentLength: size,
-        })
-        .promise();
+                    "/" +
+                    req.session.sighting_id +
+                    "/" +
+                    uniqid() +
+                    path.extname(file.originalname)
+            );
+        },
+        contentType: function (req, file, cb) {
+            cb(null, file.mimetype);
+        },
+        contentLength: function (req, file, cb) {
+            cb(null, file.size);
+        },
+    }),
+    limits: {
+        fileSize: 2097152,
+    },
+});
 
-    promise
-        .then(() => {
-            console.log("amazon upload successful");
-            next();
-            fs.unlink(path, () => {}); //delete the img stored locally
-        })
-        .catch((err) => {
-            // uh oh
-            console.log("error in upload put object -s3.js", err);
-            res.sendStatus(404);
+exports.deleteS3 = (req, res, next) => {
+    var params = {
+        Bucket: "ihamspiced",
+        Prefix: req.session.userId + "/" + req.body.id + "/",
+    };
+
+    return s3Instance
+        .listObjects(params)
+        .promise()
+        .then((data) => {
+            if (data.Contents.length === 0) {
+                // throw new Error("List of objects empty.");
+                console.log("list of objects empty");
+                return next();
+            }
+
+            let currentData = data;
+
+            params = { Bucket: "ihamspiced" };
+            params.Delete = { Objects: [] };
+
+            currentData.Contents.forEach((content) => {
+                params.Delete.Objects.push({ Key: content.Key });
+            });
+
+            return s3Instance
+                .deleteObjects(params)
+                .promise()
+                .then(() => {
+                    // it worked!!!
+                    console.log("amazon delete successful");
+                    next(); //adding this because this function will be used as middleware
+                })
+                .catch((err) => {
+                    // uh oh
+                    console.log("error in delete object", err);
+                    res.sendStatus(404);
+                });
         });
 };
-
-// exports.delete = (req, res, next) => {
-//     var params = {
-//         Bucket: "ihamspiced",
-//         Prefix: req.session.userId + "/",
-//     };
-
-//     return s3
-//         .listObjects(params)
-//         .promise()
-//         .then((data) => {
-//             if (data.Contents.length === 0) {
-//                 throw new Error("List of objects empty.");
-//             }
-
-//             let currentData = data;
-
-//             params = { Bucket: "ihamspiced" };
-//             params.Delete = { Objects: [] };
-
-//             currentData.Contents.forEach((content) => {
-//                 params.Delete.Objects.push({ Key: content.Key });
-//             });
-
-//             return s3
-//                 .deleteObjects(params)
-//                 .promise()
-//                 .then(() => {
-//                     // it worked!!!
-//                     console.log("amazon delete successful");
-//                     next(); //adding this because this function will be used as middleware
-//                 })
-//                 .catch((err) => {
-//                     // uh oh
-//                     console.log("error in delete object", err);
-//                     res.sendStatus(404);
-//                 });
-//         });
-// const promise = s3.deleteObject(params).promise();
-
-// promise
-//     .then(() => {
-//         // it worked!!!
-//         console.log("amazon delete successful");
-//         next(); //adding this because this function will be used as middleware
-//     })
-//     .catch((err) => {
-//         // uh oh
-//         console.log("error in delete object", err);
-//         res.sendStatus(404);
-//     });
-// };

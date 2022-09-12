@@ -32,11 +32,17 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
     // console.log("info in delete user marker", info);
     return (
         <>
-            <p id="delete" onClick={() => setConfirmation(true)}>
-                Delete this sighting
-            </p>
+            {!confirmation && (
+                <p id="delete" onClick={() => setConfirmation(true)}>
+                    Delete this sighting
+                </p>
+            )}
             {confirmation && (
                 <>
+                    <p id="confirm">
+                        Are you sure? This will also delete any images you
+                        uploaded
+                    </p>
                     <p id="delete" onClick={deleteUserMarker}>
                         Yes, delete
                     </p>
