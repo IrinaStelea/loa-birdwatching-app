@@ -193,7 +193,7 @@ app.post("/api/delete-user-marker", deleteS3, async (req, res) => {
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    console.log("inside the logout route");
+    // console.log("inside the logout route");
     return res.json({});
 });
 

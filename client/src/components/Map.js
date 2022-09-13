@@ -5,8 +5,10 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 import { addUserMarker } from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
-import { receiveAvailableBirds } from "../redux/birds-filter/slice";
-import { resetAvailableBirds } from "../redux/birds-filter/slice";
+import {
+    receiveAvailableBirds,
+    resetAvailableBirds,
+} from "../redux/birds-filter/slice";
 import { closePopup } from "../redux/popup/slice";
 import Logout from "./Logout.js";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
@@ -37,7 +39,7 @@ export default function Map({
         initialValue: "",
     });
     const [dataListView, setDataListView] = useState(1);
-
+    const newPin = useSelector((state) => state.pinCoordinates);
     const userData = useSelector((state) => state.userData);
 
     //define the list of birds in the search box
@@ -130,13 +132,8 @@ export default function Map({
             return {
                 ...marker.sighting,
                 id: marker.id,
-                // properties: {
-                //     ...marker.sighting.properties,
-                //     imageUrl: marker.image_url,
-                // },
             };
         });
-        // console.log("user markers", userMarkers);
 
         map.current.addSource("user-sightings", {
             type: "geojson",
@@ -207,6 +204,7 @@ export default function Map({
             // console.log("click on user layer", e.features[0]);
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates;
+
             const { comName, sciName, date, imageUrl } =
                 e.features[0].properties;
             const id = e.features[0].id;
@@ -223,6 +221,46 @@ export default function Map({
                 return;
             }
             var coordinates = e.lngLat;
+
+            //add layer with custom marker for the new pin
+            map.current.loadImage("../../newMarker.png", (error, image) => {
+                if (error) throw error;
+
+                if (!map.current.hasImage("new-marker"))
+                    map.current.addImage("new-marker", image);
+            });
+
+            if (typeof map.current.getLayer("new-pin") !== "undefined") {
+                map.current.removeLayer("new-pin");
+                map.current.removeSource("point");
+            }
+
+            map.current.addSource("point", {
+                type: "geojson",
+                data: {
+                    type: "FeatureCollection",
+                    features: [
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [coordinates.lng, coordinates.lat],
+                            },
+                        },
+                    ],
+                },
+            });
+
+            map.current.addLayer({
+                id: "new-pin",
+                type: "symbol",
+                source: "point",
+                layout: {
+                    "icon-image": "new-marker",
+                    "icon-size": 0.05,
+                },
+            });
+
             //close other popups if open
             dispatch(closePopup());
             //dispatch coord for user marker
@@ -231,9 +269,19 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    //useeffect for clearing the new marker layer
+    useEffect(() => {
+        if (
+            Object.keys(newPin).length === 0 &&
+            typeof map.current.getLayer("new-pin") !== "undefined"
+        ) {
+            map.current.removeLayer("new-pin");
+            map.current.removeSource("point");
+        }
+    }, [newPin]);
+
     useEffect(() => {
         let flying = false;
-
         map.current.on("flystart", () => {
             console.log("inside fly start");
             flying = true;
@@ -247,10 +295,9 @@ export default function Map({
             if (flying) {
                 return;
             }
-            setLng(map.current.getCenter().lng.toFixed(4));
-            setLat(map.current.getCenter().lat.toFixed(4));
+            setLng(map.current.getCenter().lng.toFixed(8));
+            setLat(map.current.getCenter().lat.toFixed(8));
             setZoom(map.current.getZoom().toFixed(2));
-            // console.log("lat and long", lat, lng);
         });
 
         map.current.on("movestart", (e) => {
@@ -258,7 +305,6 @@ export default function Map({
                 return;
             }
             dispatch(resetAvailableBirds());
-            // console.log("inside move start");
             setValue("");
         });
         map.current.on("moveend", (e) => {
@@ -271,10 +317,20 @@ export default function Map({
             ) {
                 return;
             }
+            let appPins,
+                userPins,
+                allPins = [];
+            if (typeof map.current.getLayer("sightings") !== "undefined")
+                appPins = map.current.queryRenderedFeatures({
+                    layers: ["sightings"],
+                });
 
-            let allPins = map.current.queryRenderedFeatures({
-                layers: ["user-sightings", "sightings"],
-            });
+            if (typeof map.current.getLayer("user-sightings") !== "undefined")
+                userPins = map.current.queryRenderedFeatures({
+                    layers: ["user-sightings"],
+                });
+
+            allPins = [...appPins, ...userPins];
 
             let birdNames = allPins.map((pin) => ({
                 [pin.id]: pin.properties.comName,
