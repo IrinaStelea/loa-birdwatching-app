@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addMarker } from "../../redux/user-markers/slice";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
-import DatalistInput from "react-datalist-input";
+import { DatalistInput, useComboboxControls } from "react-datalist-input";
 import Uploader from "./Uploader.js";
 import "react-datalist-input/dist/styles.css";
 
@@ -10,6 +10,9 @@ import "../../stylesheets/NewPin.css";
 
 export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [selectedBird, setSelectedBird] = useState(null);
+    const { value, setValue } = useComboboxControls({
+        initialValue: "",
+    });
     const [view, setView] = useState(1);
     const [uploaderIsVisible, setUploader] = useState(false);
     const [newPin, setNewPin] = useState();
@@ -28,14 +31,20 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     //hide success message after 3 seconds
     useEffect(() => {
         if (view === 3) {
-            console.log("inside use effect for view");
             setTimeout(() => togglePinPopUp(), 1500);
         }
         // eslint-disable-next-line
     }, [view]);
 
     const onSelect = (bird) => {
+        // console.log("bird value", bird);
         setSelectedBird(bird);
+        setValue(bird.value);
+    };
+
+    const resetSelection = () => {
+        setValue("");
+        setSelectedBird(null);
     };
 
     const toggleUploader = () => {
@@ -96,12 +105,24 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             {view === 1 && (
                 <div className="new-pin-pop-up">
                     <h4>Add a new bird sighting</h4>
-                    <DatalistInput
-                        placeholder="Start typing a bird name"
-                        showLabel={false}
-                        items={birdList}
-                        onSelect={onSelect}
-                    />
+                    <div id="datalist-container">
+                        <DatalistInput
+                            placeholder="Start typing a bird name"
+                            showLabel={false}
+                            items={birdList}
+                            value={value}
+                            onSelect={onSelect}
+                        />
+                        {
+                            <span
+                                className="reset-search"
+                                onClick={resetSelection}
+                            >
+                                X
+                            </span>
+                        }
+                    </div>
+
                     {selectedBird && (
                         <>
                             <p className="sciname">{selectedBird.sciName}</p>

@@ -21,6 +21,7 @@ export default function Map({
     userLng = 13.39,
     userLat = 52.52,
     toggleInfoBox,
+    toggleInstructions,
 }) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
@@ -30,9 +31,9 @@ export default function Map({
     const [zoom, setZoom] = useState(11);
 
     const [markersLayerVisible, setMarkersLayer] = useState(true);
-    const [markersButtonView, setMarkersButtonView] = useState(1);
+    const [markersButtonView, setMarkersButtonView] = useState(2);
     const [userMarkersLayerVisible, setUserMarkersLayer] = useState(true);
-    const [userMarkersButtonView, setUserMarkersButtonView] = useState(1);
+    const [userMarkersButtonView, setUserMarkersButtonView] = useState(2);
     const [userCurrentMarkersLayer, setUserCurrentMarkersLayer] = useState();
     const [searchedBird, setSearchedBird] = useState(null);
     const { value, setValue } = useComboboxControls({
@@ -125,6 +126,7 @@ export default function Map({
                 "circle-stroke-color": "white",
             },
         });
+        setMarkersButtonView(1);
     };
 
     const initUserLayer = () => {
@@ -177,11 +179,14 @@ export default function Map({
     //add layer of user pins
     useEffect(() => {
         if (!map.current) return;
+
         map.current.once("load", () => {
             if (typeof map.current.getLayer("user-sightings") !== "undefined")
                 return;
             if (userData.length !== 0) {
                 initUserLayer();
+            } else {
+                toggleInstructions();
             }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -317,9 +322,9 @@ export default function Map({
             ) {
                 return;
             }
-            let appPins,
-                userPins,
-                allPins = [];
+            let appPins = [];
+            let userPins = [];
+            let allPins = [];
             if (typeof map.current.getLayer("sightings") !== "undefined")
                 appPins = map.current.queryRenderedFeatures({
                     layers: ["sightings"],
@@ -382,6 +387,10 @@ export default function Map({
     };
 
     const toggleUserMarkersLayer = () => {
+        if (userData.length === 0) {
+            return;
+        }
+
         if (userMarkersLayerVisible) {
             map.current.setLayoutProperty(
                 "user-sightings",
@@ -400,25 +409,22 @@ export default function Map({
         setUserMarkersLayer(!userMarkersLayerVisible);
     };
 
-    // const toggleUserMarkersIfInvisible = () => {
-    //     if (!userMarkersLayerVisible) {
-    //         map.current.setLayoutProperty(
-    //             "user-sightings",
-    //             "visibility",
-    //             "visible"
-    //         );
-    //         setUserMarkersButtonView(1);
-    //         setUserMarkersLayer(!userMarkersLayerVisible);
-    //     }
-    // };
-
     //on select function for the filter
     const onSelect = (sel) => {
         setValue(sel.value);
         setSearchedBird(sel.value);
-        var features = map.current.queryRenderedFeatures({
-            layers: ["user-sightings", "sightings"],
+
+        let features = map.current.queryRenderedFeatures({
+            layers: ["sightings"],
         });
+
+        if (typeof map.current.getLayer("user-sightings") !== "undefined")
+            features = features.concat(
+                map.current.queryRenderedFeatures({
+                    layers: ["user-sightings"],
+                })
+            );
+
         if (!features.length) {
             return;
         }
@@ -533,37 +539,56 @@ export default function Map({
         });
     }, [popup]);
 
+    //initialise and update layer of user pins
     useEffect(() => {
+        if (!map.current) return;
+
+        if (
+            userData.length === 0 &&
+            typeof map.current.getLayer("user-sightings") !== "undefined"
+        ) {
+            map.current.removeLayer("user-sightings");
+            map.current.removeSource("user-sightings");
+            setUserMarkersButtonView(2);
+        }
+
+        if (
+            userData.length !== 0 &&
+            typeof map.current.getLayer("user-sightings") === "undefined"
+        ) {
+            console.log("inside second if");
+            initUserLayer();
+        }
+
         if (userCurrentMarkersLayer === undefined) {
             return;
+        } else {
+            let updatedUserMarkers = userData.map((marker) => {
+                return {
+                    ...marker.sighting,
+                    id: marker.id,
+                    properties: {
+                        ...marker.sighting.properties,
+                        imageUrl: marker.image_url,
+                    },
+                };
+            });
+            userCurrentMarkersLayer.setData({
+                type: "FeatureCollection",
+                features: updatedUserMarkers,
+            });
+
+            //toggle user markers layers if invisible
+            if (!userMarkersLayerVisible) {
+                map.current.setLayoutProperty(
+                    "user-sightings",
+                    "visibility",
+                    "visible"
+                );
+                setUserMarkersButtonView(1);
+                setUserMarkersLayer(!userMarkersLayerVisible);
+            }
         }
-
-        let updatedUserMarkers = userData.map((marker) => {
-            return {
-                ...marker.sighting,
-                id: marker.id,
-                properties: {
-                    ...marker.sighting.properties,
-                    imageUrl: marker.image_url,
-                },
-            };
-        });
-        userCurrentMarkersLayer.setData({
-            type: "FeatureCollection",
-            features: updatedUserMarkers,
-        });
-
-        //toggle user markers layers if invisible
-        if (!userMarkersLayerVisible) {
-            map.current.setLayoutProperty(
-                "user-sightings",
-                "visibility",
-                "visible"
-            );
-            setUserMarkersButtonView(1);
-            setUserMarkersLayer(!userMarkersLayerVisible);
-        }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
@@ -596,22 +621,22 @@ export default function Map({
                     </div>
                 )}
                 {dataListView === 2 && (
-                    <div id="filter">
-                        <DatalistInput
-                            placeholder="Find in the map view"
-                            showLabel={false}
-                            value={value}
-                            items={uniqueSearchableBirds}
-                            onSelect={onSelect}
-                        />
-                    </div>
+                    <>
+                        <div id="filter">
+                            <DatalistInput
+                                placeholder="Find in the map view"
+                                showLabel={false}
+                                value={value}
+                                items={uniqueSearchableBirds}
+                                onSelect={onSelect}
+                            />
+                        </div>
+                        <span className="close-top" onClick={resetSearch}>
+                            X
+                        </span>
+                    </>
                 )}
 
-                {dataListView === 2 && (
-                    <span className="close-top" onClick={resetSearch}>
-                        X
-                    </span>
-                )}
                 {/* <div
                     id="geolocate"
                 >

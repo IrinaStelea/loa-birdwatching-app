@@ -49,9 +49,22 @@
     width: 100%;
     text-align: center;
 }
+#datalist-container {
+    width: 100% !important;
+    position: relative;
+    display: flex;
+}
 
 .react-datalist-input__container {
-    width: 100% !important;
+    width: 90% !important;
+}
+
+.reset-search {
+    width: 10%;
+    align-self: center;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: 300;
 }
 
 mark {

@@ -65,20 +65,20 @@ export default function Uploader({ toggleUploader, setView }) {
         e.preventDefault();
 
         //image validation
-        // const validImageFiles = [];
-        // for (let image of imageFiles) {
-        //     if (image.type.match(imageMimeType)) {
-        //         validImageFiles.push(image);
-        //     }
-        // }
+        const validImageFiles = [];
+        for (let image of imageFiles) {
+            if (image.type.match(imageMimeType)) {
+                validImageFiles.push(image);
+            }
+        }
 
-        // if (!validImageFiles.length) {
-        //     setError("Please upload one or more images first");
-        //     return;
-        // }
+        if (!validImageFiles.length) {
+            setError("Please upload one or more images first");
+            return;
+        }
         // console.log("imagefiles inside submit", imageFiles);
         const formData = new FormData();
-        imageFiles.forEach((file) => formData.append("file", file));
+        validImageFiles.forEach((file) => formData.append("file", file));
 
         for (const pair of formData.entries()) {
             console.log(pair[0] + ", " + pair[1]);
@@ -101,6 +101,12 @@ export default function Uploader({ toggleUploader, setView }) {
                             image_url: data.images.map(
                                 (image) => image.image_url
                             ),
+                        })
+                    );
+                    dispatch(
+                        addAvailableBird({
+                            [data.images[0].id]:
+                                data.images[0].sighting.properties.comName,
                         })
                     );
                     toggleUploader();

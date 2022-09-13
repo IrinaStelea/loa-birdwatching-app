@@ -4,6 +4,7 @@ export default function BirdsFilterReducer(availableBirds = [], action) {
             // console.log("available birds in main reducer", action.payload);
             return action.payload;
         case "filter-birds/add":
+            console.log("add available bird reducer", action.payload);
             return [...availableBirds, action.payload];
         case "filter-birds/delete":
             return availableBirds.filter(
