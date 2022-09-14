@@ -30,6 +30,7 @@ export default function Map({
     const [lat, setLat] = useState(userLat); //52.52
     const [zoom, setZoom] = useState(11);
 
+    const [isMapReady, setMapReady] = useState(false);
     const [markersLayerVisible, setMarkersLayer] = useState(true);
     const [markersButtonView, setMarkersButtonView] = useState(2);
     const [userMarkersLayerVisible, setUserMarkersLayer] = useState(true);
@@ -39,7 +40,6 @@ export default function Map({
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
-    const [dataListView, setDataListView] = useState(1);
     const newPin = useSelector((state) => state.pinCoordinates);
     const userData = useSelector((state) => state.userData);
 
@@ -157,6 +157,7 @@ export default function Map({
                 "circle-stroke-color": "white",
             },
         });
+
         //store the layer in a variable to be able to add/remove user pins
         setUserCurrentMarkersLayer(map.current.getSource("user-sightings"));
 
@@ -185,12 +186,18 @@ export default function Map({
                 return;
             if (userData.length !== 0) {
                 initUserLayer();
-            } else {
-                toggleInstructions();
             }
+            setMapReady(true);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
+
+    //toggle instructions to add pin in case there aren't any yet
+    useEffect(() => {
+        if (userData.length === 0 && isMapReady === true) {
+            toggleInstructions();
+        }
+    }, [isMapReady]);
 
     //map events
     useEffect(() => {
@@ -539,7 +546,7 @@ export default function Map({
         });
     }, [popup]);
 
-    //initialise and update layer of user pins
+    //update layer of user pins based on userData
     useEffect(() => {
         if (!map.current) return;
 
@@ -553,10 +560,10 @@ export default function Map({
         }
 
         if (
+            map.current.loaded() &&
             userData.length !== 0 &&
             typeof map.current.getLayer("user-sightings") === "undefined"
         ) {
-            console.log("inside second if");
             initUserLayer();
         }
 
@@ -592,6 +599,12 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
+    //update birds available in search field when toggling layers
+    useEffect(() => {
+        dispatch(resetAvailableBirds());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userMarkersButtonView, markersButtonView]);
+
     return (
         <>
             <div className="button-container-top">
@@ -603,39 +616,24 @@ export default function Map({
                     />
                 </div>
 
-                {dataListView === 1 && (
-                    <div className="search-icon">
-                        <img
-                            id="search-icon"
-                            src="../../search_icon.png"
-                            alt="search icon"
-                            onClick={() => {
-                                setDataListView(2);
-                                if (!uniqueSearchableBirds) {
-                                    map.current.flyTo({
-                                        zoom: zoom + 0.0001,
-                                    });
-                                }
-                            }}
+                <>
+                    <div id="filter">
+                        <DatalistInput
+                            placeholder={
+                                uniqueSearchableBirds.length === 0
+                                    ? "Drag the map to search"
+                                    : "Find in the map view"
+                            }
+                            showLabel={false}
+                            value={value}
+                            items={uniqueSearchableBirds}
+                            onSelect={onSelect}
                         />
                     </div>
-                )}
-                {dataListView === 2 && (
-                    <>
-                        <div id="filter">
-                            <DatalistInput
-                                placeholder="Find in the map view"
-                                showLabel={false}
-                                value={value}
-                                items={uniqueSearchableBirds}
-                                onSelect={onSelect}
-                            />
-                        </div>
-                        <span className="close-top" onClick={resetSearch}>
-                            X
-                        </span>
-                    </>
-                )}
+                    <span className="close-top" onClick={resetSearch}>
+                        X
+                    </span>
+                </>
 
                 {/* <div
                     id="geolocate"

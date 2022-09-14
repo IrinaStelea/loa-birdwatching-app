@@ -156,7 +156,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
             )}
             {view === 2 && (
                 <div className="new-pin-pop-up">
-                    <h4>Add own photos for this bird?</h4>
+                    <h4>Add one or more photos for this sighting?</h4>
                     {uploaderIsVisible && (
                         <>
                             <Uploader

@@ -25,6 +25,22 @@ const s3Instance = new aws.S3({
     secretAccessKey: secrets.AWS_SECRET,
 });
 
+const imageType = {
+    "image/png": "png",
+    "image/jpeg": "jpeg",
+    "image/jpg": "jpg",
+};
+
+//file type validation
+const multerFilter = (req, file, cb) => {
+    if (!imageType[file.mimetype]) {
+        cb(null, false);
+        return cb(new Error("Please upload a valid image type"));
+    } else {
+        cb(null, true);
+    }
+};
+
 exports.uploadS3 = multer({
     storage: multerS3({
         s3: s3,
@@ -52,9 +68,10 @@ exports.uploadS3 = multer({
         },
     }),
     limits: {
-        fileSize: 2097152,
+        fileSize: 2097152, //file size validation
     },
-});
+    fileFilter: multerFilter,
+}).array("file");
 
 exports.deleteS3 = (req, res, next) => {
     var params = {
@@ -68,7 +85,7 @@ exports.deleteS3 = (req, res, next) => {
         .then((data) => {
             if (data.Contents.length === 0) {
                 // throw new Error("List of objects empty.");
-                console.log("list of objects empty");
+                // console.log("list of objects empty");
                 return next();
             }
 

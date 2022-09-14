@@ -10,6 +10,7 @@ const app = express();
 const cookieSession = require("cookie-session");
 const { validateForm } = require("./validateForm");
 const { uploadS3, deleteS3 } = require("./s3");
+const multer = require("multer");
 
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
@@ -37,6 +38,14 @@ if (process.env.NODE_ENV == "production") {
         res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
+
+// app.use((err, req, res, next) => {
+//     if (err.code === "LIMIT_FILE_SIZE") {
+//         console.log("inside error");
+//         return res.json({ success: false, message: "Max image size is 2MB" });
+//     }
+//     return next();
+// });
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
@@ -149,34 +158,48 @@ app.post("/api/submit-pin", async (req, res) => {
     }
 });
 
-app.post("/api/upload-image", uploadS3.array("file"), async (req, res) => {
-    //get the full URL of the image (amazon url + filename)
-    let fileArray = req.files;
-    let imgUrlArray = [];
-    for (let i = 0; i < fileArray.length; i++) {
-        imgUrlArray.push(fileArray[i].location);
-    }
-    // console.log("image url array", imgUrlArray);
-    try {
-        const result = await db.addImage(
-            req.session.userId,
-            req.session.sighting_id,
-            imgUrlArray
-        );
-        //clear sighting_id cookie stored
-        req.session.sighting_id = null;
-        // console.log("result from adding multiple images", result.rows);
-        return res.json({
-            success: true,
-            images: result.rows,
-        });
-    } catch (err) {
-        console.log("error in uploading image", err);
-        return res.json({
-            success: false,
-            message: "Something went wrong, please try again",
-        });
-    }
+app.post("/api/upload-image", async (req, res) => {
+    uploadS3(req, res, async function (err) {
+        //first handle Multer file validation errors
+        if (err instanceof multer.MulterError) {
+            return res.json({
+                success: false,
+                message: err.message,
+            });
+        } else if (err) {
+            return res.json({
+                success: false,
+                message: err.message,
+            });
+        }
+        //get the full URL of the image (amazon url + filename)
+        let fileArray = req.files;
+        let imgUrlArray = [];
+        for (let i = 0; i < fileArray.length; i++) {
+            imgUrlArray.push(fileArray[i].location);
+        }
+        // console.log("image url array", imgUrlArray);
+        try {
+            const result = await db.addImage(
+                req.session.userId,
+                req.session.sighting_id,
+                imgUrlArray
+            );
+            //clear sighting_id cookie stored
+            req.session.sighting_id = null;
+            // console.log("result from adding multiple images", result.rows);
+            return res.json({
+                success: true,
+                images: result.rows,
+            });
+        } catch (err) {
+            console.log("error in uploading image", err);
+            return res.json({
+                success: false,
+                message: "Something went wrong, please try again",
+            });
+        }
+    });
 });
 
 //delete user sighting

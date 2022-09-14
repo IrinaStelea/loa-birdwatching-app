@@ -1,4 +1,6 @@
 createdb birdapp
+DROP TABLE IF EXISTS sightings;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,

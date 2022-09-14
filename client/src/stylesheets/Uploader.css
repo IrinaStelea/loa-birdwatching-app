@@ -36,3 +36,7 @@
     max-width: 60vw;
     overflow-x: scroll;
 }
+
+input[type="file" i] {
+    color: white !important;
+}

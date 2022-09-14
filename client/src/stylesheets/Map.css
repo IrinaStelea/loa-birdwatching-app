@@ -96,8 +96,7 @@
     display: none !important;
 }
 
-.top-icon,
-.search-icon {
+.top-icon {
     margin: 10px;
     width: 5vh;
     height: 5vh;
@@ -110,11 +109,33 @@
     box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
 }
 
-.top-icon img,
-.search-icon img {
+.search-icon {
+    margin: 10px;
+    width: 60vw;
+    height: 5vh;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+}
+
+.top-icon img {
     width: 80%;
     object-fit: contain;
     padding: 2px;
+}
+
+.search-icon img {
+    height: 100%;
+    object-fit: contain;
+    padding: 2px;
+}
+
+.search-icon p {
+    color: gray;
 }
 
 .close-top {

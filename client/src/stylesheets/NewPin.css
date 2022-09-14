@@ -59,6 +59,10 @@
     width: 90% !important;
 }
 
+.button-container-top .react-datalist-input__container {
+    width: 100% !important;
+}
+
 .reset-search {
     width: 10%;
     align-self: center;
