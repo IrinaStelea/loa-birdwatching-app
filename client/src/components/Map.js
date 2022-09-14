@@ -513,9 +513,16 @@ export default function Map({
                 return;
             }
 
-            var features = map.current.queryRenderedFeatures(e.point, {
-                layers: ["user-sightings", "sightings"],
+            let features = map.current.queryRenderedFeatures({
+                layers: ["sightings"],
             });
+
+            if (typeof map.current.getLayer("user-sightings") !== "undefined")
+                features = features.concat(
+                    map.current.queryRenderedFeatures({
+                        layers: ["user-sightings"],
+                    })
+                );
 
             if (!features.length) {
                 return;
