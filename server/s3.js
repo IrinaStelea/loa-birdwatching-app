@@ -15,14 +15,14 @@ if (process.env.NODE_ENV == "production") {
 const s3 = new S3Client({
     region: "us-east-1",
     credentials: {
-        accessKeyId: secrets.AWS_KEY,
-        secretAccessKey: secrets.AWS_SECRET,
+        accessKeyId: secrets.AWS_KEY_ID,
+        secretAccessKey: secrets.AWS_SECRET_ACCESS_KEY,
     },
 });
 
 const s3Instance = new aws.S3({
-    accessKeyId: secrets.AWS_KEY,
-    secretAccessKey: secrets.AWS_SECRET,
+    accessKeyId: secrets.AWS_KEY_ID,
+    secretAccessKey: secrets.AWS_SECRET_ACCESS_KEY,
 });
 
 const imageType = {

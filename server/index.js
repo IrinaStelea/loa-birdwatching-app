@@ -39,14 +39,6 @@ if (process.env.NODE_ENV == "production") {
     });
 }
 
-// app.use((err, req, res, next) => {
-//     if (err.code === "LIMIT_FILE_SIZE") {
-//         console.log("inside error");
-//         return res.json({ success: false, message: "Max image size is 2MB" });
-//     }
-//     return next();
-// });
-
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
     //add user to database, cleaning the data
