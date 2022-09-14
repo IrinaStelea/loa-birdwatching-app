@@ -496,6 +496,7 @@ export default function Map({
 
     //highlights for user pins
     useEffect(() => {
+        //remove layer of highlights if the popup is closed
         if (
             typeof map.current.getLayer("selected-pin") !== "undefined" &&
             Object.keys(popup).length === 0
@@ -507,33 +508,31 @@ export default function Map({
         map.current.on("click", (e) => {
             //highlight selected pin
             if (
-                typeof map.current.getLayer("user-sightings") === "undefined" ||
-                typeof map.current.getLayer("sightings") === "undefined"
+                typeof map.current.getLayer("sightings") === "undefined" &&
+                typeof map.current.getLayer("user-sightings") === "undefined"
             ) {
                 return;
             }
 
-            let features = map.current.queryRenderedFeatures({
-                layers: ["sightings"],
-            });
-
-            if (typeof map.current.getLayer("user-sightings") !== "undefined")
-                features = features.concat(
-                    map.current.queryRenderedFeatures({
-                        layers: ["user-sightings"],
-                    })
-                );
+            var features =
+                typeof map.current.getLayer("user-sightings") === "undefined"
+                    ? map.current.queryRenderedFeatures(e.point, {
+                          layers: ["sightings"],
+                      })
+                    : map.current.queryRenderedFeatures(e.point, {
+                          layers: ["user-sightings", "sightings"],
+                      });
 
             if (!features.length) {
                 return;
             }
             if (typeof map.current.getLayer("selected-pin") !== "undefined") {
-                // console.log("inside the simple if");
                 map.current.removeLayer("selected-pin");
                 map.current.removeSource("selected-pin");
             }
 
             var feature = features[0];
+            console.log("features", feature);
             map.current.addSource("selected-pin", {
                 type: "geojson",
                 maxzoom: 24,
