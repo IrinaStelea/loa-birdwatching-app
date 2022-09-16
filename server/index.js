@@ -28,9 +28,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-//CORS middleware
-app.use(cors());
-
 // app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(express.static(path.resolve(__dirname, "../client/build")));
 
@@ -43,6 +40,9 @@ if (process.env.NODE_ENV == "production") {
         res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
+
+//CORS middleware
+app.use(cors());
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
@@ -219,7 +219,7 @@ app.get("/logout", (req, res) => {
 
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
-app.get("*", cors, (req, res) => {
+app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client/public", "index.html"));
 });
 
