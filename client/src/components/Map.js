@@ -85,25 +85,19 @@ export default function Map({
             })
         );
 
+        //add custom icon
+        map.current.loadImage("../../newMarker.png", (error, image) => {
+            if (error) throw error;
+
+            if (!map.current.hasImage("new-marker"))
+                map.current.addImage("new-marker", image);
+        });
+
         // cleanup function to remove map on unmount
         return () => map.current.remove();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    //update lng and lat on map move
-    // useEffect(() => {
-    //     //wait for map to be initialised
-    //     if (!map.current) return;
-    //     map.current.on("move", () => {
-    //         console.log("inside move event");
-    //         setLng(map.current.getCenter().lng.toFixed(4));
-    //         setLat(map.current.getCenter().lat.toFixed(4));
-    //         setZoom(map.current.getZoom().toFixed(2));
-    //     });
-
-    //     console.log("lng and lat", lng, lat);
-    // });
 
     const initAPILayer = () => {
         map.current.addSource("sightings", {
@@ -120,7 +114,7 @@ export default function Map({
             type: "circle",
             source: "sightings",
             paint: {
-                "circle-radius": 10,
+                "circle-radius": 12,
                 "circle-stroke-width": 2,
                 "circle-color": "#758bfd",
                 "circle-stroke-color": "white",
@@ -151,7 +145,7 @@ export default function Map({
             type: "circle",
             source: "user-sightings",
             paint: {
-                "circle-radius": 10,
+                "circle-radius": 12,
                 "circle-stroke-width": 2,
                 "circle-color": "#f5756a",
                 "circle-stroke-color": "white",
@@ -234,14 +228,6 @@ export default function Map({
             }
             var coordinates = e.lngLat;
 
-            //add layer with custom marker for the new pin
-            map.current.loadImage("../../newMarker.png", (error, image) => {
-                if (error) throw error;
-
-                if (!map.current.hasImage("new-marker"))
-                    map.current.addImage("new-marker", image);
-            });
-
             if (typeof map.current.getLayer("new-pin") !== "undefined") {
                 map.current.removeLayer("new-pin");
                 map.current.removeSource("point");
@@ -269,7 +255,7 @@ export default function Map({
                 source: "point",
                 layout: {
                     "icon-image": "new-marker",
-                    "icon-size": 0.05,
+                    "icon-size": 0.1,
                 },
             });
 
@@ -375,7 +361,7 @@ export default function Map({
             }
             map.current.flyTo({
                 center: e.lngLat,
-                zoom: 22,
+                zoom: 18,
             });
 
             map.current.fire("flystart");
@@ -458,7 +444,7 @@ export default function Map({
             type: "circle",
             source: "search-results",
             paint: {
-                "circle-radius": 10,
+                "circle-radius": 12,
                 "circle-stroke-width": 2,
                 "circle-color": "green",
                 "circle-stroke-color": "white",
@@ -543,7 +529,7 @@ export default function Map({
                 type: "circle",
                 source: "selected-pin",
                 paint: {
-                    "circle-radius": 10,
+                    "circle-radius": 12,
                     "circle-stroke-width": 2,
                     "circle-color": "#353d60",
                     "circle-stroke-color": "white",
@@ -636,9 +622,11 @@ export default function Map({
                             onSelect={onSelect}
                         />
                     </div>
-                    <span className="close-top" onClick={resetSearch}>
-                        X
-                    </span>
+                    {uniqueSearchableBirds.length !== 0 && (
+                        <span className="close-top" onClick={resetSearch}>
+                            X
+                        </span>
+                    )}
                 </>
 
                 {/* <div

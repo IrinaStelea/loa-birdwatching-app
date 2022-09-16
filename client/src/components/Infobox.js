@@ -33,9 +33,8 @@ export default function Infobox({ toggleInfoBox }) {
                             the eBird API owned by Cornell Lab of Ornithology.
                         </li>
                         <li>
-                            The taxonomy of bird species that can be seen in
-                            Germany is based on The Clements Checklist of Birds
-                            of the World.
+                            The taxonomy of bird species in Germany is based on
+                            The Clements Checklist of Birds of the World.
                         </li>
                         <li>Bird images come from Wikipedia.</li>
                     </ul>
@@ -52,6 +51,7 @@ export default function Infobox({ toggleInfoBox }) {
                     <p>Icons via Noun Project</p>
                 </div>
             </div>
+            <div className="overlay" onClick={toggleInfoBox}></div>
         </>
     );
 }

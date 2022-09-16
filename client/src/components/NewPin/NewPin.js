@@ -15,7 +15,6 @@ export default function NewPin({ userPin }) {
         <>
             {popUpVisible && (
                 <>
-                    {/* <img id="new-pin" src="../../newMarker.png" alt="new pin" /> */}
                     <NewPinPopUp
                         userPin={userPin}
                         togglePinPopUp={togglePinPopUp}

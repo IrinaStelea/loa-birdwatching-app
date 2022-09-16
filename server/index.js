@@ -1,19 +1,21 @@
-const path = require("path");
 const express = require("express");
-const db = require("./db.js");
-const jsonData = require("./apidata.json");
-const birdData = require("./birddata_imgwiki.json");
-
-const PORT = process.env.PORT || 3001;
-const helpers = require("./helpers.js");
 const app = express();
+const path = require("path");
 const cookieSession = require("cookie-session");
-const { validateForm } = require("./validateForm");
-const { uploadS3, deleteS3 } = require("./s3");
 const multer = require("multer");
-
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
+const cors = require("cors");
+
+const PORT = process.env.PORT || 3001;
+
+const db = require("./db.js");
+const helpers = require("./helpers.js");
+const { validateForm } = require("./validateForm");
+const { uploadS3, deleteS3 } = require("./s3");
+
+const jsonData = require("./apidata.json");
+const birdData = require("./birddata_imgwiki.json");
 
 //cookie session middleware
 app.use(
@@ -26,10 +28,13 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//CORS middleware
+app.use(cors());
+
 // app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(express.static(path.resolve(__dirname, "../client/build")));
 
-//https middleware
+//force https
 if (process.env.NODE_ENV == "production") {
     app.use((req, res, next) => {
         if (req.headers["x-forwarded-proto"].startsWith("https")) {

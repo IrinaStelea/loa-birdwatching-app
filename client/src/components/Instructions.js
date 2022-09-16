@@ -12,6 +12,7 @@ export default function Instructions({ toggleInstructions }) {
                     </p>
                 </div>
             </div>
+            <div className="overlay" onClick={toggleInstructions}></div>
         </>
     );
 }

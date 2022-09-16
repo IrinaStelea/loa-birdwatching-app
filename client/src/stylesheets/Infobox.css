@@ -29,3 +29,11 @@ a:visited {
     color: slategray;
     text-decoration: underline;
 }
+
+.overlay {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* stretch the overlay */
+    inset: 0;
+    z-index: 99;
+}
