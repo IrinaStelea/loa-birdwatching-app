@@ -5,7 +5,7 @@ const cookieSession = require("cookie-session");
 const multer = require("multer");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
-const cors = require("cors");
+// const cors = require("cors");
 
 const PORT = process.env.PORT || 3001;
 
@@ -42,7 +42,7 @@ if (process.env.NODE_ENV == "production") {
 }
 
 //CORS middleware
-app.use(cors());
+// app.use(cors());
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
