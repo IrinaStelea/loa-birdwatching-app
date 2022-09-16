@@ -216,9 +216,15 @@ app.get("/logout", (req, res) => {
     return res.json({});
 });
 
+app.get("/", (req, res) => {
+    res.status(200).sendFile(
+        path.resolve(__dirname, "client", "build", "index.html")
+    );
+});
+
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
-app.get("/*", (req, res) => {
+app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
 
