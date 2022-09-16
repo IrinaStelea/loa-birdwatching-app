@@ -29,10 +29,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, "..", "client", "public")));
-app.use(express.static(path.resolve(__dirname, "../client/build")));
 
-//force https
 if (process.env.NODE_ENV == "production") {
+    app.use(express.static(path.resolve(__dirname, "client", "build")));
     app.use((req, res, next) => {
         if (req.headers["x-forwarded-proto"].startsWith("https")) {
             return next();
@@ -43,6 +42,51 @@ if (process.env.NODE_ENV == "production") {
 
 //CORS middleware
 // app.use(cors());
+
+//fetch for login
+app.get("/user/id.json", function (req, res) {
+    if (req.session.userId) {
+        console.log("cookie is now set");
+        res.json({
+            userId: req.session.userId,
+        });
+    } else {
+        console.log("cookie does not exist");
+        res.json({});
+    }
+});
+
+//serve the json with API sightings
+app.get("/api/data.json", function (req, res) {
+    //check data for duplicate coordinates and offset by a bit
+    let dataUniqueCoord = helpers.randomizeIdenticalCoordinates(jsonData);
+
+    //convert to geoJson
+    let data = helpers.convertToGeojson(dataUniqueCoord);
+    // console.log("inside the get request", data);
+
+    res.json(data);
+});
+
+//serve the geojson with user sightings
+app.get("/api/user-data.json", async (req, res) => {
+    console.log("user id", req.session.userId);
+    try {
+        const result = await db.getUserSightings(req.session.userId);
+        // console.log("result in get user data", result.rows);
+        //merge identical sightings with several pictures
+        const mergedResult = helpers.mergeIdenticalSightings(result.rows);
+        return res.json(mergedResult);
+    } catch (err) {
+        console.log("error in getting user sightings");
+        return res.json({ message: "Something went wrong, please try again" });
+    }
+});
+
+//serve the json with bird data
+app.get("/api/birddata.json", function (req, res) {
+    res.json(birdData);
+});
 
 app.post("/api/register", validateForm, (req, res) => {
     // console.log("req body", req.body);
@@ -92,51 +136,6 @@ app.post("/login.json", (req, res) => {
                 message: "Invalid email or password",
             });
         });
-});
-
-//fetch for login
-app.get("/user/id.json", function (req, res) {
-    if (req.session.userId) {
-        console.log("cookie is now set");
-        res.json({
-            userId: req.session.userId,
-        });
-    } else {
-        console.log("cookie does not exist");
-        res.json({});
-    }
-});
-
-//serve the json with API sightings
-app.get("/api/data.json", function (req, res) {
-    //check data for duplicate coordinates and offset by a bit
-    let dataUniqueCoord = helpers.randomizeIdenticalCoordinates(jsonData);
-
-    //convert to geoJson
-    let data = helpers.convertToGeojson(dataUniqueCoord);
-    // console.log("inside the get request", data);
-
-    res.json(data);
-});
-
-//serve the geojson with user sightings
-app.get("/api/user-data.json", async (req, res) => {
-    console.log("user id", req.session.userId);
-    try {
-        const result = await db.getUserSightings(req.session.userId);
-        // console.log("result in get user data", result.rows);
-        //merge identical sightings with several pictures
-        const mergedResult = helpers.mergeIdenticalSightings(result.rows);
-        return res.json(mergedResult);
-    } catch (err) {
-        console.log("error in getting user sightings");
-        return res.json({ message: "Something went wrong, please try again" });
-    }
-});
-
-//serve the json with bird data
-app.get("/api/birddata.json", function (req, res) {
-    res.json(birdData);
 });
 
 //add new sighting
@@ -220,7 +219,7 @@ app.get("/logout", (req, res) => {
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
 app.get("/*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
 
 app.listen(PORT, () => {
