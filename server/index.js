@@ -31,7 +31,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "..", "client", "public")));
 
 if (process.env.NODE_ENV == "production") {
-    app.use(express.static(path.resolve(__dirname, "client", "build")));
+    app.use(express.static(path.resolve(__dirname, "../client/build")));
+}
+
+//force https
+if (process.env.NODE_ENV == "production") {
     app.use((req, res, next) => {
         if (req.headers["x-forwarded-proto"].startsWith("https")) {
             return next();
@@ -217,11 +221,8 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.status(200).sendFile(
-        path.resolve(__dirname, "client", "build", "index.html")
-    );
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
-
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
 app.get("*", (req, res) => {
