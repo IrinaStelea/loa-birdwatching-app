@@ -226,9 +226,16 @@ app.get("/logout", (req, res) => {
 
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
-app.get("/*", (req, res) => {
-    res.sendFile(path.resolve("client", "build", "index.html"));
-});
+
+if (process.env.NODE_ENV == "production") {
+    app.get("/*", (req, res) => {
+        res.sendFile(path.resolve("client", "build", "index.html"));
+    });
+} else {
+    app.get("/*", (req, res) => {
+        res.sendFile(path.resolve("client", "public", "index.html"));
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

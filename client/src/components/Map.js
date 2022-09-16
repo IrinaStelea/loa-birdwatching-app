@@ -255,7 +255,7 @@ export default function Map({
                 source: "point",
                 layout: {
                     "icon-image": "new-marker",
-                    "icon-size": 0.1,
+                    "icon-size": 0.075,
                 },
             });
 
@@ -653,16 +653,23 @@ export default function Map({
                 >
                     All birds
                 </button>
-                <button
-                    id={
-                        userMarkersButtonView === 1
-                            ? "my-sightings-visible"
-                            : "my-sightings"
-                    }
-                    onClick={toggleUserMarkersLayer}
-                >
-                    My birds
-                </button>
+                {userData.length === 0 && (
+                    <button id="my-sightings" onClick={toggleInstructions}>
+                        My birds
+                    </button>
+                )}
+                {userData.length !== 0 && (
+                    <button
+                        id={
+                            userMarkersButtonView === 1
+                                ? "my-sightings-visible"
+                                : "my-sightings"
+                        }
+                        onClick={toggleUserMarkersLayer}
+                    >
+                        My birds
+                    </button>
+                )}
 
                 <Logout />
             </div>
