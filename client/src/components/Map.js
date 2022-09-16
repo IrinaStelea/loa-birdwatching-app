@@ -651,7 +651,7 @@ export default function Map({
                     }
                     onClick={toggleMarkersLayer}
                 >
-                    All obs.
+                    All birds
                 </button>
                 <button
                     id={
@@ -661,7 +661,7 @@ export default function Map({
                     }
                     onClick={toggleUserMarkersLayer}
                 >
-                    My obs.
+                    My birds
                 </button>
 
                 <Logout />

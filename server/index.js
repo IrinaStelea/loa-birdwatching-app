@@ -37,10 +37,14 @@ if (process.env.NODE_ENV == "production") {
 //force https
 if (process.env.NODE_ENV == "production") {
     app.use((req, res, next) => {
+        res.setHeader(
+            "Strict-Transport-Security",
+            "max-age=8640000; includeSubDomains"
+        );
         if (req.headers["x-forwarded-proto"].startsWith("https")) {
             return next();
         }
-        res.redirect(`https://${req.hostname}${req.url}`);
+        return res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
 
