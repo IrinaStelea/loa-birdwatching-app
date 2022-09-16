@@ -28,7 +28,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// app.use(express.static(path.join(__dirname, "..", "client", "public")));
+app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(express.static(path.resolve(__dirname, "../client/build")));
 
 //force https
@@ -220,7 +220,7 @@ app.get("/logout", (req, res) => {
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
 app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/public", "index.html"));
+    res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
 });
 
 app.listen(PORT, () => {
