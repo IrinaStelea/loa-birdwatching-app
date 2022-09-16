@@ -219,7 +219,7 @@ app.get("/logout", (req, res) => {
 
 // All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
-app.get("*", (req, res) => {
+app.get("*", cors, (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client/public", "index.html"));
 });
 
