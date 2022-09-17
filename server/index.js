@@ -5,7 +5,7 @@ const cookieSession = require("cookie-session");
 const multer = require("multer");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
-const cors = require("cors");
+// const cors = require("cors");
 
 const PORT = process.env.PORT || 3001;
 
@@ -26,7 +26,10 @@ app.use(
 );
 
 //CORS middleware
-app.use(cors());
+// app.use(cors());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 //force https
 if (process.env.NODE_ENV == "production") {
@@ -41,9 +44,6 @@ if (process.env.NODE_ENV == "production") {
         return res.redirect(`https://${req.hostname}${req.url}`);
     });
 }
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 if (process.env.NODE_ENV == "production") {
     app.use(express.static(path.resolve(__dirname, "../client/build")));
