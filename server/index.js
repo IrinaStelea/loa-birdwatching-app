@@ -5,7 +5,6 @@ const cookieSession = require("cookie-session");
 const multer = require("multer");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
-// const cors = require("cors");
 
 const PORT = process.env.PORT || 3001;
 
@@ -24,9 +23,6 @@ app.use(
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
-
-//CORS middleware
-// app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -224,9 +220,7 @@ app.get("/logout", (req, res) => {
     return res.json({});
 });
 
-// All other GET requests not handled before will return our React app
 //the index.html will be in the build folder after compiling
-
 if (process.env.NODE_ENV == "production") {
     app.get("/*", (req, res) => {
         res.sendFile(path.resolve("client", "build", "index.html"));
