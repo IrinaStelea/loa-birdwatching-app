@@ -25,14 +25,8 @@ app.use(
     })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-if (process.env.NODE_ENV == "production") {
-    app.use(express.static(path.resolve(__dirname, "../client/build")));
-} else {
-    app.use(express.static(path.join(__dirname, "..", "client", "public")));
-}
+//CORS middleware
+app.use(cors());
 
 //force https
 if (process.env.NODE_ENV == "production") {
@@ -48,8 +42,14 @@ if (process.env.NODE_ENV == "production") {
     });
 }
 
-//CORS middleware
-app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+if (process.env.NODE_ENV == "production") {
+    app.use(express.static(path.resolve(__dirname, "../client/build")));
+} else {
+    app.use(express.static(path.join(__dirname, "..", "client", "public")));
+}
 
 //fetch for login
 app.get("/user/id.json", function (req, res) {
