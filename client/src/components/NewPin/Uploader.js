@@ -7,9 +7,21 @@ import { addMarker } from "../../redux/user-markers/slice";
 export default function Uploader({ toggleUploader, setView }) {
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
+    const [imageIndex, setImageIndex] = useState(0);
     const [error, setError] = useState("");
     const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
     const dispatch = useDispatch();
+
+    const prevImage = () => {
+        imageIndex !== 0
+            ? setImageIndex(imageIndex - 1)
+            : setImageIndex(onImageSubmit.length - 1);
+    };
+    const nextImage = () => {
+        imageIndex !== images.length - 1
+            ? setImageIndex(imageIndex + 1)
+            : setImageIndex(0);
+    };
 
     const handleImageInput = (e) => {
         const { files } = e.target;
@@ -121,11 +133,35 @@ export default function Uploader({ toggleUploader, setView }) {
                     <p className="error">{this.state.errorMessage}</p>
                 )} */}
             {error && <p className="error-uploader">{error}</p>}
-            {images.length > 0 && (
+            {/* {images.length > 0 && (
                 <div id="preview-images">
                     {images.map((img, idx) => (
                         <img key={idx} id="bird-img" src={img} alt="preview" />
                     ))}
+                </div>
+            )} */}
+            {images.length > 0 && (
+                <div id="image-container">
+                    {images.length > 1 ? (
+                        <h4 id="image-container-arrow" onClick={prevImage}>
+                            &lt;
+                        </h4>
+                    ) : (
+                        <div></div>
+                    )}
+                    <img
+                        key={imageIndex}
+                        id="bird-img"
+                        src={images[imageIndex]}
+                        alt="preview"
+                    />
+                    {images.length > 1 ? (
+                        <h4 id="image-container-arrow" onClick={nextImage}>
+                            &gt;
+                        </h4>
+                    ) : (
+                        <div></div>
+                    )}
                 </div>
             )}
             <form

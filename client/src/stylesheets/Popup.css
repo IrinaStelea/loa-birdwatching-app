@@ -79,3 +79,18 @@
     text-align: center;
     color: red;
 }
+
+#image-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 5.5vw;
+}
+
+#image-container-arrow {
+    cursor: pointer;
+    font-family: "Work Sans", sans-serif;
+    font-size: 1.8em;
+    font-weight: 300;
+}

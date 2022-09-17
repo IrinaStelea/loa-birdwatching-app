@@ -518,7 +518,7 @@ export default function Map({
             }
 
             var feature = features[0];
-            console.log("features", feature);
+            // console.log("features", feature);
             map.current.addSource("selected-pin", {
                 type: "geojson",
                 maxzoom: 24,
