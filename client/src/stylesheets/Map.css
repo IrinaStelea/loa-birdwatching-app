@@ -35,10 +35,6 @@
     align-items: flex-start;
 }
 
-#filter {
-    margin-top: 10px;
-}
-
 #show-birds,
 #my-sightings,
 #show-birds-visible,
@@ -52,6 +48,7 @@
     margin: 12px;
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
 }
 
 #show-birds-visible {
@@ -110,8 +107,8 @@
 }
 
 .search-icon {
-    margin: 10px;
-    width: 60vw;
+    margin: 12px;
+    width: 13vw;
     height: 5vh;
     background-color: white;
     border: 1px solid white;

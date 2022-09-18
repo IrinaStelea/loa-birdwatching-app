@@ -11,6 +11,7 @@ import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
 import Infobox from "./Infobox.js";
 import Instructions from "./Instructions.js";
+import SearchPane from "./SearchPane.js";
 import { receiveBirdData } from "../redux/bird-data/slice";
 import { receiveUserData } from "../redux/user-markers/slice";
 import "../stylesheets/App.css";
@@ -20,6 +21,8 @@ export default function App() {
     const [data, setData] = useState(null);
     const [isInfoBoxVisible, setInfoBoxVisibility] = useState(false);
     const [isInstructionsVisible, setInstructionsVisibility] = useState(false);
+    const [isSearchPaneVisible, setPane] = useState(false);
+
     // const [userData, setUserData] = useState(null);
 
     //UNCOMMENT WHEN DEPLOYING - set user location
@@ -89,6 +92,10 @@ export default function App() {
         setInstructionsVisibility(!isInstructionsVisible);
     };
 
+    const toggleSearchPane = () => {
+        setPane(!isSearchPaneVisible);
+    };
+
     return (
         <>
             <Router>
@@ -106,6 +113,8 @@ export default function App() {
                                     userLat={userLat}
                                     toggleInfoBox={toggleInfoBox}
                                     toggleInstructions={toggleInstructions}
+                                    toggleSearchPane={toggleSearchPane}
+                                    isSearchPaneVisible={isSearchPaneVisible}
                                 />
                             </div>
                         }
@@ -127,6 +136,19 @@ export default function App() {
             {isInstructionsVisible && (
                 <Instructions toggleInstructions={toggleInstructions} />
             )}
+            <div
+                className={
+                    "search-pane" + (!isSearchPaneVisible ? "" : " visible")
+                }
+            >
+                {isSearchPaneVisible && (
+                    <SearchPane
+                        toggleSearchPane={toggleSearchPane}
+                        isSearchPaneVisible={isSearchPaneVisible}
+                    />
+                )}{" "}
+            </div>
+            {isSearchPaneVisible && <div className="overlay"></div>}
         </>
     );
 }
