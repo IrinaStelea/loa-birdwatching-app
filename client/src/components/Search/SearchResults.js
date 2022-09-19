@@ -9,15 +9,15 @@ export default function SearchResults({
     const foundBird = useSelector((state) => state.foundBird);
     return (
         <>
-            <span
-                className="close-search"
+            <p
+                id="cancel-search"
                 onClick={() => {
                     toggleSearchResults();
                     dispatch(resetFoundBird());
                 }}
             >
-                X
-            </span>
+                Close
+            </p>
             <p id="search-results-info">
                 {foundBird.name} was seen {foundBird.number}{" "}
                 {foundBird.number === 1 ? "time" : "times"}

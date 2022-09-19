@@ -128,7 +128,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             {view === 1 && (
                 <>
                     <div className="new-pin-pane">
-                        {/* <h4>Add a new bird sighting</h4> */}
+    
                         <p
                             id="cancel"
                             onClick={() => {

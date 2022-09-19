@@ -42,9 +42,12 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
 
     return (
         <>
-            <span className="close-search" onClick={toggleSearchPane}>
+            <p id="cancel-search" onClick={toggleSearchPane}>
+                Cancel
+            </p>
+            {/* <span className="close-search" onClick={toggleSearchPane}>
                 X
-            </span>
+            </span> */}
             {searchableBirds.length === 0 && (
                 <p>Turn on one of the sightings layers to be able to search.</p>
             )}
