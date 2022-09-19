@@ -25,20 +25,39 @@
     border: 1px solid #353d60;
 }
 
-.new-pin-pop-up h4 {
+.new-pin-pane {
+    position: fixed;
+    left: 0;
+    width: 85vw;
+    background-color: #f5756a;
+    /* stretch the overlay */
+    inset: 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vh;
+    /* transform: translateX(-100%); */
+    border: 1px solid #353d60;
+    border-radius: 0 10px 10px 0;
+    /* transition: transform 200ms linear; */
+}
+
+.new-pin-pop-up h4,
+.new-pin-pane h4 {
     font-size: 1.6em;
     font-family: "Oswald", sans-serif;
     text-align: center;
     color: white;
 }
 
+.new-pin-pane h4 {
+    margin-top: 2vh;
+}
+
 /* #close-button {
     align-self: flex-end;
 } */
-
-#save {
-    margin-top: 2vh;
-}
 
 /* #birdlist {
     z-index: 101;
@@ -53,6 +72,7 @@
     width: 100% !important;
     position: relative;
     display: flex;
+    margin-top: 2vh;
 }
 
 .react-datalist-input__container {
@@ -121,8 +141,16 @@ mark {
     font-size: 1.2em;
 }
 
+.new-pin-pane #save {
+    margin-top: 3vh; 
+}
+
 #cancel {
     margin-top: 1vh;
     cursor: pointer;
     color: white;
+}
+
+.new-pin-pane #cancel {
+    align-self: flex-end;
 }

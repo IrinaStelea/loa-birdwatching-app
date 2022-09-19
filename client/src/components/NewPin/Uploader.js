@@ -177,11 +177,13 @@ export default function Uploader({ toggleUploader, setView }) {
                     onChange={handleImageInput}
                     multiple
                 />
-                <input
-                    type="submit"
-                    id="submit-uploader"
-                    value="Upload &amp; save"
-                ></input>
+                {images.length > 0 && (
+                    <input
+                        type="submit"
+                        id="submit-uploader"
+                        value="Upload &amp; save"
+                    ></input>
+                )}
             </form>
         </div>
     );

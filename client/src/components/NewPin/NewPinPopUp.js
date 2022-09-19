@@ -15,7 +15,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
-    const [view, setView] = useState(1);
+    const [view, setView] = useState(0);
     const [uploaderIsVisible, setUploader] = useState(false);
     const [newPin, setNewPin] = useState();
 
@@ -107,53 +107,13 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
 
     return (
         <>
-            {view === 1 && (
+            {" "}
+            {view === 0 && (
                 <div className="new-pin-pop-up">
-                    <h4>Add a new bird sighting</h4>
-                    <div id="datalist-container">
-                        <DatalistInput
-                            placeholder="Start typing a bird name"
-                            showLabel={false}
-                            items={birdList}
-                            value={value}
-                            onSelect={onSelect}
-                        />
-                        {
-                            <span
-                                className="reset-search"
-                                onClick={resetSelection}
-                            >
-                                X
-                            </span>
-                        }
-                    </div>
-
-                    {selectedBird && (
-                        <>
-                            <p className="sciname">{selectedBird.sciName}</p>
-                            <div className="pin-images">
-                                <img
-                                    id="bird-img"
-                                    src={selectedBird.img}
-                                    alt={selectedBird.comName}
-                                />
-                                <a
-                                    href={selectedBird.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    <img
-                                        id="info-icon"
-                                        src="../../info_icon_white.png"
-                                        alt="info icon"
-                                    />
-                                </a>
-                            </div>
-                            <p id="save" onClick={submitPin}>
-                                Save
-                            </p>
-                        </>
-                    )}
+                    <h4>Add a new bird sighting here?</h4>
+                    <p id="save" onClick={() => setView(1)}>
+                        Yes
+                    </p>
                     <p
                         id="cancel"
                         onClick={() => {
@@ -165,31 +125,103 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                     </p>
                 </div>
             )}
-            {view === 2 && (
-                <div className="new-pin-pop-up">
-                    <h4>Add one or more photos for this sighting?</h4>
-                    {uploaderIsVisible && (
-                        <>
-                            <Uploader
-                                toggleUploader={toggleUploader}
-                                setView={setView}
+            {view === 1 && (
+                <>
+                    <div className="new-pin-pane">
+                        {/* <h4>Add a new bird sighting</h4> */}
+                        <p
+                            id="cancel"
+                            onClick={() => {
+                                toggleNewPinPopUp();
+                                dispatch(resetUserMarker());
+                            }}
+                        >
+                            Cancel
+                        </p>
+                        <div id="datalist-container">
+                            <DatalistInput
+                                placeholder="Start typing a bird name"
+                                showLabel={false}
+                                items={birdList}
+                                value={value}
+                                onSelect={onSelect}
                             />
-                            <p id="cancel" onClick={toggleNewPinPopUp}>
-                                Cancel
-                            </p>
-                        </>
-                    )}
-                    {!uploaderIsVisible && (
-                        <>
-                            <p id="save" onClick={toggleUploader}>
-                                Yes
-                            </p>
-                            <p id="cancel" onClick={savePin}>
-                                Skip &amp; save
-                            </p>
-                        </>
-                    )}
-                </div>
+                            {
+                                <span
+                                    className="reset-search"
+                                    onClick={resetSelection}
+                                >
+                                    X
+                                </span>
+                            }
+                        </div>
+
+                        {selectedBird && (
+                            <>
+                                <p className="sciname">
+                                    {selectedBird.sciName}
+                                </p>
+                                <div className="pin-images">
+                                    <img
+                                        id="bird-img"
+                                        src={selectedBird.img}
+                                        alt={selectedBird.comName}
+                                    />
+                                    <a
+                                        href={selectedBird.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <img
+                                            id="info-icon"
+                                            src="../../info_icon_white.png"
+                                            alt="info icon"
+                                        />
+                                    </a>
+                                </div>
+                                <p id="save" onClick={submitPin}>
+                                    Save
+                                </p>
+                            </>
+                        )}
+                    </div>
+                    <div className="overlay"></div>
+                </>
+            )}
+            {view === 2 && (
+                <>
+                    <div className="new-pin-pane">
+                        <p
+                            id="cancel"
+                            onClick={() => {
+                                toggleNewPinPopUp();
+                                dispatch(resetUserMarker());
+                            }}
+                        >
+                            Cancel
+                        </p>
+                        <h4>Add one or more photos for this sighting?</h4>
+                        {uploaderIsVisible && (
+                            <>
+                                <Uploader
+                                    toggleUploader={toggleUploader}
+                                    setView={setView}
+                                />
+                            </>
+                        )}
+                        {!uploaderIsVisible && (
+                            <>
+                                <p id="save" onClick={toggleUploader}>
+                                    Yes
+                                </p>
+                                <p id="save" onClick={savePin}>
+                                    Save without photos
+                                </p>
+                            </>
+                        )}
+                    </div>
+                    <div className="overlay"></div>
+                </>
             )}
             {view === 3 && (
                 <div className="new-pin-pop-up">
