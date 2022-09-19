@@ -1,8 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { receiveSearchedBird } from "../redux/searched-bird/slice";
+import { receiveSearchedBird } from "../../redux/searched-bird/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
-import "../stylesheets/SearchPane.css";
+import "../../stylesheets/SearchPane.css";
 
 export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
     const dispatch = useDispatch();
@@ -35,25 +35,33 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         toggleSearchPane();
     };
 
-    const resetSearch = () => {
-        setValue("");
-    };
+    //TO DO
+    // const resetSearch = () => {
+    //     setValue("");
+    // };
 
     return (
         <>
             <span className="close-search" onClick={toggleSearchPane}>
                 X
             </span>
-            <h4>Search the map for a bird</h4>
-            <div id="filter">
-                <DatalistInput
-                    placeholder="Start typing a bird name"
-                    showLabel={false}
-                    value={value}
-                    items={uniqueSearchableBirds}
-                    onSelect={onSelect}
-                />
-            </div>
+            {searchableBirds.length === 0 && (
+                <p>Turn on one of the sightings layers to be able to search.</p>
+            )}
+            {searchableBirds.length !== 0 && (
+                <>
+                    <h4>Search the map for a bird</h4>
+                    <div id="filter">
+                        <DatalistInput
+                            placeholder="Start typing a bird name"
+                            showLabel={false}
+                            value={value}
+                            items={uniqueSearchableBirds}
+                            onSelect={onSelect}
+                        />
+                    </div>
+                </>
+            )}
         </>
     );
 }

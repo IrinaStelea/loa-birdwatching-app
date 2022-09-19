@@ -1,8 +1,9 @@
 import { useDispatch } from "react-redux";
-import { resetSearchedBird } from "../redux/searched-bird/slice";
+import { resetSearchedBird } from "../../redux/searched-bird/slice";
 
-export default function SearchIcon({ toggleSearchPane }) {
+export default function SearchIcon({ toggleSearchPane}) {
     const dispatch = useDispatch();
+
     return (
         <div className="search-icon">
             <img

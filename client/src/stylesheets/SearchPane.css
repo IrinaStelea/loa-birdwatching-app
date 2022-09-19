@@ -1,8 +1,7 @@
 .search-pane {
     position: fixed;
-    right: 0;
     width: 85vw;
-    background-color: snow;
+    background-color: white;
     /* stretch the overlay */
     inset: 0;
     z-index: 99;
@@ -10,7 +9,7 @@
     flex-direction: column;
     padding: 2vh;
     transform: translateX(-100%);
-    border: 1px solid snow;
+    border: 1px solid #353d60;
     border-radius: 0 10px 10px 0;
     transition: transform 200ms linear;
 }
@@ -22,7 +21,17 @@
 
 #filter {
     margin-top: 2vh;
+    position: relative;
+    display: flex;
 }
+#filter .react-datalist-input__container {
+    width: 90% !important;
+}
+
+#filter .react-datalist-input__listbox {
+    max-height: 30vh;
+}
+
 .close-search {
     margin-top: 2vh;
     margin-right: 5vw;
@@ -46,4 +55,25 @@
     /* stretch the overlay */
     inset: 0;
     z-index: 95;
+}
+
+.search-results {
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    background-color: white;
+    /* stretch the overlay */
+    z-index: 110;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 2vh 2vh;
+    transform: translateY(100%);
+    border: 1px solid #353d60;
+    border-radius: 10px 10px 0 0;
+    transition: transform 200ms linear;
+}
+
+.search-visible {
+    transform: translateY(0%);
+    transition: transform 200ms linear;
 }

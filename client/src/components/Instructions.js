@@ -1,4 +1,4 @@
-export default function Instructions({ toggleInstructions }) {
+export default function Instructions({ toggleInstructions, instructions }) {
     return (
         <>
             <div className="popup">
@@ -6,10 +6,7 @@ export default function Instructions({ toggleInstructions }) {
                     x
                 </h4>
                 <div className="info-popup">
-                    <p>
-                        It looks like you don't have any bird sightings yet.
-                        Click/tap on the map to add a new pin.
-                    </p>
+                    <p>{instructions}</p>
                 </div>
             </div>
             <div className="overlay" onClick={toggleInstructions}></div>

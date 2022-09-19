@@ -2,18 +2,22 @@ import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
-import { addUserMarker } from "../redux/new-user-marker/slice.js";
+import {
+    addUserMarker,
+    resetUserMarker,
+} from "../redux/new-user-marker/slice.js";
 import { openPopup } from "../redux/popup/slice.js";
 import { receiveUserPopup } from "../redux/user-popup/slice.js";
 import {
     receiveAvailableBirds,
     resetAvailableBirds,
 } from "../redux/birds-filter/slice";
+import { receiveFoundBird } from "../redux/found-bird/slice.js";
+import { resetSearchedBird } from "../redux/searched-bird/slice";
 import { closePopup } from "../redux/popup/slice";
 import Logout from "./Logout.js";
-import SearchIcon from "./SearchIcon.js";
+import SearchIcon from "./Search/SearchIcon.js";
 import "../stylesheets/Map.css";
-import { CloudWatchLogs } from "aws-sdk";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -25,6 +29,10 @@ export default function Map({
     toggleInstructions,
     toggleSearchPane,
     isSearchPaneVisible,
+    toggleSearchResults,
+    isSearchResultsVisible,
+    toggleNewPinPopUp,
+    isNewPinVisible,
 }) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
@@ -41,9 +49,7 @@ export default function Map({
     const [userCurrentMarkersLayer, setUserCurrentMarkersLayer] = useState();
     const newPin = useSelector((state) => state.pinCoordinates);
     const userData = useSelector((state) => state.userData);
-
     const popup = useSelector((state) => state.popupInfo);
-
     const searchedBird = useSelector((state) => state.searchedBird);
 
     //initialize map
@@ -174,7 +180,7 @@ export default function Map({
     //toggle instructions to add pin in case there aren't any yet
     useEffect(() => {
         if (userData.length === 0 && isMapReady === true) {
-            toggleInstructions();
+            toggleInstructions("no sightings");
         }
     }, [isMapReady]);
 
@@ -246,9 +252,16 @@ export default function Map({
 
             //close other popups if open
             dispatch(closePopup());
+            //close search results if open
+            if (isSearchResultsVisible) {
+                toggleSearchResults();
+            }
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
+
+            toggleNewPinPopUp();
         });
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -263,43 +276,42 @@ export default function Map({
         }
     }, [newPin]);
 
-    //useeffect for the search filter
+    //useeffect to populate the search filter
     useEffect(() => {
-        // let flying = false;
-        // map.current.on("flystart", () => {
-        //     console.log("inside fly start");
-        //     flying = true;
-        // });
-
-        // map.current.on("flyend", () => {
-        //     flying = false;
-        // });
-
-        // map.current.on("move", () => {
-        //     if (flying) {
-        //         return;
-        //     }
-        //     setLng(map.current.getCenter().lng.toFixed(8));
-        //     setLat(map.current.getCenter().lat.toFixed(8));
-        //     setZoom(map.current.getZoom().toFixed(2));
-        // });
-
         if (isSearchPaneVisible) {
+            //close other popups if open
+            dispatch(closePopup());
+            //close new pin popup if open
+            if (isNewPinVisible) {
+                toggleNewPinPopUp();
+                dispatch(resetUserMarker());
+            }
+
             if (
                 typeof map.current.getLayer("sightings") === "undefined" &&
                 typeof map.current.getLayer("user-sightings") === "undefined"
             )
                 return;
 
+            if (!markersLayerVisible && !userMarkersLayerVisible) {
+                return;
+            }
+
             let APIBirds = [];
             let userBirds = [];
             let allBirds = [];
-            if (typeof map.current.getLayer("sightings") !== "undefined") {
+            if (
+                typeof map.current.getLayer("sightings") !== "undefined" &&
+                markersLayerVisible
+            ) {
                 APIBirds = map.current.getSource("sightings")._data.features;
             }
             console.log("api birds", APIBirds);
 
-            if (typeof map.current.getLayer("user-sightings") !== "undefined") {
+            if (
+                typeof map.current.getLayer("user-sightings") !== "undefined" &&
+                userMarkersLayerVisible
+            ) {
                 userBirds =
                     map.current.getSource("user-sightings")._data.features;
             }
@@ -315,81 +327,101 @@ export default function Map({
             dispatch(resetAvailableBirds());
         }
 
-        // map.current.on("movestart", (e) => {
-        //     if (flying) {
-        //         return;
-        //     }
-        //     dispatch(resetAvailableBirds());
-        //     setValue("");
-        // });
-        // map.current.on("moveend", (e) => {
-        //     if (flying) {
-        //         map.current.fire("flyend");
-        //     }
-        // });
-        //     if (
-        //         typeof map.current.getLayer("sightings") === "undefined" &&
-        //         typeof map.current.getLayer("user-sightings") === "undefined"
-        //     ) {
-        //         return;
-        //     }
-        //     let appPins = [];
-        //     let userPins = [];
-        //     let allPins = [];
-        //     if (typeof map.current.getLayer("sightings") !== "undefined")
-        //         appPins = map.current.queryRenderedFeatures({
-        //             layers: ["sightings"],
-        //         });
+        //     // let flying = false;
+        //     // map.current.on("flystart", () => {
+        //     //     console.log("inside fly start");
+        //     //     flying = true;
+        //     // });
 
-        //     if (typeof map.current.getLayer("user-sightings") !== "undefined")
-        //         userPins = map.current.queryRenderedFeatures({
-        //             layers: ["user-sightings"],
-        //         });
+        //     // map.current.on("flyend", () => {
+        //     //     flying = false;
+        //     // });
 
-        //     allPins = [...appPins, ...userPins];
+        //     // map.current.on("move", () => {
+        //     //     if (flying) {
+        //     //         return;
+        //     //     }
+        //     //     setLng(map.current.getCenter().lng.toFixed(8));
+        //     //     setLat(map.current.getCenter().lat.toFixed(8));
+        //     //     setZoom(map.current.getZoom().toFixed(2));
+        //     // });
 
-        //     let birdNames = allPins.map((pin) => ({
-        //         [pin.id]: pin.properties.comName,
-        //     }));
+        //     // map.current.on("movestart", (e) => {
+        //     //     if (flying) {
+        //     //         return;
+        //     //     }
+        //     //     dispatch(resetAvailableBirds());
+        //     //     setValue("");
+        //     // });
+        //     // map.current.on("moveend", (e) => {
+        //     //     if (flying) {
+        //     //         map.current.fire("flyend");
+        //     //     }
+        //     // });
+        //     //     if (
+        //     //         typeof map.current.getLayer("sightings") === "undefined" &&
+        //     //         typeof map.current.getLayer("user-sightings") === "undefined"
+        //     //     ) {
+        //     //         return;
+        //     //     }
+        //     //     let appPins = [];
+        //     //     let userPins = [];
+        //     //     let allPins = [];
+        //     //     if (typeof map.current.getLayer("sightings") !== "undefined")
+        //     //         appPins = map.current.queryRenderedFeatures({
+        //     //             layers: ["sightings"],
+        //     //         });
 
-        //     dispatch(receiveAvailableBirds(birdNames));
-        // });
+        //     //     if (typeof map.current.getLayer("user-sightings") !== "undefined")
+        //     //         userPins = map.current.queryRenderedFeatures({
+        //     //             layers: ["user-sightings"],
+        //     //         });
+
+        //     //     allPins = [...appPins, ...userPins];
+
+        //     //     let birdNames = allPins.map((pin) => ({
+        //     //         [pin.id]: pin.properties.comName,
+        //     //     }));
+
+        //     //     dispatch(receiveAvailableBirds(birdNames));
+        //     // });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isSearchPaneVisible]);
+    }, [isSearchPaneVisible, markersLayerVisible, userMarkersLayerVisible]);
 
-    //when clicking on the basemap, zoom in to 18 or more
-    // useEffect(() => {
-    //     map.current.on("click", function flexibleZoom(e) {
-    //         if (typeof map.current.getLayer("sightings") !== "undefined") {
-    //             let features = map.current.queryRenderedFeatures(e.point, {
-    //                 layers: ["sightings"],
-    //             });
-    //             if (features.length !== 0) {
-    //                 return;
-    //             }
-    //         }
+    //when clicking on the basemap to add a new marker, center on that point
+    useEffect(() => {
+        map.current.on("click", function flexibleZoom(e) {
+            if (typeof map.current.getLayer("sightings") !== "undefined") {
+                let features = map.current.queryRenderedFeatures(e.point, {
+                    layers: ["sightings"],
+                });
+                if (features.length !== 0) {
+                    return;
+                }
+            }
 
-    //         if (typeof map.current.getLayer("user-sightings") !== "undefined") {
-    //             let features = map.current.queryRenderedFeatures(e.point, {
-    //                 layers: ["user-sightings"],
-    //             });
-    //             if (features.length !== 0) {
-    //                 return;
-    //             }
-    //         }
-    //         map.current.flyTo({
-    //             center: e.lngLat,
-    //             zoom: 18,
-    //         });
+            if (typeof map.current.getLayer("user-sightings") !== "undefined") {
+                let features = map.current.queryRenderedFeatures(e.point, {
+                    layers: ["user-sightings"],
+                });
+                if (features.length !== 0) {
+                    return;
+                }
+            }
+            map.current.flyTo({
+                center: e.lngLat,
+            });
 
-    //         map.current.fire("flystart");
-    //     });
-    // }, []);
+            map.current.fire("flystart");
+        });
+    }, []);
 
     const toggleMarkersLayer = () => {
         if (markersLayerVisible) {
             map.current.setLayoutProperty("sightings", "visibility", "none");
             setMarkersButtonView(2);
+            //reset available birds for search
+            dispatch(resetAvailableBirds());
         } else {
             map.current.setLayoutProperty("sightings", "visibility", "visible");
             setMarkersButtonView(1);
@@ -409,6 +441,8 @@ export default function Map({
                 "none"
             );
             setUserMarkersButtonView(2);
+            //reset available birds for search
+            dispatch(resetAvailableBirds());
         } else {
             map.current.setLayoutProperty(
                 "user-sightings",
@@ -429,7 +463,6 @@ export default function Map({
             features = features.concat(
                 map.current.getSource("user-sightings")._data.features
             );
-        console.log("features", features);
         if (!features.length) {
             return;
         }
@@ -437,7 +470,6 @@ export default function Map({
             (bird) =>
                 bird.properties.comName.split("-").join(" ") === searchedBird
         );
-        console.log("selection", selection);
         if (typeof map.current.getLayer("search-results") !== "undefined") {
             map.current.removeLayer("search-results");
             map.current.removeSource("search-results");
@@ -464,17 +496,20 @@ export default function Map({
 
         let foundPins = map.current.getSource("search-results")._data.features;
 
-        console.log("foundpins", foundPins);
-
         if (foundPins.length === 0) {
             return;
         } else if (foundPins.length === 1) {
-            console.log("inside the fly event");
             map.current.flyTo({
                 center: foundPins[0].geometry.coordinates,
             });
+            dispatch(
+                receiveFoundBird({
+                    name: searchedBird,
+                    number: foundPins.length,
+                })
+            );
+            toggleSearchResults();
         } else {
-            console.log("inside fit bounds");
             let minLng = Math.min(
                 ...foundPins.map((p) => p.geometry.coordinates[0])
             );
@@ -487,18 +522,42 @@ export default function Map({
             let maxLat = Math.max(
                 ...foundPins.map((p) => p.geometry.coordinates[1])
             );
-            console.log("minLng: 	", minLng);
-            console.log("minLat: 	", minLat);
-            console.log("maxLng: 	", maxLng);
-            console.log("maxLat: 	", maxLat);
-            map.current.fitBounds([
-                [minLng, minLat], // southwestern corner of the bounds
-                [maxLng, maxLat], // northeastern corner of the bounds
-            ]);
+            map.current.fitBounds(
+                [
+                    [minLng, minLat], // southwestern corner of the bounds
+                    [maxLng, maxLat], // northeastern corner of the bounds
+                ],
+                {
+                    padding: {
+                        top: 60,
+                        right: 60,
+                        bottom: 120,
+                        left: 60,
+                    },
+                }
+            );
+
+            dispatch(
+                receiveFoundBird({
+                    name: searchedBird,
+                    number: foundPins.length,
+                })
+            );
+            toggleSearchResults();
         }
 
-        //     // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchedBird]);
+
+    //useeffect to clear the search highlights
+    useEffect(() => {
+        if (isSearchResultsVisible) return;
+
+        if (typeof map.current.getLayer("search-results") !== "undefined") {
+            map.current.removeLayer("search-results");
+            map.current.removeSource("search-results");
+        }
+    }, [isSearchResultsVisible]);
 
     //delete search highlight in case user deletes that pin
     useEffect(() => {
@@ -512,20 +571,15 @@ export default function Map({
         let updatedFeatures = oldFeatures.filter(
             (feature) => feature.id !== popup.id
         );
-
+        // console.log("updatedFeatures: 	", updatedFeatures);
         map.current.getSource("search-results").setData({
             type: "FeatureCollection",
             features: updatedFeatures,
         });
+        // if (updatedFeatures.length !== 0 && isSearchResultsVisible) {
+        //     toggleSearchResults();
+        // }
     }, [popup]);
-
-    //TODO// const resetSearch = () => {
-    //     if (typeof map.current.getLayer("search-results") !== "undefined") {
-    //         map.current.removeLayer("search-results");
-    //         map.current.removeSource("search-results");
-    //         setValue("");
-    //     }
-    // };
 
     //highlights for user pins
     useEffect(() => {
@@ -638,12 +692,6 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData]);
 
-    //update birds available in search field when toggling layers
-    useEffect(() => {
-        dispatch(resetAvailableBirds());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userMarkersButtonView, markersButtonView]);
-
     return (
         <>
             <div className="button-container-top">
@@ -681,7 +729,10 @@ export default function Map({
                     All birds
                 </button>
                 {userData.length === 0 && (
-                    <button id="my-sightings" onClick={toggleInstructions}>
+                    <button
+                        id="my-sightings"
+                        onClick={() => toggleInstructions("no sightings")}
+                    >
                         My birds
                     </button>
                 )}

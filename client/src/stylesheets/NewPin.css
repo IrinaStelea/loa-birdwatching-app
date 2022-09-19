@@ -56,15 +56,26 @@
 }
 
 .react-datalist-input__container {
-    width: 90% !important;
+    width: 100% !important;
 }
 
 .reset-search {
-    width: 10%;
+    width: 6vw;
+    height: 6vw;
+    padding: 1vw;
     align-self: center;
     text-align: center;
-    font-size: 1.5em;
-    font-weight: 300;
+    font-size: 1.2em;
+    font-weight: 400;
+    background: white;
+    border: 1px solid #8e8e8e;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8e8e8e;
+    position: absolute;
+    right: 1vw;
 }
 
 mark {
@@ -98,7 +109,7 @@ mark {
 }
 
 .react-datalist-input__listbox {
-    max-height: 40vh;
+    max-height: 30vh;
     overflow-y: scroll;
 }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addMarker } from "../../redux/user-markers/slice";
+import { resetUserMarker } from "../../redux/new-user-marker/slice";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
 import Uploader from "./Uploader.js";
@@ -8,7 +9,8 @@ import "react-datalist-input/dist/styles.css";
 
 import "../../stylesheets/NewPin.css";
 
-export default function NewPinPopUp({ togglePinPopUp, userPin }) {
+export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
+    const dispatch = useDispatch();
     const [selectedBird, setSelectedBird] = useState(null);
     const { value, setValue } = useComboboxControls({
         initialValue: "",
@@ -16,7 +18,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     const [view, setView] = useState(1);
     const [uploaderIsVisible, setUploader] = useState(false);
     const [newPin, setNewPin] = useState();
-    const dispatch = useDispatch();
+
     const birdList = useSelector(
         (state) =>
             state.birdData &&
@@ -31,7 +33,10 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
     //hide success message after 3 seconds
     useEffect(() => {
         if (view === 3) {
-            setTimeout(() => togglePinPopUp(), 1500);
+            setTimeout(() => {
+                toggleNewPinPopUp();
+                dispatch(resetUserMarker());
+            }, 1500);
         }
         // eslint-disable-next-line
     }, [view]);
@@ -149,7 +154,13 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                             </p>
                         </>
                     )}
-                    <p id="cancel" onClick={togglePinPopUp}>
+                    <p
+                        id="cancel"
+                        onClick={() => {
+                            toggleNewPinPopUp();
+                            dispatch(resetUserMarker());
+                        }}
+                    >
                         Cancel
                     </p>
                 </div>
@@ -163,7 +174,7 @@ export default function NewPinPopUp({ togglePinPopUp, userPin }) {
                                 toggleUploader={toggleUploader}
                                 setView={setView}
                             />
-                            <p id="cancel" onClick={togglePinPopUp}>
+                            <p id="cancel" onClick={toggleNewPinPopUp}>
                                 Cancel
                             </p>
                         </>

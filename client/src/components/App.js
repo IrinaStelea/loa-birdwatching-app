@@ -11,9 +11,11 @@ import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
 import Infobox from "./Infobox.js";
 import Instructions from "./Instructions.js";
-import SearchPane from "./SearchPane.js";
+import SearchPane from "./Search/SearchPane.js";
+import SearchResults from "./Search/SearchResults.js";
 import { receiveBirdData } from "../redux/bird-data/slice";
 import { receiveUserData } from "../redux/user-markers/slice";
+import { resetUserMarker } from "../redux/new-user-marker/slice";
 import "../stylesheets/App.css";
 
 export default function App() {
@@ -21,7 +23,10 @@ export default function App() {
     const [data, setData] = useState(null);
     const [isInfoBoxVisible, setInfoBoxVisibility] = useState(false);
     const [isInstructionsVisible, setInstructionsVisibility] = useState(false);
+    const [instructions, setInstructions] = useState("");
     const [isSearchPaneVisible, setPane] = useState(false);
+    const [isSearchResultsVisible, setSearchResults] = useState(false);
+    const [isNewPinVisible, setNewPinVisibility] = useState(false);
 
     // const [userData, setUserData] = useState(null);
 
@@ -88,12 +93,25 @@ export default function App() {
         setInfoBoxVisibility(!isInfoBoxVisible);
     };
 
-    const toggleInstructions = () => {
+    const toggleInstructions = (param) => {
         setInstructionsVisibility(!isInstructionsVisible);
+        if (param === "no sightings") {
+            setInstructions(
+                "It looks like you don't have any bird sightings yet. Click/tap on the map to add a new pin."
+            );
+        }
     };
 
     const toggleSearchPane = () => {
         setPane(!isSearchPaneVisible);
+    };
+
+    const toggleSearchResults = () => {
+        setSearchResults(!isSearchResultsVisible);
+    };
+
+    const toggleNewPinPopUp = () => {
+        setNewPinVisibility(!isNewPinVisible);
     };
 
     return (
@@ -115,6 +133,12 @@ export default function App() {
                                     toggleInstructions={toggleInstructions}
                                     toggleSearchPane={toggleSearchPane}
                                     isSearchPaneVisible={isSearchPaneVisible}
+                                    toggleSearchResults={toggleSearchResults}
+                                    isSearchResultsVisible={
+                                        isSearchResultsVisible
+                                    }
+                                    toggleNewPinPopUp={toggleNewPinPopUp}
+                                    isNewPinVisible={isNewPinVisible}
                                 />
                             </div>
                         }
@@ -130,11 +154,20 @@ export default function App() {
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </Router>
-            {Object.keys(userPin).length !== 0 && <NewPin userPin={userPin} />}
+            {Object.keys(userPin).length !== 0 && (
+                <NewPin
+                    userPin={userPin}
+                    toggleNewPinPopUp={toggleNewPinPopUp}
+                    isNewPinVisible={isNewPinVisible}
+                />
+            )}
             {popupCoord && popupCoord.length !== 0 && <Popup />}
             {isInfoBoxVisible && <Infobox toggleInfoBox={toggleInfoBox} />}
             {isInstructionsVisible && (
-                <Instructions toggleInstructions={toggleInstructions} />
+                <Instructions
+                    toggleInstructions={toggleInstructions}
+                    instructions={instructions}
+                />
             )}
             <div
                 className={
@@ -149,6 +182,19 @@ export default function App() {
                 )}{" "}
             </div>
             {isSearchPaneVisible && <div className="overlay"></div>}
+            <div
+                className={
+                    "search-results" +
+                    (!isSearchResultsVisible ? "" : " search-visible")
+                }
+            >
+                {isSearchResultsVisible && (
+                    <SearchResults
+                        toggleSearchResults={toggleSearchResults}
+                        isSearchResultsVisible={isSearchResultsVisible}
+                    />
+                )}
+            </div>
         </>
     );
 }
