@@ -1,9 +1,11 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { receiveSearchedBird } from "../redux/searched-bird/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
 import "../stylesheets/SearchPane.css";
 
 export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
+    const dispatch = useDispatch();
     const [searchedBird, setSearchedBird] = useState(null);
     const { value, setValue } = useComboboxControls({
         initialValue: "",
@@ -29,6 +31,8 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
     const onSelect = (sel) => {
         setValue(sel.value);
         setSearchedBird(sel.value);
+        dispatch(receiveSearchedBird(sel.value));
+        toggleSearchPane();
     };
 
     const resetSearch = () => {

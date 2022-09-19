@@ -23,6 +23,8 @@
     justify-content: flex-start;
     width: 90%;
     bottom: 0;
+    gap: 5vw;
+    margin: 3vw;
 }
 
 .button-container-top {
@@ -30,9 +32,11 @@
     z-index: 1;
     display: flex;
     justify-content: flex-start;
-    width: 100%;
+    width: 80%;
     top: 0;
     align-items: flex-start;
+    gap: 5vw;
+    margin: 3vw;
 }
 
 #show-birds,
@@ -42,10 +46,11 @@
     background-color: rgba(53, 61, 96, 0.8);
     color: white;
     padding: 1vw 3vw;
+    height: 5vh;
     font-family: "Work Sans", sans-serif;
     font-size: 1.1em;
     font-weight: 500;
-    margin: 12px;
+    /* margin: 10px 0; */
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
     box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
@@ -63,12 +68,15 @@
 #logout,
 #geolocate {
     background-color: rgba(53, 61, 96, 0.8);
-    padding: 2vw 3vw;
-    margin: 12px;
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
     display: flex;
     align-items: center;
+    width: 5vh;
+    height: 5vh;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+    display: flex;
+    justify-content: center;
 }
 #logout img {
     width: 6vw;
@@ -94,7 +102,6 @@
 }
 
 .top-icon {
-    margin: 10px;
     width: 5vh;
     height: 5vh;
     background-color: white;
@@ -107,7 +114,6 @@
 }
 
 .search-icon {
-    margin: 12px;
     width: 13vw;
     height: 5vh;
     background-color: white;

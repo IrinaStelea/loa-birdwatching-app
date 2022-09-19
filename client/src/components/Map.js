@@ -13,6 +13,7 @@ import { closePopup } from "../redux/popup/slice";
 import Logout from "./Logout.js";
 import SearchIcon from "./SearchIcon.js";
 import "../stylesheets/Map.css";
+import { CloudWatchLogs } from "aws-sdk";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
@@ -42,6 +43,8 @@ export default function Map({
     const userData = useSelector((state) => state.userData);
 
     const popup = useSelector((state) => state.popupInfo);
+
+    const searchedBird = useSelector((state) => state.searchedBird);
 
     //initialize map
     useEffect(() => {
@@ -355,33 +358,33 @@ export default function Map({
     }, [isSearchPaneVisible]);
 
     //when clicking on the basemap, zoom in to 18 or more
-    useEffect(() => {
-        map.current.on("click", function flexibleZoom(e) {
-            if (typeof map.current.getLayer("sightings") !== "undefined") {
-                let features = map.current.queryRenderedFeatures(e.point, {
-                    layers: ["sightings"],
-                });
-                if (features.length !== 0) {
-                    return;
-                }
-            }
+    // useEffect(() => {
+    //     map.current.on("click", function flexibleZoom(e) {
+    //         if (typeof map.current.getLayer("sightings") !== "undefined") {
+    //             let features = map.current.queryRenderedFeatures(e.point, {
+    //                 layers: ["sightings"],
+    //             });
+    //             if (features.length !== 0) {
+    //                 return;
+    //             }
+    //         }
 
-            if (typeof map.current.getLayer("user-sightings") !== "undefined") {
-                let features = map.current.queryRenderedFeatures(e.point, {
-                    layers: ["user-sightings"],
-                });
-                if (features.length !== 0) {
-                    return;
-                }
-            }
-            map.current.flyTo({
-                center: e.lngLat,
-                zoom: 18,
-            });
+    //         if (typeof map.current.getLayer("user-sightings") !== "undefined") {
+    //             let features = map.current.queryRenderedFeatures(e.point, {
+    //                 layers: ["user-sightings"],
+    //             });
+    //             if (features.length !== 0) {
+    //                 return;
+    //             }
+    //         }
+    //         map.current.flyTo({
+    //             center: e.lngLat,
+    //             zoom: 18,
+    //         });
 
-            map.current.fire("flystart");
-        });
-    }, []);
+    //         map.current.fire("flystart");
+    //     });
+    // }, []);
 
     const toggleMarkersLayer = () => {
         if (markersLayerVisible) {
@@ -417,53 +420,85 @@ export default function Map({
         setUserMarkersLayer(!userMarkersLayerVisible);
     };
 
-    //TODO //on select function for the filter
-    // const onSelect = (sel) => {
-    //     let features = map.current.queryRenderedFeatures({
-    //         layers: ["sightings"],
-    //     });
+    //filter select
+    useEffect(() => {
+        if (!searchedBird) return;
 
-    //     if (typeof map.current.getLayer("user-sightings") !== "undefined")
-    //         features = features.concat(
-    //             map.current.queryRenderedFeatures({
-    //                 layers: ["user-sightings"],
-    //             })
-    //         );
+        let features = map.current.getSource("sightings")._data.features;
+        if (typeof map.current.getLayer("user-sightings") !== "undefined")
+            features = features.concat(
+                map.current.getSource("user-sightings")._data.features
+            );
+        console.log("features", features);
+        if (!features.length) {
+            return;
+        }
+        let selection = features.filter(
+            (bird) =>
+                bird.properties.comName.split("-").join(" ") === searchedBird
+        );
+        console.log("selection", selection);
+        if (typeof map.current.getLayer("search-results") !== "undefined") {
+            map.current.removeLayer("search-results");
+            map.current.removeSource("search-results");
+        }
+        map.current.addSource("search-results", {
+            type: "geojson",
+            maxzoom: 24,
+            data: {
+                type: "FeatureCollection",
+                features: selection,
+            },
+        });
+        map.current.addLayer({
+            id: "search-results",
+            type: "circle",
+            source: "search-results",
+            paint: {
+                "circle-radius": 12,
+                "circle-stroke-width": 2,
+                "circle-color": "green",
+                "circle-stroke-color": "white",
+            },
+        });
 
-    //     if (!features.length) {
-    //         return;
-    //     }
+        let foundPins = map.current.getSource("search-results")._data.features;
 
-    //     let selection = features.filter(
-    //         (bird) => bird.properties.comName.split("-").join(" ") === sel.value
-    //     );
+        console.log("foundpins", foundPins);
 
-    //     if (typeof map.current.getLayer("search-results") !== "undefined") {
-    //         map.current.removeLayer("search-results");
-    //         map.current.removeSource("search-results");
-    //     }
+        if (foundPins.length === 0) {
+            return;
+        } else if (foundPins.length === 1) {
+            console.log("inside the fly event");
+            map.current.flyTo({
+                center: foundPins[0].geometry.coordinates,
+            });
+        } else {
+            console.log("inside fit bounds");
+            let minLng = Math.min(
+                ...foundPins.map((p) => p.geometry.coordinates[0])
+            );
+            let maxLng = Math.max(
+                ...foundPins.map((p) => p.geometry.coordinates[0])
+            );
+            let minLat = Math.min(
+                ...foundPins.map((p) => p.geometry.coordinates[1])
+            );
+            let maxLat = Math.max(
+                ...foundPins.map((p) => p.geometry.coordinates[1])
+            );
+            console.log("minLng: 	", minLng);
+            console.log("minLat: 	", minLat);
+            console.log("maxLng: 	", maxLng);
+            console.log("maxLat: 	", maxLat);
+            map.current.fitBounds([
+                [minLng, minLat], // southwestern corner of the bounds
+                [maxLng, maxLat], // northeastern corner of the bounds
+            ]);
+        }
 
-    //     map.current.addSource("search-results", {
-    //         type: "geojson",
-    //         maxzoom: 24,
-    //         data: {
-    //             type: "FeatureCollection",
-    //             features: selection,
-    //         },
-    //     });
-    //     map.current.addLayer({
-    //         id: "search-results",
-    //         type: "circle",
-    //         source: "search-results",
-    //         paint: {
-    //             "circle-radius": 12,
-    //             "circle-stroke-width": 2,
-    //             "circle-color": "green",
-    //             "circle-stroke-color": "white",
-    //         },
-    //     });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // };
+        //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchedBird]);
 
     //delete search highlight in case user deletes that pin
     useEffect(() => {
