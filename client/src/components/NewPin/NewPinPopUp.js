@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addMarker } from "../../redux/user-markers/slice";
 import { resetUserMarker } from "../../redux/new-user-marker/slice";
@@ -15,6 +15,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
+    const dataListRef = useRef();
     const [view, setView] = useState(0);
     const [uploaderIsVisible, setUploader] = useState(false);
     const [newPin, setNewPin] = useState();
@@ -45,6 +46,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
         // console.log("bird value", bird);
         setSelectedBird(bird);
         setValue(bird.value);
+        dataListRef.current.blur();
     };
 
     const resetSelection = () => {
@@ -139,6 +141,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                         </p>
                         <div id="datalist-container">
                             <DatalistInput
+                                ref={dataListRef}
                                 placeholder="Start typing a bird name"
                                 showLabel={false}
                                 items={birdList}
