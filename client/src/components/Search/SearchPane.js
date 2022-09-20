@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { receiveSearchedBird } from "../../redux/searched-bird/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
+import { receiveSearchedBird } from "../../redux/searched-bird/slice";
 import "../../stylesheets/SearchPane.css";
 
 export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
@@ -11,7 +11,7 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         initialValue: "",
     });
 
-    //define the list of birds in the search box
+    //define the list of birds in the search box, dropping hyphens
     const searchableBirds = useSelector(
         (state) =>
             state.availableBirds &&
@@ -43,19 +43,11 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         }, 500);
     };
 
-    //TO DO
-    // const resetSearch = () => {
-    //     setValue("");
-    // };
-
     return (
         <>
             <p id="cancel-search" onClick={toggleSearchPane}>
                 Cancel
             </p>
-            {/* <span className="close-search" onClick={toggleSearchPane}>
-                X
-            </span> */}
             {searchableBirds.length === 0 && (
                 <p>Turn on one of the sightings layers to be able to search.</p>
             )}

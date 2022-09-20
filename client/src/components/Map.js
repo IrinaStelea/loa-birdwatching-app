@@ -477,7 +477,7 @@ export default function Map({
                     padding: {
                         top: 60,
                         right: 60,
-                        bottom: 130,
+                        bottom: 150,
                         left: 60,
                     },
                 }
