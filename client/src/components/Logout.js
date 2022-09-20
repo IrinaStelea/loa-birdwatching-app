@@ -3,14 +3,12 @@ export default function Logout() {
         fetch("/logout")
             .then((response) => response.json())
             .then((data) => {
-                console.log("data after logout", data);
                 //redirect to login
                 window.history.pushState("", "", "/");
                 window.location.reload();
-                // window.location.assign("/login");
             })
             .catch((err) => {
-                console.log(err);
+                console.log("logout error", err);
             });
     };
     return (

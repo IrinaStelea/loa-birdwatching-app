@@ -6,12 +6,7 @@ import { closePopup } from "../../redux/popup/slice";
 import "../../stylesheets/Popup.css";
 
 export default function Popup() {
-    //  const [popUpVisible, setPopUp] = useState(true);
     const dispatch = useDispatch();
-
-    const togglePopUp = () => {
-        dispatch(closePopup());
-    };
 
     const popup = useSelector((state) => state.popupInfo);
     const fullUserDataforPopup = useSelector(
@@ -21,7 +16,9 @@ export default function Popup() {
     );
     const isUserPopup = useSelector((state) => state.isUserPopup);
 
-    // console.log("popup info in component", popup);
+    const togglePopUp = () => {
+        dispatch(closePopup());
+    };
 
     return (
         <>

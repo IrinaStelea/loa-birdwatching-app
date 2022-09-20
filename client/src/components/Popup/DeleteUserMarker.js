@@ -9,7 +9,7 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
 
     const deleteUserMarker = () => {
         const id = info.id;
-        console.log("info in delete", info);
+
         fetch("/api/delete-user-marker", {
             method: "POST",
             headers: {
@@ -19,7 +19,6 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
         })
             .then((resp) => resp.json())
             .then((data) => {
-                console.log("response from delete", data);
                 dispatch(deleteMarker(id));
                 dispatch(deleteAvailableBird({ [info.id]: info.comName }));
                 togglePopUp();
@@ -29,7 +28,6 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
             });
     };
 
-    // console.log("info in delete user marker", info);
     return (
         <>
             {!confirmation && (

@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-//have stateful fields everywhere in our application
 export default function useStatefulFields() {
     const [values, setValues] = useState({});
     const onChange = (e) => {
@@ -9,6 +8,6 @@ export default function useStatefulFields() {
             [e.currentTarget.name]: e.currentTarget.value,
         });
     };
-    //return the values and the onChange to be used externally
+    //return the values and the onChange to be used in registration & login
     return [values, onChange];
 }

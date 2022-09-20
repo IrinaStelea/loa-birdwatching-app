@@ -67,7 +67,6 @@ export default function useAuthSubmit(url, fieldsArray, values) {
         })
             .then((response) => response.json())
             .then((data) => {
-                // console.log(data);
                 if (!data.success && data.message) {
                     setErrors({});
                     setServerError(data.message);
@@ -82,6 +81,6 @@ export default function useAuthSubmit(url, fieldsArray, values) {
             });
     };
 
-    //we want to return the error and the function onSubmit (when the outer code wants to trigger this hook it calls on Submit)
+    //return the errors and onSubmit to be used in registration and login
     return [serverError, errors, onSubmit];
 }

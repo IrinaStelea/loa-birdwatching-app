@@ -6,7 +6,6 @@ import { addAvailableBird } from "../../redux/birds-filter/slice";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
 import Uploader from "./Uploader.js";
 import "react-datalist-input/dist/styles.css";
-
 import "../../stylesheets/NewPin.css";
 
 export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
@@ -42,8 +41,8 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
         // eslint-disable-next-line
     }, [view]);
 
+    //onSelect function for the birdlist input
     const onSelect = (bird) => {
-        // console.log("bird value", bird);
         setSelectedBird(bird);
         setValue(bird.value);
 
@@ -103,7 +102,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("data after add new pin", data);
+                // console.log("data after add new pin", data);
                 setNewPin(data);
                 setView(2);
             })

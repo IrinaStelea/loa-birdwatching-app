@@ -5,12 +5,12 @@ import "../../stylesheets/Uploader.css";
 import { addMarker } from "../../redux/user-markers/slice";
 
 export default function Uploader({ toggleUploader, setView }) {
+    const dispatch = useDispatch();
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const [imageIndex, setImageIndex] = useState(0);
     const [error, setError] = useState("");
     const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
-    const dispatch = useDispatch();
 
     const prevImage = () => {
         imageIndex !== 0
@@ -23,11 +23,12 @@ export default function Uploader({ toggleUploader, setView }) {
             : setImageIndex(0);
     };
 
+    //multiple file submissions
     const handleImageInput = (e) => {
         const { files } = e.target;
         const validImageFiles = [];
-        // //file validation: check the file extension
 
+        //file validation: check the file extension
         for (let file of files) {
             if (file.type.match(imageMimeType)) {
                 validImageFiles.push(file);
@@ -40,7 +41,7 @@ export default function Uploader({ toggleUploader, setView }) {
         setError("Please upload a valid image file");
     };
 
-    //preview of the uploaded file
+    //preview of the uploaded images
     useEffect(() => {
         let fileReaders = [];
         let images = [];
@@ -62,7 +63,7 @@ export default function Uploader({ toggleUploader, setView }) {
             });
         }
 
-        //if the read process is incomplete when the component rerenders or unmounts, abort
+        //abort if the fileRead process is incomplete when the component rerenders/unmounts
         return () => {
             isCancel = true;
             for (let fileReader of fileReaders) {
@@ -76,7 +77,7 @@ export default function Uploader({ toggleUploader, setView }) {
     const onImageSubmit = (e) => {
         e.preventDefault();
 
-        //image validation
+        //client-side image validation
         const validImageFiles = [];
         for (let image of imageFiles) {
             if (image.type.match(imageMimeType)) {
@@ -88,13 +89,14 @@ export default function Uploader({ toggleUploader, setView }) {
             setError("Please upload one or more images first");
             return;
         }
-        // console.log("imagefiles inside submit", imageFiles);
+
         const formData = new FormData();
         validImageFiles.forEach((file) => formData.append("file", file));
 
-        for (const pair of formData.entries()) {
-            console.log(pair[0] + ", " + pair[1]);
-        }
+        //see the contents of formData
+        // for (const pair of formData.entries()) {
+        //     console.log(pair[0] + ", " + pair[1]);
+        // }
 
         fetch("/api/upload-image", {
             method: "POST",
@@ -105,7 +107,7 @@ export default function Uploader({ toggleUploader, setView }) {
                 if (!data.success && data.message) {
                     setError(data.message);
                 } else {
-                    console.log("image added successfully, data is", data);
+                    // console.log("image added successfully, data is", data);
                     dispatch(
                         addMarker({
                             id: data.images[0].id,
@@ -129,17 +131,7 @@ export default function Uploader({ toggleUploader, setView }) {
 
     return (
         <div id="uploader">
-            {/* {this.state.errorMessage && (
-                    <p className="error">{this.state.errorMessage}</p>
-                )} */}
             {error && <p className="error-uploader">{error}</p>}
-            {/* {images.length > 0 && (
-                <div id="preview-images">
-                    {images.map((img, idx) => (
-                        <img key={idx} id="bird-img" src={img} alt="preview" />
-                    ))}
-                </div>
-            )} */}
             {images.length > 0 && (
                 <div id="image-container">
                     {images.length > 1 ? (

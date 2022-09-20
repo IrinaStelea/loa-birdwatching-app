@@ -6,7 +6,6 @@ import "../../stylesheets/SearchPane.css";
 
 export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
     const dispatch = useDispatch();
-    const [searchedBird, setSearchedBird] = useState(null);
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
@@ -27,7 +26,7 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
             value: bird,
         }));
 
-    //on select function for the filter
+    //onSelect function for the search filter
     const onSelect = (sel) => {
         //disable focus on the text input (for soft keyboard mobile)
         const dataListInput = document.querySelector(
@@ -35,8 +34,8 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         );
         dataListInput.blur();
         setValue(sel.value);
-        setSearchedBird(sel.value);
 
+        //wait for soft keyboard to close so that map re-centers nicely
         setTimeout(() => {
             dispatch(receiveSearchedBird(sel.value));
             toggleSearchPane();

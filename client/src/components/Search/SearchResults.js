@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
 import { resetFoundBird } from "../../redux/found-bird/slice";
 import "../../stylesheets/SearchPane.css";
-export default function SearchResults({
-    toggleSearchResults,
-    isSearchResultsVisible,
-}) {
+
+export default function SearchResults({ toggleSearchResults }) {
     const dispatch = useDispatch();
+
     const foundBird = useSelector((state) => state.foundBird);
+
     return (
         <>
             <p

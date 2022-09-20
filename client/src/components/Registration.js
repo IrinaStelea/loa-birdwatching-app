@@ -1,6 +1,6 @@
+import { Link } from "react-router-dom";
 import useStatefulFields from "../hooks/useStatefulFields.js";
 import useAuthSubmit from "../hooks/useAuthSubmit.js";
-import { Link } from "react-router-dom";
 import "../stylesheets/App.css";
 
 export default function Registration() {
@@ -27,7 +27,7 @@ export default function Registration() {
                 )}
                 <h2>Register to start using Loa:</h2>
                 <form
-                    // always add an id to match the label otherwise clicking on the label won't work
+                    // CSS note: always add an id to match the label otherwise clicking on the label won't work as set via CSS
                     id="registration"
                     className="form-container"
                     onSubmit={onSubmit}
