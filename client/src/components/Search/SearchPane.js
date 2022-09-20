@@ -36,8 +36,11 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         dataListInput.blur();
         setValue(sel.value);
         setSearchedBird(sel.value);
-        dispatch(receiveSearchedBird(sel.value));
-        setTimeout(() => toggleSearchPane(), 1000);
+
+        setTimeout(() => {
+            dispatch(receiveSearchedBird(sel.value));
+            toggleSearchPane();
+        }, 500);
     };
 
     //TO DO
