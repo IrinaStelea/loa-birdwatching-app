@@ -13,7 +13,7 @@
 }
 
 #logo {
-    width: 70vw;
+    width: 50vw;
     justify-self: center;
 }
 
@@ -58,12 +58,6 @@ h2 {
 #start-span p {
     margin: 2vh 0;
     font-weight: 400;
-}
-
-@media screen and (min-width: 720px) {
-    #logo {
-        width: 50vw;
-    }
 }
 
 @media screen and (min-width: 1024px) {

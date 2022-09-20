@@ -32,6 +32,12 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         setValue(sel.value);
         setSearchedBird(sel.value);
         dispatch(receiveSearchedBird(sel.value));
+        //disable focus on the text input (for soft keyboard mobile)
+        const dataListInput = document.querySelector(
+            ".react-datalist-input__textbox"
+        );
+        dataListInput.blur();
+
         toggleSearchPane();
     };
 
