@@ -1,7 +1,7 @@
 export default function FoundBirdReducer(foundBird = null, action) {
     if (action.type === "found-bird/receive") {
         foundBird = action.payload;
-        console.log("foundBird: 	", foundBird);
+        // console.log("foundBird: 	", foundBird);
     }
     if (action.type === "found-bird/reset") {
         foundBird = action.payload;

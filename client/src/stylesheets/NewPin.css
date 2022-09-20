@@ -80,8 +80,8 @@
 }
 
 .reset-search {
-    width: 6vw;
-    height: 6vw;
+    width: 5.8vw;
+    height: 5.8vw;
     padding: 1vw;
     align-self: center;
     text-align: center;
@@ -173,8 +173,14 @@ mark {
         width: 90% !important;
     }
 
+    .react-datalist-input__textbox {
+        height: 4vw;
+    }
+
     .reset-search {
         right: 10%;
+        width: 3.7vw;
+        height: 3.7vw;
     }
 
     #bird-img {
