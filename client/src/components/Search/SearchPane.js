@@ -29,15 +29,14 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
 
     //on select function for the filter
     const onSelect = (sel) => {
-        setValue(sel.value);
-        setSearchedBird(sel.value);
-        dispatch(receiveSearchedBird(sel.value));
         //disable focus on the text input (for soft keyboard mobile)
         const dataListInput = document.querySelector(
             ".react-datalist-input__textbox"
         );
         dataListInput.blur();
-
+        setValue(sel.value);
+        setSearchedBird(sel.value);
+        dispatch(receiveSearchedBird(sel.value));
         toggleSearchPane();
     };
 
