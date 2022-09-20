@@ -37,7 +37,7 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
         setValue(sel.value);
         setSearchedBird(sel.value);
         dispatch(receiveSearchedBird(sel.value));
-        toggleSearchPane();
+        setTimeout(() => toggleSearchPane(), 1000);
     };
 
     //TO DO
