@@ -54,6 +54,18 @@
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
     box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mapboxgl-ctrl-group button {
+    height: 5vh !important;
+    width: 5vh !important;
+}
+
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl {
+    margin: 3vw 3vw 0 0 !important;
 }
 
 #show-birds-visible {
@@ -150,4 +162,54 @@
     font-size: 1.5em;
     font-weight: 300;
     padding: 0 2vw;
+}
+
+@media screen and (min-width: 720px) {
+    .button-container-bottom {
+        gap: 7vw;
+    }
+    #show-birds,
+    #my-sightings,
+    #show-birds-visible,
+    #my-sightings-visible {
+        font-size: 1.5em;
+    }
+    .top-icon img {
+        padding: 0.5vw;
+    }
+
+    #logout img {
+        padding: 1.7vw;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    #logout {
+        width: 3vw;
+        height: 3vw;
+    }
+
+    .top-icon {
+        width: 3vw;
+        height: 3vw;
+    }
+
+    #logout img {
+        width: 5vw;
+    }
+
+    .button-container-bottom {
+        gap: 2vw;
+        width: 50%;
+    }
+
+    .button-container-top {
+        gap: 2vw;
+        width: 20%;
+    }
+
+    .mapboxgl-ctrl-group button {
+        height: 3vw !important;
+        width: 3vw !important;
+    }
 }

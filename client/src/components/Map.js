@@ -13,7 +13,6 @@ import {
     resetAvailableBirds,
 } from "../redux/birds-filter/slice";
 import { receiveFoundBird } from "../redux/found-bird/slice.js";
-import { resetSearchedBird } from "../redux/searched-bird/slice";
 import { closePopup } from "../redux/popup/slice";
 import Logout from "./Logout.js";
 import SearchIcon from "./Search/SearchIcon.js";
@@ -33,6 +32,7 @@ export default function Map({
     isSearchResultsVisible,
     toggleNewPinPopUp,
     isNewPinVisible,
+    setSearchResults,
 }) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
@@ -218,6 +218,7 @@ export default function Map({
                 // console.log("preventing click on basemap");
                 return;
             }
+
             var coordinates = e.lngLat;
 
             if (typeof map.current.getLayer("new-pin") !== "undefined") {
@@ -254,9 +255,7 @@ export default function Map({
             //close other popups if open
             dispatch(closePopup());
             //close search results if open
-            if (isSearchResultsVisible) {
-                toggleSearchResults();
-            }
+            setSearchResults(false);
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
 
@@ -478,7 +477,7 @@ export default function Map({
                     padding: {
                         top: 60,
                         right: 60,
-                        bottom: 120,
+                        bottom: 130,
                         left: 60,
                     },
                 }

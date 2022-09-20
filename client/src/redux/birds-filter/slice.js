@@ -1,7 +1,7 @@
 export default function BirdsFilterReducer(availableBirds = [], action) {
     switch (action.type) {
         case "filter-birds/receive":
-            console.log("available birds in main reducer", action.payload);
+            // console.log("available birds in main reducer", action.payload);
             return action.payload;
         case "filter-birds/add":
             // console.log("add available bird reducer", action.payload);

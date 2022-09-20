@@ -15,7 +15,6 @@ import SearchPane from "./Search/SearchPane.js";
 import SearchResults from "./Search/SearchResults.js";
 import { receiveBirdData } from "../redux/bird-data/slice";
 import { receiveUserData } from "../redux/user-markers/slice";
-import { resetUserMarker } from "../redux/new-user-marker/slice";
 import "../stylesheets/App.css";
 
 export default function App() {
@@ -137,6 +136,7 @@ export default function App() {
                                     isSearchResultsVisible={
                                         isSearchResultsVisible
                                     }
+                                    setSearchResults={setSearchResults}
                                     toggleNewPinPopUp={toggleNewPinPopUp}
                                     isNewPinVisible={isNewPinVisible}
                                 />

@@ -128,7 +128,6 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             {view === 1 && (
                 <>
                     <div className="new-pin-pane">
-    
                         <p
                             id="cancel"
                             onClick={() => {

@@ -94,3 +94,54 @@
     font-size: 1.8em;
     font-weight: 300;
 }
+
+@media screen and (min-width: 720px) {
+    #close {
+        font-size: 2.5em;
+    }
+
+    #info-icon {
+        width: 15%;
+    }
+
+    .popup {
+        width: 60vw;
+    }
+
+    #bird-thumbnail {
+        width: 30vw;
+        height: 30vw;
+        margin-top: 2vh;
+    }
+
+    .pin-images {
+        width: 34vw;
+        height: 34vw;
+        margin: 0;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .popup {
+        width: 32vw;
+        top: 3vw;
+    }
+    #bird-thumbnail {
+        width: 18vw;
+        height: 18vw;
+        margin-top: 2vh;
+    }
+
+    .pin-images {
+        width: 20vw;
+        height: 20vw;
+        margin: 0;
+    }
+    #info-icon {
+        width: 15%;
+    }
+
+    #image-container {
+        gap: 3vw;
+    }
+}

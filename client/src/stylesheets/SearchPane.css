@@ -89,3 +89,12 @@
     font-style: italic;
     margin-top: 2vh;
 }
+
+@media screen and (min-width: 1024px) {
+    .search-pane {
+        width: 50vw;
+    }
+    .search-results {
+        width: 40vw;
+    }
+}
