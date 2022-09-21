@@ -7,6 +7,7 @@ import {
     Navigate,
 } from "react-router-dom";
 import Map from "./Map.js";
+import UserLocation from "./UserLocation.js";
 import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
 import Infobox from "./Infobox.js";
@@ -26,31 +27,11 @@ export default function App() {
     const [isSearchPaneVisible, setPane] = useState(false);
     const [isSearchResultsVisible, setSearchResults] = useState(false);
     const [isNewPinVisible, setNewPinVisibility] = useState(false);
+    // const [isLocationVisible, setLocationVisibility] = useState(true);
 
     // const [userData, setUserData] = useState(null);
 
-    //UNCOMMENT WHEN DEPLOYING - set user location
-    const [userLng, setLng] = useState();
-    const [userLat, setLat] = useState();
-    // const [userLocationModal, setUserLocationModal] = useState(true);
-    // let latitude;
-    // let longitude;
-    // const setUserLocation = () => {
-    //     console.log("click on my location");
-    //     if (navigator.geolocation) {
-    //         navigator.geolocation.getCurrentPosition(function (position) {
-    //             latitude = position.coords.latitude;
-    //             longitude = position.coords.longitude;
-    //         });
-    //     }
-
-    //     setTimeout(() => {
-    //         setLng(longitude);
-    //         setLat(latitude);
-    //         // console.log("user lat and long", userLat, userLng);
-    //         setUserLocationModal(!userLocationModal);
-    //     }, 3000);
-    // };
+    // const [didUserSetLocation, setDidUserSetLocation] = useState(false);
 
     //fetch api data stored in back-end
     useEffect(() => {
@@ -113,12 +94,14 @@ export default function App() {
         setNewPinVisibility(!isNewPinVisible);
     };
 
+    // const toggleLocationPopup = () => {
+    //     setLocationVisibility(!isLocationVisible);
+    // };
+
     return (
         <>
             <Router>
                 <Routes>
-                    {/* <UserLocation setUserLocation={setUserLocation} /> */}
-                    {/* {!userLocationModal && ( */}
                     <Route
                         exact
                         path="/"
@@ -126,8 +109,6 @@ export default function App() {
                             <div className="map">
                                 <Map
                                     data={data}
-                                    userLng={userLng}
-                                    userLat={userLat}
                                     toggleInfoBox={toggleInfoBox}
                                     toggleInstructions={toggleInstructions}
                                     toggleSearchPane={toggleSearchPane}
@@ -139,17 +120,11 @@ export default function App() {
                                     setSearchResults={setSearchResults}
                                     toggleNewPinPopUp={toggleNewPinPopUp}
                                     isNewPinVisible={isNewPinVisible}
+                                    // isLocationVisible={isLocationVisible}
                                 />
                             </div>
                         }
                     />
-                    {/* <Map
-                            data={data}
-                            userLng={userLng}
-                            userLat={userLat}
-                            toggleInfoBox={toggleInfoBox}
-                        /> */}
-                    {/* )} */}
 
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
@@ -182,6 +157,19 @@ export default function App() {
                 )}{" "}
             </div>
             {isSearchPaneVisible && <div className="overlay"></div>}
+            {/* <div
+                className={
+                    "location-pane" + (!isLocationVisible ? "" : " visible")
+                }
+            > */}
+            {/* {isLocationVisible && (
+                    <UserLocation
+                        toggleLocationPopup={toggleLocationPopup}
+                        setDidUserSetLocation={setDidUserSetLocation}
+                    />
+                )}
+            </div>
+            {isLocationVisible && <div className="overlay"></div>} */}
             <div
                 className={
                     "search-results" +

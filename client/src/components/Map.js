@@ -22,8 +22,6 @@ mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzd
 
 export default function Map({
     data,
-    userLng = 13.39,
-    userLat = 52.52,
     toggleInfoBox,
     toggleInstructions,
     toggleSearchPane,
@@ -33,12 +31,16 @@ export default function Map({
     toggleNewPinPopUp,
     isNewPinVisible,
     setSearchResults,
+    isLocationVisible,
 }) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [lng, setLng] = useState(userLng); //13.39
-    const [lat, setLat] = useState(userLat); //52.52
+    const [startLng, setStartLng] = useState();
+    const [startLat, setStartLat] = useState();
+    const [didUserSetLocation, setDidUserSetLocation] = useState(false);
+    const [lng, setLng] = useState(startLng); //13.39
+    const [lat, setLat] = useState(startLat); //52.52
     const [zoom, setZoom] = useState(11);
 
     const [isMapReady, setMapReady] = useState(false);
@@ -52,16 +54,64 @@ export default function Map({
     const popup = useSelector((state) => state.popupInfo);
     const searchedBird = useSelector((state) => state.searchedBird);
 
+    function getLongAndLat() {
+        return new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+        );
+    }
+
+    const getPosition = async () => {
+        try {
+            if (navigator.geolocation) {
+                const position = await getLongAndLat();
+                setStartLng(position.coords.longitude);
+                setStartLat(position.coords.latitude);
+                setDidUserSetLocation(true);
+            } else {
+                setStartLng(13.39);
+                setStartLat(52.52);
+            }
+        } catch (e) {
+            console.log("error in getting location", e);
+            setStartLng(13.39);
+            setStartLat(52.52);
+        }
+        // finally {
+        //     if (!navigator.geolocation) {
+        //         setStartLng(13.39);
+        //         setStartLat(52.52);
+        //     }
+        // }
+    };
+
+    useEffect(() => {
+        getPosition();
+    }, []);
+
     //initialize map
     useEffect(() => {
+        // const getPosition = async () => {
+        //     if (navigator.geolocation) {
+        //         const position = await getLongAndLat();
+        //         setStartLng(position.coords.longitude);
+        //         setStartLat(position.coords.latitude);
+        //     } else {
+        //         setStartLng(13.39);
+        //         setStartLat(52.52);
+        //     }
+        // };
+        if (!startLng && !startLat) return;
         if (map.current) return; // initialize map only once
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/outdoors-v11",
-            center: [userLng, userLat],
+            center: [startLng, startLat],
             zoom: zoom,
         });
 
+        map.current.once("load", () => {
+            setMapReady(true);
+        });
         //add geolocation
         map.current.addControl(
             new mapboxgl.GeolocateControl({
@@ -88,7 +138,7 @@ export default function Map({
         return () => map.current.remove();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [startLat, startLng]);
 
     const initAPILayer = () => {
         map.current.addSource("sightings", {
@@ -152,41 +202,54 @@ export default function Map({
     //layer of API pins
     useEffect(() => {
         if (!map.current) return;
-        map.current.once("load", () => {
-            if (typeof map.current.getLayer("sightings") !== "undefined")
-                return;
-            if (data) {
-                initAPILayer();
-            }
-        });
+
+        if (typeof map.current.getLayer("sightings") !== "undefined") return;
+        if (data && isMapReady) {
+            console.log("initiating api layer");
+            initAPILayer();
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data]);
+    }, [data, isMapReady]);
 
     //add layer of user pins
     useEffect(() => {
         if (!map.current) return;
 
-        map.current.once("load", () => {
-            if (typeof map.current.getLayer("user-sightings") !== "undefined")
-                return;
-            if (userData.length !== 0) {
-                initUserLayer();
-            }
-            setMapReady(true);
-        });
+        if (typeof map.current.getLayer("user-sightings") !== "undefined")
+            return;
+        if (userData.length !== 0 && isMapReady) {
+            initUserLayer();
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userData]);
+    }, [userData, isMapReady]);
+
+    //trigger click on location if the user approved
+    useEffect(() => {
+        if (didUserSetLocation && isMapReady) {
+            const geolocationButton = document.querySelector(
+                ".mapboxgl-ctrl-geolocate"
+            );
+            geolocationButton.click();
+        }
+    }, [didUserSetLocation, isMapReady]);
 
     //toggle instructions to add pin in case there aren't any yet
     useEffect(() => {
-        if (userData.length === 0 && isMapReady === true) {
+        if (
+            userData.length === 0 &&
+            isMapReady === true &&
+            !isLocationVisible
+        ) {
             toggleInstructions("no sightings");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isMapReady]);
+    }, [isMapReady, isLocationVisible]);
 
     //map events
     useEffect(() => {
+        if (!map.current) return;
         //add pop-up with info to each API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
@@ -275,6 +338,7 @@ export default function Map({
 
     //useeffect for clearing the new marker layer
     useEffect(() => {
+        if (!map.current) return;
         if (
             Object.keys(newPin).length === 0 &&
             typeof map.current.getLayer("new-pin") !== "undefined"
@@ -339,6 +403,7 @@ export default function Map({
 
     //when clicking on the basemap to add a new marker, center on that point
     useEffect(() => {
+        if (!map.current) return;
         map.current.on("click", function flexibleZoom(e) {
             if (typeof map.current.getLayer("sightings") !== "undefined") {
                 let features = map.current.queryRenderedFeatures(e.point, {
@@ -528,6 +593,7 @@ export default function Map({
 
     //useeffect to clear the search highlights
     useEffect(() => {
+        if (!map.current) return;
         if (isSearchResultsVisible) return;
         if (typeof map.current.getLayer("sightings") === "undefined") return;
         map.current.setFilter("sightings", null);
@@ -538,6 +604,7 @@ export default function Map({
 
     //highlights for user pins
     useEffect(() => {
+        if (!map.current) return;
         //remove layer of highlights if the popup is closed
         if (
             typeof map.current.getLayer("selected-pin") !== "undefined" &&

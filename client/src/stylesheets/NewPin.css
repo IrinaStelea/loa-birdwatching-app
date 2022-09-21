@@ -156,6 +156,12 @@ mark {
     align-self: flex-end;
 }
 
+#comment {
+    width: 80%;
+    height: 10%;
+    margin-top: 1vh;
+}
+
 @media screen and (min-width: 720px) {
     .new-pin-pop-up {
         top: 10vh;
@@ -223,10 +229,4 @@ mark {
         width: 18vw;
         height: 18vw;
     }
-}
-
-#comment {
-    width: 80%;
-    height: 10%;
-    margin-top: 1vh; 
 }
