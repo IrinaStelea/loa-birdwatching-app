@@ -407,7 +407,6 @@ export default function Map({
                         bird.properties.comName.split("-").join(" ") ===
                         searchedBird
                 )?.properties.sciName;
-            console.log("searched bird", searchedBirdAPISciName);
 
             if (searchedBirdAPISciName) {
                 map.current.setFilter("sightings", [

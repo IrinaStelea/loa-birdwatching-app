@@ -107,7 +107,7 @@ export default function Uploader({ toggleUploader, setView }) {
                 if (!data.success && data.message) {
                     setError(data.message);
                 } else {
-                    // console.log("image added successfully, data is", data);
+                    console.log("image added successfully, data is", data);
                     dispatch(
                         addMarker({
                             id: data.images[0].id,

@@ -19,7 +19,7 @@ const birdData = require("./birddata_imgwiki.json");
 //cookie session middleware
 app.use(
     cookieSession({
-        secret: COOKIE_SECRET, //used to generate the 2nd cookie used to verify the integrity of 1st cookie
+        secret: COOKIE_SECRET,
         maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
@@ -50,7 +50,7 @@ if (process.env.NODE_ENV == "production") {
 //fetch for login
 app.get("/user/id.json", function (req, res) {
     if (req.session.userId) {
-        console.log("cookie is now set");
+        // console.log("cookie is now set");
         res.json({
             userId: req.session.userId,
         });
@@ -187,7 +187,7 @@ app.post("/api/upload-image", async (req, res) => {
             );
             //clear sighting_id cookie stored
             req.session.sighting_id = null;
-            // console.log("result from adding multiple images", result.rows);
+            console.log("result from adding multiple images", result.rows);
             return res.json({
                 success: true,
                 images: result.rows,

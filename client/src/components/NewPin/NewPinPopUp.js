@@ -16,7 +16,6 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
     });
     const [view, setView] = useState(0);
     const [uploaderIsVisible, setUploader] = useState(false);
-    const [newPin, setNewPin] = useState();
 
     const birdList = useSelector(
         (state) =>
@@ -62,7 +61,45 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
         setUploader(!uploaderIsVisible);
     };
 
-    const savePin = () => {
+    const submitPin = async () => {
+        try {
+            const date = new Date()
+                .toLocaleString("en-GB", {
+                    timeZone: "Europe/Brussels",
+                })
+                .split(",")
+                .join("");
+            const res = await fetch("/api/submit-pin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    geoJSON: {
+                        type: "Feature",
+                        geometry: {
+                            type: "Point",
+                            coordinates: [userPin.lng, userPin.lat],
+                        },
+                        properties: {
+                            comName: selectedBird.value,
+                            sciName: selectedBird.sciName,
+                            date: date,
+                        },
+                    },
+                }),
+            });
+            const data = await res.json();
+            // console.log("data after add new pin", data);
+            return data;
+        } catch (err) {
+            console.log("error in fetch add new pin", err);
+        }
+    };
+
+    const savePinWithoutPhotos = async () => {
+        const newPin = await submitPin();
+        console.log("newPin: 	", newPin);
         dispatch(addMarker(newPin));
         dispatch(
             addAvailableBird({
@@ -70,45 +107,6 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             })
         );
         setView(3);
-    };
-
-    const submitPin = (e) => {
-        const date = new Date()
-            .toLocaleString("en-GB", {
-                timeZone: "Europe/Brussels",
-            })
-            .split(",")
-            .join("");
-
-        fetch("/api/submit-pin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                geoJSON: {
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [userPin.lng, userPin.lat],
-                    },
-                    properties: {
-                        comName: selectedBird.value,
-                        sciName: selectedBird.sciName,
-                        date: date,
-                    },
-                },
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                // console.log("data after add new pin", data);
-                setNewPin(data);
-                setView(2);
-            })
-            .catch((err) => {
-                console.log("error in fetch add new pin", err);
-            });
     };
 
     return (
@@ -184,8 +182,8 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                                         />
                                     </a>
                                 </div>
-                                <p id="save" onClick={submitPin}>
-                                    Save
+                                <p id="save" onClick={() => setView(2)}>
+                                    Continue
                                 </p>
                             </>
                         )}
@@ -196,15 +194,6 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             {view === 2 && (
                 <>
                     <div className="new-pin-pane">
-                        <p
-                            id="cancel"
-                            onClick={() => {
-                                toggleNewPinPopUp();
-                                dispatch(resetUserMarker());
-                            }}
-                        >
-                            Cancel
-                        </p>
                         <h4>Add one or more photos for this sighting?</h4>
                         {uploaderIsVisible && (
                             <>
@@ -216,10 +205,16 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                         )}
                         {!uploaderIsVisible && (
                             <>
-                                <p id="save" onClick={toggleUploader}>
+                                <p
+                                    id="save"
+                                    onClick={() => {
+                                        submitPin();
+                                        toggleUploader();
+                                    }}
+                                >
                                     Yes
                                 </p>
-                                <p id="save" onClick={savePin}>
+                                <p id="save" onClick={savePinWithoutPhotos}>
                                     Save without photos
                                 </p>
                             </>
