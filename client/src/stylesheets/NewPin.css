@@ -224,3 +224,9 @@ mark {
         height: 18vw;
     }
 }
+
+#comment {
+    width: 80%;
+    height: 10%;
+    margin-top: 1vh; 
+}

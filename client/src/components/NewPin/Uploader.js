@@ -124,7 +124,7 @@ export default function Uploader({ toggleUploader, setView }) {
                         })
                     );
                     toggleUploader();
-                    setView(3);
+                    setView(4);
                 }
             });
     };

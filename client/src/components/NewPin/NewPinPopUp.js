@@ -16,6 +16,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
     });
     const [view, setView] = useState(0);
     const [uploaderIsVisible, setUploader] = useState(false);
+    const [comment, setComment] = useState("");
 
     const birdList = useSelector(
         (state) =>
@@ -31,7 +32,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
 
     //hide success message after 3 seconds
     useEffect(() => {
-        if (view === 3) {
+        if (view === 4) {
             setTimeout(() => {
                 toggleNewPinPopUp();
                 dispatch(resetUserMarker());
@@ -85,6 +86,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                             comName: selectedBird.value,
                             sciName: selectedBird.sciName,
                             date: date,
+                            comment: comment,
                         },
                     },
                 }),
@@ -99,14 +101,13 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
 
     const savePinWithoutPhotos = async () => {
         const newPin = await submitPin();
-        console.log("newPin: 	", newPin);
         dispatch(addMarker(newPin));
         dispatch(
             addAvailableBird({
                 [newPin.id]: newPin.sighting.properties.comName,
             })
         );
-        setView(3);
+        setView(4);
     };
 
     return (
@@ -194,6 +195,41 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             {view === 2 && (
                 <>
                     <div className="new-pin-pane">
+                        <h4>Add a comment for this sighting?</h4>
+                        <textarea
+                            name="comment"
+                            id="comment"
+                            onChange={(e) => {
+                                setComment(e.currentTarget.value);
+                            }}
+                        ></textarea>
+
+                        <>
+                            <p
+                                id="save"
+                                onClick={() => {
+                                    setView(3);
+                                }}
+                            >
+                                Save comment &amp; continue
+                            </p>
+                            <p
+                                id="save"
+                                onClick={() => {
+                                    setView(3);
+                                    setComment("");
+                                }}
+                            >
+                                Skip
+                            </p>
+                        </>
+                    </div>
+                    <div className="overlay"></div>
+                </>
+            )}
+            {view === 3 && (
+                <>
+                    <div className="new-pin-pane">
                         <h4>Add one or more photos for this sighting?</h4>
                         {uploaderIsVisible && (
                             <>
@@ -223,7 +259,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                     <div className="overlay"></div>
                 </>
             )}
-            {view === 3 && (
+            {view === 4 && (
                 <div className="new-pin-pop-up">
                     <h4>Pin added successfully</h4>
                 </div>

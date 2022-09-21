@@ -203,11 +203,19 @@ export default function Map({
             // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates;
 
-            const { comName, sciName, date, imageUrl } =
+            const { comName, sciName, date, imageUrl, comment } =
                 e.features[0].properties;
             const id = e.features[0].id;
             dispatch(
-                openPopup({ coordinates, comName, sciName, date, id, imageUrl })
+                openPopup({
+                    coordinates,
+                    comName,
+                    sciName,
+                    date,
+                    id,
+                    imageUrl,
+                    comment,
+                })
             );
             dispatch(receiveUserPopup(true));
         });

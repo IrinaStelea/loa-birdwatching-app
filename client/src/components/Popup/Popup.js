@@ -37,6 +37,14 @@ export default function Popup() {
                     {popup.date.slice(0, 10).split("-").reverse().join("-")} at{" "}
                     {popup.date.slice(11, 16)}
                 </p>
+                {isUserPopup && popup.comment && (
+                    <>
+                        <p className="popup-comment">
+                            <span id="span-comment">Comment: </span>
+                            {popup.comment}
+                        </p>
+                    </>
+                )}
                 {isUserPopup && (
                     <DeleteUserMarker info={popup} togglePopUp={togglePopUp} />
                 )}

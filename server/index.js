@@ -187,7 +187,7 @@ app.post("/api/upload-image", async (req, res) => {
             );
             //clear sighting_id cookie stored
             req.session.sighting_id = null;
-            console.log("result from adding multiple images", result.rows);
+            // console.log("result from adding multiple images", result.rows);
             return res.json({
                 success: true,
                 images: result.rows,
