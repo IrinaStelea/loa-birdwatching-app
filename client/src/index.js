@@ -1,15 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./components/App";
-import reportWebVitals from "./reportWebVitals";
 import { createStore, applyMiddleware } from "redux";
-import * as immutableState from "redux-immutable-state-invariant";
-import { composeWithDevTools } from "redux-devtools-extension";
 import { Provider } from "react-redux";
 import rootReducer from "./redux/reducer.js";
+import * as immutableState from "redux-immutable-state-invariant";
+import reportWebVitals from "./reportWebVitals";
+import { composeWithDevTools } from "redux-devtools-extension";
+import App from "./components/App";
 import Welcome from "./components/Welcome";
-import "mapbox-gl/dist/mapbox-gl.css"; //stylesheet for the map
+import "./index.css";
+import "mapbox-gl/dist/mapbox-gl.css"; //map's own stylesheet
 
 const store = createStore(
     rootReducer,

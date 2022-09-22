@@ -46,9 +46,6 @@ exports.uploadS3 = multer({
         s3: s3,
         bucket: "ihamspiced",
         acl: "public-read",
-        // metadata: function (req, file, cb) {
-        //     cb(null, { fieldName: uniquePath });
-        // },
         key: function (req, file, cb) {
             cb(
                 null,
@@ -68,7 +65,7 @@ exports.uploadS3 = multer({
         },
     }),
     limits: {
-        fileSize: 2097152, //file size validation
+        fileSize: 2097152, //file size validation is handled here by Multer
     },
     fileFilter: multerFilter,
 }).array("file");
@@ -84,8 +81,7 @@ exports.deleteS3 = (req, res, next) => {
         .promise()
         .then((data) => {
             if (data.Contents.length === 0) {
-                // throw new Error("List of objects empty.");
-                // console.log("list of objects empty");
+                // no need to throw an error here because some sightings might not have user images
                 return next();
             }
 
@@ -102,13 +98,11 @@ exports.deleteS3 = (req, res, next) => {
                 .deleteObjects(params)
                 .promise()
                 .then(() => {
-                    // it worked!!!
-                    console.log("amazon delete successful");
-                    next(); //adding this because this function will be used as middleware
+                    // console.log("amazon delete successful");
+                    next();
                 })
                 .catch((err) => {
-                    // uh oh
-                    console.log("error in delete object", err);
+                    // console.log("error in delete object", err);
                     res.sendStatus(404);
                 });
         });

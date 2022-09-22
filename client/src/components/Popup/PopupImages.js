@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
-export default function Images({ fullUserDataforPopup, popup }) {
+export default function PopupImages({ fullUserDataforPopup, popup }) {
     const [imageIndex, setImageIndex] = useState(0);
     const userImages = fullUserDataforPopup[0]?.image_url;
     const selBird = useSelector(

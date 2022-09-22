@@ -1,17 +1,14 @@
 export default function UserDataReducer(userData = [], action) {
     if (action.type === "user-data/receive") {
         userData = action.payload;
-        // console.log("user data in main reducer", userData);
     }
 
     if (action.type === "user-data/delete") {
         userData = userData.filter((marker) => marker.id !== action.payload);
-        // console.log("inside delete user marker in main reducer");
     }
 
     if (action.type === "user-data/add") {
         userData = [...userData, action.payload];
-        // console.log("adding user data in main reducer", userData);
     }
 
     return userData;

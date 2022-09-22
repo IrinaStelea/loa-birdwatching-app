@@ -14,9 +14,7 @@ const helpers = require("./helpers.js");
 const { validateForm } = require("./validateForm");
 const { uploadS3, deleteS3 } = require("./s3");
 const birdData = require("./birddata_imgwiki.json");
-
-//version of API data on storate
-// const jsonData = require("./apidata.json");
+// const jsonData = require("./apidata.json"); //version of API data on storage
 
 //cookie session middleware
 app.use(
@@ -49,7 +47,7 @@ if (process.env.NODE_ENV == "production") {
     app.use(express.static(path.join(__dirname, "..", "client", "public")));
 }
 
-//fetch for login
+//pre-login route
 app.get("/user/id.json", function (req, res) {
     if (req.session.userId) {
         // console.log("cookie is now set");
@@ -57,15 +55,13 @@ app.get("/user/id.json", function (req, res) {
             userId: req.session.userId,
         });
     } else {
-        console.log("cookie does not exist");
+        // console.log("cookie does not exist");
         res.json({});
     }
 });
 
 //post route for API fetch for the bird sightings
 app.post("/api/data.json", async function (req, res) {
-    // let myHeaders = new Headers();
-    // myHeaders.append("X-eBirdApiToken");
     let requestOptions = {
         method: "GET",
         headers: { "X-eBirdApiToken": "roeouv9euh7o" },
@@ -86,7 +82,6 @@ app.post("/api/data.json", async function (req, res) {
 
     //convert to geoJson
     let data = helpers.convertToGeojson(dataUniqueCoord);
-    // console.log("inside the get request", data);
 
     res.json(data);
 });
@@ -96,23 +91,23 @@ app.get("/api/user-data.json", async (req, res) => {
     console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        // console.log("result in get user data", result.rows);
-        //merge identical sightings with several pictures
+
+        //merge user images for the same sighting
         const mergedResult = helpers.mergeIdenticalSightings(result.rows);
         return res.json(mergedResult);
     } catch (err) {
-        console.log("error in getting user sightings");
+        // console.log("error in getting user sightings");
         return res.json({ message: "Something went wrong, please try again" });
     }
 });
 
-//serve the json with bird data
+//serve the json with bird information
 app.get("/api/birddata.json", function (req, res) {
     res.json(birdData);
 });
 
+//post for registration route
 app.post("/api/register", validateForm, (req, res) => {
-    // console.log("req body", req.body);
     //add user to database, cleaning the data
     db.insertUser(
         helpers.cleanString(req.body.firstName),
@@ -128,11 +123,10 @@ app.post("/api/register", validateForm, (req, res) => {
                 userId,
             };
             // console.log("user id cookie assigned", req.session.userId);
-            //send success message
             return res.json({ success: true });
         })
         .catch((err) => {
-            console.log("error in adding new user", err);
+            // console.log("error in adding new user", err);
             return res.json({
                 success: false,
                 message: "Something went wrong, please try again!",
@@ -140,6 +134,7 @@ app.post("/api/register", validateForm, (req, res) => {
         });
 });
 
+//post for login route
 app.post("/login.json", (req, res) => {
     db.validateUser(req.body.email.toLowerCase(), req.body.password)
         .then((result) => {
@@ -161,7 +156,7 @@ app.post("/login.json", (req, res) => {
         });
 });
 
-//add new sighting
+//add new user sighting
 app.post("/api/submit-pin", async (req, res) => {
     try {
         const result = await db.addSighting(
@@ -169,7 +164,7 @@ app.post("/api/submit-pin", async (req, res) => {
             req.body.geoJSON
         );
         const sighting_id = result.rows[0].id;
-        //store sighting id in cookie session in case user wants to add picture
+        //store sighting_id in cookie session in case user wants to add picture
         req.session = { ...req.session, sighting_id };
         return res.json(result.rows[0]);
     } catch (error) {
@@ -177,6 +172,7 @@ app.post("/api/submit-pin", async (req, res) => {
     }
 });
 
+//add user images
 app.post("/api/upload-image", async (req, res) => {
     uploadS3(req, res, async function (err) {
         //first handle Multer file validation errors
@@ -197,7 +193,7 @@ app.post("/api/upload-image", async (req, res) => {
         for (let i = 0; i < fileArray.length; i++) {
             imgUrlArray.push(fileArray[i].location);
         }
-        // console.log("image url array", imgUrlArray);
+
         try {
             const result = await db.addImage(
                 req.session.userId,
@@ -212,7 +208,7 @@ app.post("/api/upload-image", async (req, res) => {
                 images: result.rows,
             });
         } catch (err) {
-            console.log("error in uploading image", err);
+            // console.log("error in uploading image", err);
             return res.json({
                 success: false,
                 message: "Something went wrong, please try again",
@@ -221,11 +217,10 @@ app.post("/api/upload-image", async (req, res) => {
     });
 });
 
-//delete user sighting
+//delete user sighting including images from S3 if available
 app.post("/api/delete-user-marker", deleteS3, async (req, res) => {
     try {
         const result = await db.deleteSighting(req.body.id);
-        // console.log("result deleting sighting", result)
 
         return res.json({ message: "success" });
     } catch (error) {
@@ -235,11 +230,10 @@ app.post("/api/delete-user-marker", deleteS3, async (req, res) => {
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    // console.log("inside the logout route");
     return res.json({});
 });
 
-//the index.html will be in the build folder after compiling
+//NOTE: the index.html will be in the build folder after compiling
 if (process.env.NODE_ENV == "production") {
     app.get("/*", (req, res) => {
         res.sendFile(path.resolve("client", "build", "index.html"));

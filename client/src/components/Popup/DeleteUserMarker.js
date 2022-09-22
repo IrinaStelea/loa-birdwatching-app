@@ -5,6 +5,7 @@ import { deleteMarker } from "../../redux/user-markers/slice";
 
 export default function DeleteUserMarker({ info, togglePopUp }) {
     const dispatch = useDispatch();
+
     const [confirmation, setConfirmation] = useState(false);
 
     const deleteUserMarker = () => {
@@ -18,7 +19,7 @@ export default function DeleteUserMarker({ info, togglePopUp }) {
             body: JSON.stringify({ id }),
         })
             .then((resp) => resp.json())
-            .then((data) => {
+            .then(() => {
                 dispatch(deleteMarker(id));
                 dispatch(deleteAvailableBird({ [info.id]: info.comName }));
                 togglePopUp();

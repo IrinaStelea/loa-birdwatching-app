@@ -27,7 +27,7 @@ export default function Registration() {
                 )}
                 <h2>Register to start using Loa:</h2>
                 <form
-                    // CSS note: always add an id to match the label otherwise clicking on the label won't work as set via CSS
+                    // CSS note: always add an id to match the label otherwise clicking on the label won't work as set in CSS
                     id="registration"
                     className="form-container"
                     onSubmit={onSubmit}

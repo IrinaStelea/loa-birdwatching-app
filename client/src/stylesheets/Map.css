@@ -37,7 +37,6 @@
     font-family: "Work Sans", sans-serif;
     font-size: 1.1em;
     font-weight: 500;
-    /* margin: 10px 0; */
     border-radius: 5px;
     border: 1px solid rgba(53, 61, 96, 0.8);
     box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
@@ -102,14 +101,13 @@
     width: 10vw;
     padding-left: 2vw;
     padding-right: 2vw;
-    /* object-fit: contain; */
 }
 
 .mapboxgl-popup-content {
     text-align: center;
 }
 
-/* IMPORTANT: remove this later on */
+/* IMPORTANT to remove if app is used in real world */
 .mapboxgl-ctrl-logo {
     display: none !important;
 }

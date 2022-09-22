@@ -1,3 +1,4 @@
+//server-side validation for registration & login forms
 exports.validateForm = (req, res, next) => {
     let errorMessage = ``;
 

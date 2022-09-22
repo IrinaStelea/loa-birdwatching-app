@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { DatalistInput, useComboboxControls } from "react-datalist-input";
+import Uploader from "./Uploader.js";
 import { addMarker } from "../../redux/user-markers/slice";
 import { resetUserMarker } from "../../redux/new-user-marker/slice";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
-import { DatalistInput, useComboboxControls } from "react-datalist-input";
-import Uploader from "./Uploader.js";
 import "react-datalist-input/dist/styles.css";
 import "../../stylesheets/NewPin.css";
 
@@ -46,7 +46,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
         setSelectedBird(bird);
         setValue(bird.value);
 
-        //disable focus on the text input (for soft keyboard mobile)
+        //disable focus on the text input for soft keyboard on mobile
         const dataListInput = document.querySelector(
             ".react-datalist-input__textbox"
         );
@@ -92,7 +92,6 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                 }),
             });
             const data = await res.json();
-            // console.log("data after add new pin", data);
             return data;
         } catch (err) {
             console.log("error in fetch add new pin", err);

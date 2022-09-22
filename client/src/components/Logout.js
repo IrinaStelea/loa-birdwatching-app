@@ -2,7 +2,7 @@ export default function Logout() {
     const logout = () => {
         fetch("/logout")
             .then((response) => response.json())
-            .then((data) => {
+            .then(() => {
                 //redirect to login
                 window.history.pushState("", "", "/");
                 window.location.reload();

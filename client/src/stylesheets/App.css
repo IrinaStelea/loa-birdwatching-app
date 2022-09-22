@@ -45,7 +45,6 @@ body {
     border: 1px solid red !important;
 }
 
-/* .form-upload input { */
 .form-entry input {
     outline: none;
     border: none;
@@ -56,7 +55,6 @@ body {
     font-size: 1em;
 }
 
-/* .form-upload input:focus + label, */
 input:focus + label,
 input:not(:placeholder-shown) + label {
     color: rgba (53, 61, 96, 0.8);

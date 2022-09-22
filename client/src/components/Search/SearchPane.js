@@ -5,6 +5,7 @@ import "../../stylesheets/SearchPane.css";
 
 export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
     const dispatch = useDispatch();
+
     const { value, setValue } = useComboboxControls({
         initialValue: "",
     });
@@ -18,6 +19,7 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
             )
     );
 
+    //avoid duplicates in bird search
     let uniqueSearchableBirds = [...new Set(searchableBirds)]
         .sort()
         .map((bird, idx) => ({
@@ -32,9 +34,10 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
             ".react-datalist-input__textbox"
         );
         dataListInput.blur();
+
         setValue(sel.value);
 
-        //wait for soft keyboard to close so that map re-centers nicely
+        //on mobile, wait for soft keyboard to close so that map re-centers
         setTimeout(() => {
             dispatch(receiveSearchedBird(sel.value));
             toggleSearchPane();

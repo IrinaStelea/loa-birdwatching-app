@@ -1,5 +1,4 @@
-//function to clean first and last name
-
+//function to clean first and last name of user
 module.exports.cleanString = (string) => {
     return string
         .trim()
@@ -9,6 +8,7 @@ module.exports.cleanString = (string) => {
         .join(" ");
 };
 
+//function to convert data from API into geoJson for populating the map
 module.exports.convertToGeojson = (data) => {
     var geojsonData = [];
     data.forEach(function (d, idx) {
@@ -29,9 +29,10 @@ module.exports.convertToGeojson = (data) => {
     return geojsonData;
 };
 
+//function to slightly offset identical coordinates so they can be added as separate points to the map (Mapbox does not work well with clusters)
 module.exports.randomizeIdenticalCoordinates = (data) => {
-    //look for identical lat & long and store them in an object as key-value pairs
     let coordObj = {};
+    //look for identical lat & long and store them in an temporary object as key-value pairs
     data = data.map(function (entry) {
         if (
             Object.keys(coordObj).includes(`${entry.lat}`) &&
@@ -57,6 +58,7 @@ module.exports.randomizeIdenticalCoordinates = (data) => {
     return data;
 };
 
+//the same sighting can have multiple pictures in the image table, merge those images into an array
 module.exports.mergeIdenticalSightings = (data) => {
     const temp = data.reduce((a, b) => {
         const found = a.find((e) => e.id == b.id && e.sighting && b.sighting);

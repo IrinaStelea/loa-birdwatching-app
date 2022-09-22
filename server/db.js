@@ -33,9 +33,8 @@ function hashPassword(pass) {
 
 module.exports.insertUser = (first, last, email, password) => {
     return hashPassword(password).then((hashedPass) => {
-        // console.log("hashed pass", hashedPass);
         return db.query(
-            //add user to users table returning the id & first name to store in the cookie session
+            //add user to users table returning the id to store in the cookie session
             `
             INSERT INTO users(first, last, email, password)
             VALUES ($1, $2, $3, $4) RETURNING id, first`,
@@ -61,13 +60,12 @@ module.exports.validateUser = (email, inputPass) => {
             //compare passwords
             return bcrypt.compare(inputPass, dbPass).then((result) => {
                 if (result) {
-                    console.log("authentication successful");
-                    // const firstName = results.rows[0].first;
+                    // console.log("authentication successful");
                     //return userId for the cookie
                     return userId;
                 } else {
                     console.log("authentication failed. passwords don't match");
-                    // throw error for the POST login catch
+                    // throw error for the POST login catch on the server
                     throw new Error("Passwords don't match");
                 }
             });
@@ -89,7 +87,6 @@ module.exports.addSighting = (id, sighting) => {
 };
 
 module.exports.deleteSighting = (id) => {
-    //this will delete the images uploaded by the user for that particular sighting thanks to ON DELETE CASCADE
     return db.query(`DELETE FROM sightings WHERE id=$1`, [id]);
 };
 
@@ -99,5 +96,3 @@ module.exports.addImage = (userId, sightingId, imageUrlArray) => {
         [userId, sightingId, imageUrlArray]
     );
 };
-
-// `INSERT into sightings_images (user_id, sighting_id, image_url) VALUES($1, $2, unnest($3::text[])) RETURNING *`;

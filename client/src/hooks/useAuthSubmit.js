@@ -13,7 +13,7 @@ export default function useAuthSubmit(url, fieldsArray, values) {
             }
         }
 
-        //front-end validation for email and password
+        //client-side validation for email and password
         if (values.email !== undefined) {
             let lastAtPos = values.email.lastIndexOf("@");
             let lastDotPos = values.email.lastIndexOf(".");
@@ -81,6 +81,6 @@ export default function useAuthSubmit(url, fieldsArray, values) {
             });
     };
 
-    //return the errors and onSubmit to be used in registration and login
+    //return the errors and onSubmit to be used in registration & login
     return [serverError, errors, onSubmit];
 }

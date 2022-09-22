@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import Images from "./Images.js";
+import PopupImages from "./PopupImages.js";
 import DeleteUserMarker from "./DeleteUserMarker.js";
 import { closePopup } from "../../redux/popup/slice";
 import "../../stylesheets/Popup.css";
@@ -28,7 +28,7 @@ export default function Popup() {
                 </h4>
                 <h2>{popup.comName}</h2>
                 <p className="sci-name">{popup.sciName}</p>
-                <Images
+                <PopupImages
                     popup={popup}
                     fullUserDataforPopup={fullUserDataforPopup}
                 />

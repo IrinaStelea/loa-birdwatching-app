@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-    BrowserRouter as Router,
-    Route,
-    Routes,
-    Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Map from "./Map.js";
 import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
@@ -31,13 +26,16 @@ export default function App() {
     const [isSearchResultsVisible, setSearchResults] = useState(false);
     const [isNewPinVisible, setNewPinVisibility] = useState(false);
 
+    const userPin = useSelector((state) => state.pinCoordinates);
+    const popupCoord = useSelector((state) => state.popupInfo.coordinates);
+
+    //get position functions
     function getLongAndLat() {
         return new Promise((resolve, reject) =>
             navigator.geolocation.getCurrentPosition(resolve, reject)
         );
     }
 
-    //get position function
     const getPosition = async () => {
         try {
             if (navigator.geolocation) {
@@ -50,21 +48,23 @@ export default function App() {
                 setStartLat(52.52);
             }
         } catch (e) {
-            console.log("error in getting location", e);
+            // console.log("error in getting location", e);
             setStartLng(13.39);
             setStartLat(52.52);
         }
     };
 
+    ////////////////get position on app mount
     useEffect(() => {
         getPosition();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    //fetch api data stored in back-end
+    ////////////////fetch data from back-end
+    // API data
     useEffect(() => {
         if (!startLng || !startLat) return;
-        //fetch the json with the recent sightings
+
         const fetchAPIData = async () => {
             const res = await fetch("/api/data.json", {
                 method: "POST",
@@ -78,12 +78,12 @@ export default function App() {
         fetchAPIData();
     }, [startLng, startLat]);
 
-    //fetch user sightings
+    //user data
     useEffect(() => {
         const fetchUserData = async () => {
             const res = await fetch("/api/user-data.json");
             const userData = await res.json();
-            // console.log("user data on mountin", userData);
+            // console.log("user data", userData);
 
             dispatch(receiveUserData(userData));
         };
@@ -91,6 +91,7 @@ export default function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    //general bird data
     useEffect(() => {
         fetch("/api/birddata.json")
             .then((res) => res.json())
@@ -99,9 +100,7 @@ export default function App() {
             });
     });
 
-    const userPin = useSelector((state) => state.pinCoordinates);
-    const popupCoord = useSelector((state) => state.popupInfo.coordinates);
-
+    ////////////////toggle functions for various components
     const toggleInfoBox = () => {
         setInfoBoxVisibility(!isInfoBoxVisible);
     };
@@ -129,7 +128,7 @@ export default function App() {
 
     return (
         <>
-            <Router>
+            <BrowserRouter>
                 <Routes>
                     <Route
                         exact
@@ -156,10 +155,9 @@ export default function App() {
                             </div>
                         }
                     />
-
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
-            </Router>
+            </BrowserRouter>
             {Object.keys(userPin).length !== 0 && (
                 <NewPin
                     userPin={userPin}

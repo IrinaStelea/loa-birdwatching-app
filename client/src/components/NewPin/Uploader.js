@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { addAvailableBird } from "../../redux/birds-filter/slice";
-import "../../stylesheets/Uploader.css";
 import { addMarker } from "../../redux/user-markers/slice";
+import "../../stylesheets/Uploader.css";
 
 export default function Uploader({ toggleUploader, setView }) {
     const dispatch = useDispatch();
+
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const [imageIndex, setImageIndex] = useState(0);
     const [error, setError] = useState("");
+
     const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
 
     const prevImage = () => {
@@ -23,12 +25,12 @@ export default function Uploader({ toggleUploader, setView }) {
             : setImageIndex(0);
     };
 
-    //multiple file submissions
+    //multiple file input
     const handleImageInput = (e) => {
         const { files } = e.target;
         const validImageFiles = [];
 
-        //file validation: check the file extension
+        //file validation client-side
         for (let file of files) {
             if (file.type.match(imageMimeType)) {
                 validImageFiles.push(file);
@@ -77,7 +79,7 @@ export default function Uploader({ toggleUploader, setView }) {
     const onImageSubmit = (e) => {
         e.preventDefault();
 
-        //client-side image validation
+        //file validation before previewing
         const validImageFiles = [];
         for (let image of imageFiles) {
             if (image.type.match(imageMimeType)) {
@@ -107,7 +109,7 @@ export default function Uploader({ toggleUploader, setView }) {
                 if (!data.success && data.message) {
                     setError(data.message);
                 } else {
-                    console.log("image added successfully, data is", data);
+                    // console.log("image added successfully, data is", data);
                     dispatch(
                         addMarker({
                             id: data.images[0].id,

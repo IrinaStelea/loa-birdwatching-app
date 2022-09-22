@@ -2,7 +2,6 @@
     position: fixed;
     width: 85vw;
     background-color: white;
-    /* stretch the pane */
     inset: 0;
     z-index: 99;
     display: flex;

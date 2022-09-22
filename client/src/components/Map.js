@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import Logout from "./Logout.js";
+import SearchIcon from "./Search/SearchIcon.js";
 import {
     addUserMarker,
     resetUserMarker,
@@ -14,8 +16,6 @@ import {
 } from "../redux/birds-filter/slice";
 import { receiveFoundBird } from "../redux/found-bird/slice.js";
 import { closePopup } from "../redux/popup/slice";
-import Logout from "./Logout.js";
-import SearchIcon from "./Search/SearchIcon.js";
 import "../stylesheets/Map.css";
 
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
@@ -36,11 +36,9 @@ export default function Map({
     setSearchResults,
 }) {
     const dispatch = useDispatch();
+
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [lng, setLng] = useState(startLng);
-    const [lat, setLat] = useState(startLat);
-    const [zoom, setZoom] = useState(11);
 
     const [isMapReady, setMapReady] = useState(false);
     const [markersLayerVisible, setMarkersLayer] = useState(true);
@@ -48,13 +46,14 @@ export default function Map({
     const [userMarkersLayerVisible, setUserMarkersLayer] = useState(true);
     const [userMarkersButtonView, setUserMarkersButtonView] = useState(2);
     const [userCurrentMarkersLayer, setUserCurrentMarkersLayer] = useState();
+
     const newPin = useSelector((state) => state.pinCoordinates);
     const userData = useSelector((state) => state.userData);
     const popup = useSelector((state) => state.popupInfo);
     const searchedBird = useSelector((state) => state.searchedBird);
 
     //////////////// FUNCTIONS
-    //function to add layer with API data
+    //initialise layer with API data
     const initAPILayer = () => {
         map.current.addSource("sightings", {
             type: "geojson",
@@ -79,7 +78,7 @@ export default function Map({
         setMarkersButtonView(1);
     };
 
-    //function to add layer with user data
+    //initialise layer with user data
     const initUserLayer = () => {
         let userMarkers = userData.map((marker) => {
             return {
@@ -109,7 +108,7 @@ export default function Map({
             },
         });
 
-        //store the layer in a variable to be able to add/remove user pins
+        //store the user layer in a variable to be able to add/remove pins
         setUserCurrentMarkersLayer(map.current.getSource("user-sightings"));
 
         setUserMarkersButtonView(1);
@@ -158,33 +157,33 @@ export default function Map({
     //////////////// MAP & USE EFFECT LOGIC
     //initialize map
     useEffect(() => {
-        if (!startLng && !startLat) return;
+        if (!startLng && !startLat) return; //wait for lat and lng to be available
         if (map.current) return; // initialize map only once
+
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/outdoors-v11",
             center: [startLng, startLat],
-            zoom: zoom,
+            zoom: 11,
         });
 
         map.current.once("load", () => {
-            setMapReady(true);
+            setMapReady(true); //set this variable true to use for further loading of map events
         });
-        //add geolocation
+
+        //geolocation button
         map.current.addControl(
             new mapboxgl.GeolocateControl({
                 fitBoundsOptions: { maxZoom: 10 },
                 positionOptions: {
                     enableHighAccuracy: true,
                 },
-                // track user location as it changes
                 trackUserLocation: true,
-                // arrow to indicate device direction
-                showUserHeading: true,
+                showUserHeading: true, // arrow to indicate device direction
             })
         );
 
-        //add custom icon
+        //map loads custom marker for new user pin
         map.current.loadImage("../../newMarker.png", (error, image) => {
             if (error) throw error;
 
@@ -198,7 +197,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [startLat, startLng]);
 
-    //initialise layer of API pins
+    //initialise layer of API pins once map is loaded and data is available
     useEffect(() => {
         if (!map.current) return;
 
@@ -210,7 +209,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [APIdata, isMapReady]);
 
-    //add layer of user pins
+    //initialise layer of user pins once map is loaded and data is available
     useEffect(() => {
         if (!map.current) return;
 
@@ -223,7 +222,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userData, isMapReady]);
 
-    //trigger click on location if the user approved
+    //trigger click on geolocation button if the user has already approved tracking
     useEffect(() => {
         if (didUserSetLocation && isMapReady) {
             const geolocationButton = document.querySelector(
@@ -233,7 +232,7 @@ export default function Map({
         }
     }, [didUserSetLocation, isMapReady]);
 
-    //toggle instructions to add pin in case there aren't any yet
+    //show popup with instructions on how to add new pins in case the user doesn't have any yet
     useEffect(() => {
         if (userData.length === 0 && isMapReady === true) {
             toggleInstructions("no sightings");
@@ -244,7 +243,8 @@ export default function Map({
     //map click events
     useEffect(() => {
         if (!isMapReady) return;
-        //add pop-up with info to each API marker
+
+        //add pop-up with info to each clicked-on API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
             const id = e.features[0].id;
@@ -254,12 +254,10 @@ export default function Map({
             dispatch(receiveUserPopup(false));
         });
 
+        //add pop-up with info to each clicked-on user marker
         map.current.on("click", "user-sightings", (e) => {
             e.clickOnLayer = true;
-            // console.log("click on user layer", e.features[0]);
-            // get coordinates of click + bird info
             const coordinates = e.features[0].geometry.coordinates;
-
             const { comName, sciName, date, imageUrl, comment } =
                 e.features[0].properties;
             const id = e.features[0].id;
@@ -280,16 +278,17 @@ export default function Map({
         //add new pin on user click
         map.current.on("click", function addMarker(e) {
             if (e.clickOnLayer) {
-                // console.log("preventing click on basemap");
-                return;
+                return; //prevent click on basemap if the click is on one of the pins
             }
 
             var coordinates = e.lngLat;
 
+            //center map on clicked-on point
             map.current.flyTo({
                 center: coordinates,
             });
 
+            //add marker to clicked-on location
             if (typeof map.current.getLayer("new-pin") !== "undefined") {
                 map.current.removeLayer("new-pin");
                 map.current.removeSource("point");
@@ -334,7 +333,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isMapReady]);
 
-    //useeffect for clearing the new marker layer
+    //clear the new marker layer if the newPin data is reset in the store
     useEffect(() => {
         if (!map.current) return;
         if (
@@ -346,7 +345,7 @@ export default function Map({
         }
     }, [newPin]);
 
-    //useeffect to populate the search filter
+    //populate the search filter with all available birds (from turned on layers)
     useEffect(() => {
         if (isSearchPaneVisible) {
             //close other popups if open
@@ -399,7 +398,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSearchPaneVisible, markersLayerVisible, userMarkersLayerVisible]);
 
-    //filter select
+    //match selected bird in search with map pins, center map on these pins and hide all other pins
     useEffect(() => {
         if (!searchedBird) return;
 
@@ -472,6 +471,7 @@ export default function Map({
         if (foundPins.length === 0) {
             return;
         } else if (foundPins.length === 1) {
+            //if only one sighting is found on the map, center the map on it
             map.current.flyTo({
                 center: foundPins[0].geometry.coordinates,
             });
@@ -483,6 +483,7 @@ export default function Map({
             );
             toggleSearchResults();
         } else {
+            //if more than one sightings are found, fit the map view to contain all of them
             let minLng = Math.min(
                 ...foundPins.map((p) => p.geometry.coordinates[0])
             );
@@ -497,8 +498,8 @@ export default function Map({
             );
             map.current.fitBounds(
                 [
-                    [minLng, minLat], // southwestern corner
-                    [maxLng, maxLat], // northeastern corner
+                    [minLng, minLat], // southwest corner
+                    [maxLng, maxLat], // northeast corner
                 ],
                 {
                     padding: {
@@ -533,10 +534,10 @@ export default function Map({
         }
     }, [isSearchResultsVisible]);
 
-    //add layer of highlights for selected pins
+    //add layer to highlight the pins selected with click
     useEffect(() => {
         if (!map.current) return;
-        //remove layer of highlights if the popup is closed
+        //if popup is closed remove the highlight
         if (
             typeof map.current.getLayer("selected-pin") !== "undefined" &&
             Object.keys(popup).length === 0
@@ -592,7 +593,7 @@ export default function Map({
         });
     }, [popup]);
 
-    //update layer of user pins when adding/deleting a new pin
+    //update map layer of user pins when adding a new pin or deleting
     useEffect(() => {
         if (!map.current) return;
 
@@ -631,7 +632,7 @@ export default function Map({
                 features: updatedUserMarkers,
             });
 
-            //toggle user markers layers if invisible
+            //when adding successfully a new pin, turn on the user markers layers if invisible
             if (!userMarkersLayerVisible) {
                 map.current.setLayoutProperty(
                     "user-sightings",
@@ -658,10 +659,6 @@ export default function Map({
                 <Logout />
             </div>
             <div>
-                {/* <div className="sidebar">
-                    Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-                </div> */}
-
                 <div ref={mapContainer} className="map-container" />
             </div>
             <div className="button-container-bottom">
@@ -701,31 +698,3 @@ export default function Map({
         </>
     );
 }
-
-//fetch to eBird API
-// React.useEffect(() => {
-//     fetch("/api")
-//         .then((res) => res.json())
-//         .then((data) => setData(data.message));
-//     let myHeaders = new Headers();
-//     myHeaders.append("X-eBirdApiToken", "roeouv9euh7o");
-
-//     let requestOptions = {
-//         method: "GET",
-//         headers: myHeaders,
-//         redirect: "follow",
-//     };
-//     let lat = 52.50;
-//     let lng = 13.41;
-//     //query param "back" sets the time frame (up to 30 days)
-//     //query param "dist" sets the range (up to 50 km)
-//     (async () => {
-//         const response = await fetch(
-//             `https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=50`,
-//             requestOptions
-//         );
-//         const data = await response.json();
-//         console.log("data from fetch", data);
-//         setData(data);
-//     })();
-// }, []);

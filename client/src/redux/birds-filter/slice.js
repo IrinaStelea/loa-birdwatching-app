@@ -1,10 +1,8 @@
 export default function BirdsFilterReducer(availableBirds = [], action) {
     switch (action.type) {
         case "filter-birds/receive":
-            // console.log("available birds in main reducer", action.payload);
             return action.payload;
         case "filter-birds/add":
-            // console.log("add available bird reducer", action.payload);
             return [...availableBirds, action.payload];
         case "filter-birds/delete":
             return availableBirds.filter(
@@ -12,7 +10,6 @@ export default function BirdsFilterReducer(availableBirds = [], action) {
                     Object.keys(bird)[0] !== Object.keys(action.payload)[0]
             );
         case "filter-birds/reset":
-            // console.log("available birds reset", action.payload);
             return [];
 
         default:
