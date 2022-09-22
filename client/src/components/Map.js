@@ -21,7 +21,10 @@ import "../stylesheets/Map.css";
 mapboxgl.accessToken = `pk.eyJ1IjoiY2FwYXR1bGx1bWlpIiwiYSI6ImNsNzV4MW8xNTA1cTEzdm1pdmNyYzZib2IifQ.ij1zzeUFjHOcpPf4Wlc3Kw`;
 
 export default function Map({
-    data,
+    startLng,
+    startLat,
+    didUserSetLocation,
+    APIdata,
     toggleInfoBox,
     toggleInstructions,
     toggleSearchPane,
@@ -31,16 +34,12 @@ export default function Map({
     toggleNewPinPopUp,
     isNewPinVisible,
     setSearchResults,
-    isLocationVisible,
 }) {
     const dispatch = useDispatch();
     const mapContainer = useRef(null);
     const map = useRef(null);
-    const [startLng, setStartLng] = useState();
-    const [startLat, setStartLat] = useState();
-    const [didUserSetLocation, setDidUserSetLocation] = useState(false);
-    const [lng, setLng] = useState(startLng); //13.39
-    const [lat, setLat] = useState(startLat); //52.52
+    const [lng, setLng] = useState(startLng);
+    const [lat, setLat] = useState(startLat);
     const [zoom, setZoom] = useState(11);
 
     const [isMapReady, setMapReady] = useState(false);
@@ -54,52 +53,111 @@ export default function Map({
     const popup = useSelector((state) => state.popupInfo);
     const searchedBird = useSelector((state) => state.searchedBird);
 
-    function getLongAndLat() {
-        return new Promise((resolve, reject) =>
-            navigator.geolocation.getCurrentPosition(resolve, reject)
-        );
-    }
+    //////////////// FUNCTIONS
+    //function to add layer with API data
+    const initAPILayer = () => {
+        map.current.addSource("sightings", {
+            type: "geojson",
+            maxzoom: 24, //this provides more precision for the highlight overlay
+            data: {
+                type: "FeatureCollection",
+                features: APIdata,
+            },
+        });
 
-    const getPosition = async () => {
-        try {
-            if (navigator.geolocation) {
-                const position = await getLongAndLat();
-                setStartLng(position.coords.longitude);
-                setStartLat(position.coords.latitude);
-                setDidUserSetLocation(true);
-            } else {
-                setStartLng(13.39);
-                setStartLat(52.52);
-            }
-        } catch (e) {
-            console.log("error in getting location", e);
-            setStartLng(13.39);
-            setStartLat(52.52);
-        }
-        // finally {
-        //     if (!navigator.geolocation) {
-        //         setStartLng(13.39);
-        //         setStartLat(52.52);
-        //     }
-        // }
+        map.current.addLayer({
+            id: "sightings",
+            type: "circle",
+            source: "sightings",
+            paint: {
+                "circle-radius": 12,
+                "circle-stroke-width": 2,
+                "circle-color": "#758bfd",
+                "circle-stroke-color": "white",
+            },
+        });
+        setMarkersButtonView(1);
     };
 
-    useEffect(() => {
-        getPosition();
-    }, []);
+    //function to add layer with user data
+    const initUserLayer = () => {
+        let userMarkers = userData.map((marker) => {
+            return {
+                ...marker.sighting,
+                id: marker.id,
+            };
+        });
 
+        map.current.addSource("user-sightings", {
+            type: "geojson",
+            maxzoom: 24,
+            data: {
+                type: "FeatureCollection",
+                features: userMarkers,
+            },
+        });
+
+        map.current.addLayer({
+            id: "user-sightings",
+            type: "circle",
+            source: "user-sightings",
+            paint: {
+                "circle-radius": 12,
+                "circle-stroke-width": 2,
+                "circle-color": "#f5756a",
+                "circle-stroke-color": "white",
+            },
+        });
+
+        //store the layer in a variable to be able to add/remove user pins
+        setUserCurrentMarkersLayer(map.current.getSource("user-sightings"));
+
+        setUserMarkersButtonView(1);
+    };
+
+    //toggle API markers layer
+    const toggleMarkersLayer = () => {
+        if (markersLayerVisible) {
+            map.current.setLayoutProperty("sightings", "visibility", "none");
+            setMarkersButtonView(2);
+            //if turning off, reset available birds for the search
+            dispatch(resetAvailableBirds());
+        } else {
+            map.current.setLayoutProperty("sightings", "visibility", "visible");
+            setMarkersButtonView(1);
+        }
+        setMarkersLayer(!markersLayerVisible);
+    };
+
+    //toggle user markers layer
+    const toggleUserMarkersLayer = () => {
+        if (userData.length === 0) {
+            return;
+        }
+
+        if (userMarkersLayerVisible) {
+            map.current.setLayoutProperty(
+                "user-sightings",
+                "visibility",
+                "none"
+            );
+            setUserMarkersButtonView(2);
+            //if turning off, reset available birds for the search
+            dispatch(resetAvailableBirds());
+        } else {
+            map.current.setLayoutProperty(
+                "user-sightings",
+                "visibility",
+                "visible"
+            );
+            setUserMarkersButtonView(1);
+        }
+        setUserMarkersLayer(!userMarkersLayerVisible);
+    };
+
+    //////////////// MAP & USE EFFECT LOGIC
     //initialize map
     useEffect(() => {
-        // const getPosition = async () => {
-        //     if (navigator.geolocation) {
-        //         const position = await getLongAndLat();
-        //         setStartLng(position.coords.longitude);
-        //         setStartLat(position.coords.latitude);
-        //     } else {
-        //         setStartLng(13.39);
-        //         setStartLat(52.52);
-        //     }
-        // };
         if (!startLng && !startLat) return;
         if (map.current) return; // initialize map only once
         map.current = new mapboxgl.Map({
@@ -140,77 +198,17 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [startLat, startLng]);
 
-    const initAPILayer = () => {
-        map.current.addSource("sightings", {
-            type: "geojson",
-            maxzoom: 24, //this provides more precision for the highlight/select overlay
-            data: {
-                type: "FeatureCollection",
-                features: data,
-            },
-        });
-
-        map.current.addLayer({
-            id: "sightings",
-            type: "circle",
-            source: "sightings",
-            paint: {
-                "circle-radius": 12,
-                "circle-stroke-width": 2,
-                "circle-color": "#758bfd",
-                "circle-stroke-color": "white",
-            },
-        });
-        setMarkersButtonView(1);
-    };
-
-    const initUserLayer = () => {
-        let userMarkers = userData.map((marker) => {
-            return {
-                ...marker.sighting,
-                id: marker.id,
-            };
-        });
-
-        map.current.addSource("user-sightings", {
-            type: "geojson",
-            maxzoom: 24,
-            data: {
-                type: "FeatureCollection",
-                features: userMarkers,
-            },
-        });
-
-        map.current.addLayer({
-            id: "user-sightings",
-            type: "circle",
-            source: "user-sightings",
-            paint: {
-                "circle-radius": 12,
-                "circle-stroke-width": 2,
-                "circle-color": "#f5756a",
-                "circle-stroke-color": "white",
-            },
-        });
-
-        //store the layer in a variable to be able to add/remove user pins
-        setUserCurrentMarkersLayer(map.current.getSource("user-sightings"));
-
-        setUserMarkersButtonView(1);
-    };
-
-    //layer of API pins
+    //initialise layer of API pins
     useEffect(() => {
         if (!map.current) return;
 
         if (typeof map.current.getLayer("sightings") !== "undefined") return;
-        if (data && isMapReady) {
-            console.log("initiating api layer");
+        if (APIdata && isMapReady) {
             initAPILayer();
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data, isMapReady]);
+    }, [APIdata, isMapReady]);
 
     //add layer of user pins
     useEffect(() => {
@@ -237,19 +235,15 @@ export default function Map({
 
     //toggle instructions to add pin in case there aren't any yet
     useEffect(() => {
-        if (
-            userData.length === 0 &&
-            isMapReady === true &&
-            !isLocationVisible
-        ) {
+        if (userData.length === 0 && isMapReady === true) {
             toggleInstructions("no sightings");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isMapReady, isLocationVisible]);
+    }, [isMapReady]);
 
-    //map events
+    //map click events
     useEffect(() => {
-        if (!map.current) return;
+        if (!isMapReady) return;
         //add pop-up with info to each API marker
         map.current.on("click", "sightings", (e) => {
             e.clickOnLayer = true;
@@ -291,6 +285,10 @@ export default function Map({
             }
 
             var coordinates = e.lngLat;
+
+            map.current.flyTo({
+                center: coordinates,
+            });
 
             if (typeof map.current.getLayer("new-pin") !== "undefined") {
                 map.current.removeLayer("new-pin");
@@ -334,7 +332,7 @@ export default function Map({
         });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [isMapReady]);
 
     //useeffect for clearing the new marker layer
     useEffect(() => {
@@ -400,73 +398,6 @@ export default function Map({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSearchPaneVisible, markersLayerVisible, userMarkersLayerVisible]);
-
-    //when clicking on the basemap to add a new marker, center on that point
-    useEffect(() => {
-        if (!map.current) return;
-        map.current.on("click", function flexibleZoom(e) {
-            if (typeof map.current.getLayer("sightings") !== "undefined") {
-                let features = map.current.queryRenderedFeatures(e.point, {
-                    layers: ["sightings"],
-                });
-                if (features.length !== 0) {
-                    return;
-                }
-            }
-
-            if (typeof map.current.getLayer("user-sightings") !== "undefined") {
-                let features = map.current.queryRenderedFeatures(e.point, {
-                    layers: ["user-sightings"],
-                });
-                if (features.length !== 0) {
-                    return;
-                }
-            }
-            map.current.flyTo({
-                center: e.lngLat,
-            });
-
-            map.current.fire("flystart");
-        });
-    }, []);
-
-    const toggleMarkersLayer = () => {
-        if (markersLayerVisible) {
-            map.current.setLayoutProperty("sightings", "visibility", "none");
-            setMarkersButtonView(2);
-            //reset available birds for search
-            dispatch(resetAvailableBirds());
-        } else {
-            map.current.setLayoutProperty("sightings", "visibility", "visible");
-            setMarkersButtonView(1);
-        }
-        setMarkersLayer(!markersLayerVisible);
-    };
-
-    const toggleUserMarkersLayer = () => {
-        if (userData.length === 0) {
-            return;
-        }
-
-        if (userMarkersLayerVisible) {
-            map.current.setLayoutProperty(
-                "user-sightings",
-                "visibility",
-                "none"
-            );
-            setUserMarkersButtonView(2);
-            //reset available birds for search
-            dispatch(resetAvailableBirds());
-        } else {
-            map.current.setLayoutProperty(
-                "user-sightings",
-                "visibility",
-                "visible"
-            );
-            setUserMarkersButtonView(1);
-        }
-        setUserMarkersLayer(!userMarkersLayerVisible);
-    };
 
     //filter select
     useEffect(() => {
@@ -566,8 +497,8 @@ export default function Map({
             );
             map.current.fitBounds(
                 [
-                    [minLng, minLat], // southwestern corner of the bounds
-                    [maxLng, maxLat], // northeastern corner of the bounds
+                    [minLng, minLat], // southwestern corner
+                    [maxLng, maxLat], // northeastern corner
                 ],
                 {
                     padding: {
@@ -591,7 +522,7 @@ export default function Map({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchedBird]);
 
-    //useeffect to clear the search highlights
+    //clear the filter applied to the map by the search
     useEffect(() => {
         if (!map.current) return;
         if (isSearchResultsVisible) return;
@@ -602,7 +533,7 @@ export default function Map({
         }
     }, [isSearchResultsVisible]);
 
-    //highlights for user pins
+    //add layer of highlights for selected pins
     useEffect(() => {
         if (!map.current) return;
         //remove layer of highlights if the popup is closed
@@ -661,7 +592,7 @@ export default function Map({
         });
     }, [popup]);
 
-    //update layer of user pins based on userData
+    //update layer of user pins when adding/deleting a new pin
     useEffect(() => {
         if (!map.current) return;
 
@@ -725,12 +656,6 @@ export default function Map({
                     />
                 </div>
                 <Logout />
-
-                {/* <div
-                    id="geolocate"
-                >
-                    <img src="../../location.png" alt="location icon" />
-                </div> */}
             </div>
             <div>
                 {/* <div className="sidebar">

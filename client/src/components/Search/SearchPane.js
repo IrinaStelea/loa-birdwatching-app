@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { DatalistInput, useComboboxControls } from "react-datalist-input";
 import { receiveSearchedBird } from "../../redux/searched-bird/slice";
@@ -48,7 +47,10 @@ export default function SearchPane({ toggleSearchPane, isSearchPaneVisible }) {
                 Cancel
             </p>
             {searchableBirds.length === 0 && (
-                <p>Turn on one of the sightings layers to be able to search.</p>
+                <p>
+                    Turn on at least one of the sightings layers to be able to
+                    search.
+                </p>
             )}
             {searchableBirds.length !== 0 && (
                 <>

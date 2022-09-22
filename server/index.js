@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const path = require("path");
+const fetch = require("node-fetch");
 const cookieSession = require("cookie-session");
 const multer = require("multer");
 const COOKIE_SECRET =
@@ -12,9 +13,10 @@ const db = require("./db.js");
 const helpers = require("./helpers.js");
 const { validateForm } = require("./validateForm");
 const { uploadS3, deleteS3 } = require("./s3");
-
-const jsonData = require("./apidata.json");
 const birdData = require("./birddata_imgwiki.json");
+
+//version of API data on storate
+// const jsonData = require("./apidata.json");
 
 //cookie session middleware
 app.use(
@@ -60,10 +62,27 @@ app.get("/user/id.json", function (req, res) {
     }
 });
 
-//serve the json with API sightings
-app.get("/api/data.json", function (req, res) {
+//post route for API fetch for the bird sightings
+app.post("/api/data.json", async function (req, res) {
+    // let myHeaders = new Headers();
+    // myHeaders.append("X-eBirdApiToken");
+    let requestOptions = {
+        method: "GET",
+        headers: { "X-eBirdApiToken": "roeouv9euh7o" },
+        redirect: "follow",
+    };
+
+    let lat = req.body.lat;
+    let lng = req.body.lng;
+
+    const response = await fetch(
+        `https://api.ebird.org/v2/data/obs/geo/recent?lat=${lat}&lng=${lng}&back=30&dist=50`,
+        requestOptions
+    );
+    const APIdata = await response.json();
+
     //check data for duplicate coordinates and offset by a bit
-    let dataUniqueCoord = helpers.randomizeIdenticalCoordinates(jsonData);
+    let dataUniqueCoord = helpers.randomizeIdenticalCoordinates(APIdata);
 
     //convert to geoJson
     let data = helpers.convertToGeojson(dataUniqueCoord);

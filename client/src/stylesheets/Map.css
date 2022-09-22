@@ -55,6 +55,20 @@
     margin: 3vw 3vw 0 0 !important;
 }
 
+.mapboxgl-user-location-dot,
+.mapboxgl-user-location-dot:before {
+    background-color: green !important;
+}
+
+.mapboxgl-user-location-show-heading .mapboxgl-user-location-heading:after,
+.mapboxgl-user-location-show-heading .mapboxgl-user-location-heading:before {
+    border-bottom: 7.5px solid green !important;
+}
+
+.mapboxgl-user-location-accuracy-circle {
+    background-color: rgba(0, 128, 0, 0.2) !important;
+}
+
 #show-birds-visible {
     background-color: rgba(117, 139, 253, 0.9);
     border: 1px solid #758bfd;

@@ -7,7 +7,6 @@ import {
     Navigate,
 } from "react-router-dom";
 import Map from "./Map.js";
-import UserLocation from "./UserLocation.js";
 import Popup from "./Popup/Popup";
 import NewPin from "./NewPin/NewPin.js";
 import Infobox from "./Infobox.js";
@@ -20,30 +19,64 @@ import "../stylesheets/App.css";
 
 export default function App() {
     const dispatch = useDispatch();
-    const [data, setData] = useState(null);
+
+    const [startLng, setStartLng] = useState();
+    const [startLat, setStartLat] = useState();
+    const [didUserSetLocation, setDidUserSetLocation] = useState(false);
+    const [APIdata, setAPIData] = useState(null);
     const [isInfoBoxVisible, setInfoBoxVisibility] = useState(false);
     const [isInstructionsVisible, setInstructionsVisibility] = useState(false);
     const [instructions, setInstructions] = useState("");
     const [isSearchPaneVisible, setPane] = useState(false);
     const [isSearchResultsVisible, setSearchResults] = useState(false);
     const [isNewPinVisible, setNewPinVisibility] = useState(false);
-    // const [isLocationVisible, setLocationVisibility] = useState(true);
 
-    // const [userData, setUserData] = useState(null);
+    function getLongAndLat() {
+        return new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+        );
+    }
 
-    // const [didUserSetLocation, setDidUserSetLocation] = useState(false);
+    //get position function
+    const getPosition = async () => {
+        try {
+            if (navigator.geolocation) {
+                const position = await getLongAndLat();
+                setStartLng(position.coords.longitude);
+                setStartLat(position.coords.latitude);
+                setDidUserSetLocation(true);
+            } else {
+                setStartLng(13.39);
+                setStartLat(52.52);
+            }
+        } catch (e) {
+            console.log("error in getting location", e);
+            setStartLng(13.39);
+            setStartLat(52.52);
+        }
+    };
+
+    useEffect(() => {
+        getPosition();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     //fetch api data stored in back-end
     useEffect(() => {
+        if (!startLng || !startLat) return;
         //fetch the json with the recent sightings
         const fetchAPIData = async () => {
-            const res = await fetch("/api/data.json");
+            const res = await fetch("/api/data.json", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ lng: startLng, lat: startLat }),
+            });
             const data = await res.json();
             // console.log("api data", data);
-            setData(data);
+            setAPIData(data);
         };
         fetchAPIData();
-    }, []);
+    }, [startLng, startLat]);
 
     //fetch user sightings
     useEffect(() => {
@@ -94,10 +127,6 @@ export default function App() {
         setNewPinVisibility(!isNewPinVisible);
     };
 
-    // const toggleLocationPopup = () => {
-    //     setLocationVisibility(!isLocationVisible);
-    // };
-
     return (
         <>
             <Router>
@@ -108,7 +137,10 @@ export default function App() {
                         element={
                             <div className="map">
                                 <Map
-                                    data={data}
+                                    startLng={startLng}
+                                    startLat={startLat}
+                                    didUserSetLocation={didUserSetLocation}
+                                    APIdata={APIdata}
                                     toggleInfoBox={toggleInfoBox}
                                     toggleInstructions={toggleInstructions}
                                     toggleSearchPane={toggleSearchPane}
@@ -120,7 +152,6 @@ export default function App() {
                                     setSearchResults={setSearchResults}
                                     toggleNewPinPopUp={toggleNewPinPopUp}
                                     isNewPinVisible={isNewPinVisible}
-                                    // isLocationVisible={isLocationVisible}
                                 />
                             </div>
                         }
@@ -157,19 +188,6 @@ export default function App() {
                 )}{" "}
             </div>
             {isSearchPaneVisible && <div className="overlay"></div>}
-            {/* <div
-                className={
-                    "location-pane" + (!isLocationVisible ? "" : " visible")
-                }
-            > */}
-            {/* {isLocationVisible && (
-                    <UserLocation
-                        toggleLocationPopup={toggleLocationPopup}
-                        setDidUserSetLocation={setDidUserSetLocation}
-                    />
-                )}
-            </div>
-            {isLocationVisible && <div className="overlay"></div>} */}
             <div
                 className={
                     "search-results" +
