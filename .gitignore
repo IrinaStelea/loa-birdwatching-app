@@ -1,4 +1,4 @@
 secrets.json
 research.txt
-./server/birddata.json
-./server/apidata.json
+server/birddata.json
+server/apidata.json
