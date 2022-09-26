@@ -24,10 +24,11 @@
     cursor: pointer;
 }
 
-.error-uploader {
+.error-popup {
     font-style: italic;
     white-space: pre-wrap;
     text-align: center;
+    margin-top: 3vh;
 }
 
 #preview-images {

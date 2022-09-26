@@ -163,6 +163,33 @@
     padding: 0 2vw;
 }
 
+@media screen and (max-width: 720px) and (orientation: landscape) {
+    .top-icon,
+    #logout {
+        width: 5vw;
+        height: 5vw;
+    }
+
+    #logout img {
+        width: 4vw;
+        padding: 0.5vw;
+    }
+
+    #show-birds,
+    #my-sightings,
+    #show-birds-visible,
+    #my-sightings-visible,
+    .search-icon {
+        font-size: 1.2em;
+        height: 5vw;
+    }
+
+    .mapboxgl-ctrl-group button {
+        height: 5vw !important;
+        width: 5vw !important;
+    }
+}
+
 @media screen and (min-width: 720px) {
     .button-container-bottom {
         gap: 7vw;

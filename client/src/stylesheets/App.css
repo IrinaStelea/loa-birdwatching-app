@@ -113,4 +113,29 @@ input:not(:placeholder-shown) + label {
     color: red;
     white-space: pre-wrap;
     text-align: center;
+    font-style: italic;
+}
+
+@media screen and (max-width: 720px) and (orientation: landscape) {
+    h2,
+    #footnote {
+        font-size: 1em;
+    }
+
+    #footnote {
+        margin-top: 0.5vh;
+    }
+    .form-entry label {
+        font-size: 0.9em;
+    }
+
+    .form-container {
+        gap: 3vh;
+    }
+
+    input:focus + label,
+    input:not(:placeholder-shown) + label {
+        color: rgba (53, 61, 96, 0.8);
+        transform: translateY(-0.8em) scale(0.8);
+    }
 }

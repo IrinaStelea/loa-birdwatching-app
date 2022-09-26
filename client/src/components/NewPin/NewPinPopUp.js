@@ -17,6 +17,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
     const [view, setView] = useState(0);
     const [uploaderIsVisible, setUploader] = useState(false);
     const [comment, setComment] = useState("");
+    const [error, setError] = useState("");
 
     const birdList = useSelector(
         (state) =>
@@ -95,18 +96,24 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
             return data;
         } catch (err) {
             console.log("error in fetch add new pin", err);
+            setError("Something went wrong, please try again");
         }
     };
 
     const savePinWithoutPhotos = async () => {
-        const newPin = await submitPin();
-        dispatch(addMarker(newPin));
-        dispatch(
-            addAvailableBird({
-                [newPin.id]: newPin.sighting.properties.comName,
-            })
-        );
-        setView(4);
+        const data = await submitPin();
+
+        if (data.error) {
+            setError(data.error);
+        } else {
+            dispatch(addMarker(data));
+            dispatch(
+                addAvailableBird({
+                    [data.id]: data.sighting.properties.comName,
+                })
+            );
+            setView(4);
+        }
     };
 
     return (
@@ -235,6 +242,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                                 <Uploader
                                     toggleUploader={toggleUploader}
                                     setView={setView}
+                                    setError={setError}
                                 />
                             </>
                         )}
@@ -254,6 +262,7 @@ export default function NewPinPopUp({ toggleNewPinPopUp, userPin }) {
                                 </p>
                             </>
                         )}
+                        {error && <p className="error-popup">{error}</p>}
                     </div>
                     <div className="overlay"></div>
                 </>

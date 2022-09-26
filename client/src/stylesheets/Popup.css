@@ -106,6 +106,14 @@
     font-style: normal;
 }
 
+.error-delete {
+    color: red;
+    white-space: pre-wrap;
+    text-align: center;
+    font-style: italic;
+    margin-top: 1vh;
+}
+
 @media screen and (min-width: 720px) {
     #close {
         font-size: 2.5em;
@@ -128,6 +136,25 @@
     .pin-images {
         width: 34vw;
         height: 34vw;
+        margin: 0;
+    }
+}
+
+@media screen and (max-width: 720px) and (orientation: landscape) {
+    .popup {
+        width: 50vw;
+        max-height: 90vh;
+    }
+
+    #bird-thumbnail {
+        width: 14vw;
+        height: 14vw;
+        margin-top: 2vh;
+    }
+
+    .pin-images {
+        width: 16vw;
+        height: 16vw;
         margin: 0;
     }
 }

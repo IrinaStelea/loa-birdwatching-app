@@ -4,13 +4,12 @@ import { addAvailableBird } from "../../redux/birds-filter/slice";
 import { addMarker } from "../../redux/user-markers/slice";
 import "../../stylesheets/Uploader.css";
 
-export default function Uploader({ toggleUploader, setView }) {
+export default function Uploader({ toggleUploader, setView, setError }) {
     const dispatch = useDispatch();
 
     const [imageFiles, setImageFiles] = useState([]);
     const [images, setImages] = useState([]);
     const [imageIndex, setImageIndex] = useState(0);
-    const [error, setError] = useState("");
 
     const imageMimeType = /image\/(png|jpg|jpeg|gif)/i;
 
@@ -106,8 +105,8 @@ export default function Uploader({ toggleUploader, setView }) {
         })
             .then((result) => result.json())
             .then((data) => {
-                if (!data.success && data.message) {
-                    setError(data.message);
+                if (data.error) {
+                    setError(data.error);
                 } else {
                     // console.log("image added successfully, data is", data);
                     dispatch(
@@ -133,7 +132,6 @@ export default function Uploader({ toggleUploader, setView }) {
 
     return (
         <div id="uploader">
-            {error && <p className="error-uploader">{error}</p>}
             {images.length > 0 && (
                 <div id="image-container">
                     {images.length > 1 ? (

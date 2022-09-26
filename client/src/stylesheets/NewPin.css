@@ -175,6 +175,19 @@ mark {
     }
 }
 
+@media screen and (max-width: 720px) and (orientation: landscape) {
+      .new-pin-pop-up {
+        top: 5vh;
+        width: 60vw;
+    }
+
+     #bird-img {
+        object-fit: cover;
+        width: 14vw;
+        height: 14vw;
+    }
+}
+
 @media screen and (min-width: 1024px) {
     .new-pin-pop-up {
         top: 3vw;

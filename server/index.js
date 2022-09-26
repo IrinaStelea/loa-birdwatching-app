@@ -169,6 +169,10 @@ app.post("/api/submit-pin", async (req, res) => {
         return res.json(result.rows[0]);
     } catch (error) {
         console.log("error in adding new pin", error);
+        return res.json({
+            success: "false",
+            error: "Something went wrong, please try again",
+        });
     }
 });
 
@@ -179,12 +183,12 @@ app.post("/api/upload-image", async (req, res) => {
         if (err instanceof multer.MulterError) {
             return res.json({
                 success: false,
-                message: err.message,
+                error: err.message,
             });
         } else if (err) {
             return res.json({
                 success: false,
-                message: err.message,
+                error: err.message,
             });
         }
         //get the full URL of the image (amazon url + filename)
@@ -211,7 +215,7 @@ app.post("/api/upload-image", async (req, res) => {
             // console.log("error in uploading image", err);
             return res.json({
                 success: false,
-                message: "Something went wrong, please try again",
+                error: "Something went wrong, please try again",
             });
         }
     });
@@ -221,10 +225,18 @@ app.post("/api/upload-image", async (req, res) => {
 app.post("/api/delete-user-marker", deleteS3, async (req, res) => {
     try {
         const result = await db.deleteSighting(req.body.id);
-
-        return res.json({ message: "success" });
+        if (result.rowCount > 0) {
+            return res.json({ message: "success" });
+        } else {
+            return res.json({
+                error: "Something went wrong, please try again",
+            });
+        }
     } catch (error) {
         console.log("error in deleting sighting", error);
+        return res.json({
+            error: "Something went wrong, please try again",
+        });
     }
 });
 

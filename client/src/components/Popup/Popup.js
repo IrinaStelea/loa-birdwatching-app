@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import PopupImages from "./PopupImages.js";
@@ -7,6 +8,8 @@ import "../../stylesheets/Popup.css";
 
 export default function Popup() {
     const dispatch = useDispatch();
+
+    const [error, setError] = useState("");
 
     const popup = useSelector((state) => state.popupInfo);
     const fullUserDataforPopup = useSelector(
@@ -46,8 +49,13 @@ export default function Popup() {
                     </>
                 )}
                 {isUserPopup && (
-                    <DeleteUserMarker info={popup} togglePopUp={togglePopUp} />
+                    <DeleteUserMarker
+                        info={popup}
+                        togglePopUp={togglePopUp}
+                        setError={setError}
+                    />
                 )}
+                {error && <p className="error-delete">{error}</p>}
             </div>
         </>
     );
