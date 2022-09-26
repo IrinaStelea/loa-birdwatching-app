@@ -8,10 +8,10 @@ https://loa-birds.herokuapp.com
 
 Loa is a map-based SPA allowing users to view & search recent bird sightings in their area (API data) as well as add/delete their own bird sightings, with optional photos & comments.
 
-Optimized for mobile & desktop.
+📱 🖥 Optimized for both mobile & desktop.
 On mobile, best viewed in portait mode.
 
-I love spending time in nature, but know nothing about birds, so I wanted to build an app that can help me (and others) learn more about birds and come in handy for birdwatching.
+❓ I love spending time in nature, but know nothing about birds, so I wanted to build an app that can help me (and others) learn more about birds and come in handy for birdwatching.
 Loa started as my final project in the full stack bootcamp at Spiced Academy and I continued to improve it after graduating.
 
 ## Features
