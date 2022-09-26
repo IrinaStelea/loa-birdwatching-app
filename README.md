@@ -37,7 +37,7 @@ Loa started as my final project in the full stack bootcamp at Spiced Academy and
     -   add new bird sightings
     -   optional: add a comment to a new sighting
     -   optional: upload one or more images for a new sighting (with client and server-side image validation)
-    -   delete their own pins
+    -   delete their own pins (including deletion of images associated with the pin on AWS S3)
 
 -   Users can
     -   authenticate/login (with client and server-side validation)
@@ -60,3 +60,40 @@ Loa started as my final project in the full stack bootcamp at Spiced Academy and
 -   clone the repository
 -   install all the dependencies with `npm install`
 -   run the project locally with `npm run dev` and open it at `localhost:3000`
+
+## Previews
+
+### Interacting with map pins
+<img src="client/public/pin_info_popup.gif">
+
+<br>
+
+### Adding a new user sighting
+<img src="client/public/adding_new_pin.gif">
+
+<br>
+
+### Deleting a pin + logout
+<img src="client/public/delete_logout.gif">
+
+<br>
+
+### Search function
+<img src="client/public/search_function.gif">
+
+<br>
+
+### Login and map load with geolocation off
+<img src="client/public/login_geolocation_off.gif">
+
+<br>
+
+### Login new user and map load with geolocation on
+<img src="client/public/new_user_login_geolocation_on.gif">
+
+<br>
+
+### Registration screen with form validation
+<img src="client/public/registration_form_validation.gif">
+
+<br>
