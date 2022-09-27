@@ -18,8 +18,8 @@ Loa started as my final project in the full stack bootcamp at Spiced Academy and
 
 -   Map-based view with two distinctive layers of data:
 
-    -   bird sightings in the past 30 days on a 50-km radius around user location (if user rejected geolocation, default location is center of Berlin) - data via eBird API
-    -   bird sightings recorded by the logged-in user
+    -   bird sightings in the past 30 days on a 50-km radius around user location (if user rejected geolocation, default location is center of Berlin) - data via eBird API, converted to GeoJSON before map rendering
+    -   bird sightings of the logged-in user, stored as GeoJSON in a back-end database
 
 -   Geolocation
 
@@ -32,7 +32,7 @@ Loa started as my final project in the full stack bootcamp at Spiced Academy and
     -   users can search through all birds visible on the map (pre-populated search list that updates dynamically based on user interaction with the map)
     -   the map re-centers on the pin(s) that match the user search
 
--   Users can manage their own bird sightings in the following ways:
+-   Users can manage their own bird sightings:
 
     -   add new bird sightings
     -   optional: add a comment to a new sighting
@@ -56,6 +56,7 @@ Loa started as my final project in the full stack bootcamp at Spiced Academy and
 ## Set up this project locally
 
 -   you need to own an AWS account with an S3 Bucket and pass AWS credentials so the image uploading/deleting middleware works
+-   you need to own a key for the eBird API
 -   set up a PSQL database as described in the `birdapp.sql` file in this repo
 -   clone the repository
 -   install all the dependencies with `npm install`

@@ -6,6 +6,8 @@ const cookieSession = require("cookie-session");
 const multer = require("multer");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("../secrets.json").COOKIE_SECRET;
+const EBIRD_TOKEN =
+    process.env.EBIRD_TOKEN || require("../secrets.json").EBIRD_TOKEN;
 
 const PORT = process.env.PORT || 3001;
 
@@ -64,7 +66,7 @@ app.get("/user/id.json", function (req, res) {
 app.post("/api/data.json", async function (req, res) {
     let requestOptions = {
         method: "GET",
-        headers: { "X-eBirdApiToken": "roeouv9euh7o" },
+        headers: { "X-eBirdApiToken": EBIRD_TOKEN },
         redirect: "follow",
     };
 

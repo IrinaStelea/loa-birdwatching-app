@@ -13,6 +13,10 @@
     gap: 2vh;
 }
 
+#uploader #bird-img {
+    margin: 0;
+}
+
 #submit-uploader {
     background: none !important;
     border: none;

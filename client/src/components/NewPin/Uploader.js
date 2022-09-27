@@ -132,6 +132,7 @@ export default function Uploader({ toggleUploader, setView, setError }) {
 
     return (
         <div id="uploader">
+            <p>Max 2MB / image</p>
             {images.length > 0 && (
                 <div id="image-container">
                     {images.length > 1 ? (
