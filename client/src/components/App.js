@@ -72,7 +72,6 @@ export default function App() {
                 body: JSON.stringify({ lng: startLng, lat: startLat }),
             });
             const data = await res.json();
-            // console.log("api data", data);
             setAPIData(data);
         };
         fetchAPIData();

@@ -61,7 +61,7 @@ module.exports.randomizeIdenticalCoordinates = (data) => {
 //the same sighting can have multiple pictures in the image table, merge those images into an array
 module.exports.mergeIdenticalSightings = (data) => {
     const temp = data.reduce((a, b) => {
-        const found = a.find((e) => e.id == b.id && e.sighting && b.sighting);
+        const found = a.find((e) => e.id == b.id);
         return (
             found
                 ? found.image_url.push(b.image_url)
