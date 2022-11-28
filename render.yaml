@@ -17,3 +17,4 @@ services:
 databases: # Render PostgreSQL database
   - name: postgresql-corrugated-73331
     ipAllowList: [] # only allow internal connections
+    plan: free
