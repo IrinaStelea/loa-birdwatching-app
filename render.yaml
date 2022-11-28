@@ -11,10 +11,10 @@ services:
     envVars:
       - key: DATABASE_URL # Render PostgreSQL database
         fromDatabase:
-          name: postgresql-corrugated-73331
+          name: loa-birds
           property: connectionString
 
 databases: # Render PostgreSQL database
-  - name: postgresql-corrugated-73331
+  - name: loa-birds
     ipAllowList: [] # only allow internal connections
     plan: free
