@@ -90,10 +90,10 @@ app.post("/api/data.json", async function (req, res) {
 
 //serve the geojson with user sightings
 app.get("/api/user-data.json", async (req, res) => {
-    console.log("user id", req.session.userId);
+    // console.log("user id", req.session.userId);
     try {
         const result = await db.getUserSightings(req.session.userId);
-        console.log("user data", result);
+
         //merge user images for the same sighting
         const mergedResult = helpers.mergeIdenticalSightings(result.rows);
         return res.json(mergedResult);
