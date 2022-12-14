@@ -280,7 +280,6 @@ export default function Map({
             if (e.clickOnLayer) {
                 return; //prevent click on basemap if the click is on one of the pins
             }
-
             var coordinates = e.lngLat;
 
             //center map on clicked-on point
@@ -326,7 +325,6 @@ export default function Map({
             setSearchResults(false);
             //dispatch coord for user marker
             dispatch(addUserMarker(coordinates));
-
             toggleNewPinPopUp();
         });
 
