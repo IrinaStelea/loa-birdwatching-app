@@ -5,7 +5,7 @@
 }
 
 .button-container-bottom {
-    position: absolute;
+    position: sticky;
     display: flex;
     justify-content: flex-start;
     /* width: 90%; */
