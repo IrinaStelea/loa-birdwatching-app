@@ -1,6 +1,4 @@
-html {
-    height: 100vh;
-}
+
 
 body {
     font-family: "Work Sans", sans-serif;
@@ -13,6 +11,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
+    height: 100vh;
     /* height: 100vh;
     max-height: 100%; */
 }
