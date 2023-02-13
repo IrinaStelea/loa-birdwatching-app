@@ -97,7 +97,8 @@ export default function App() {
             .then((birdData) => {
                 dispatch(receiveBirdData(birdData));
             });
-    });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     ////////////////toggle functions for various components
     const toggleInfoBox = () => {
