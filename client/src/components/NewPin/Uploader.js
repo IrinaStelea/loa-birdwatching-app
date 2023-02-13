@@ -16,7 +16,7 @@ export default function Uploader({ toggleUploader, setView, setError }) {
     const prevImage = () => {
         imageIndex !== 0
             ? setImageIndex(imageIndex - 1)
-            : setImageIndex(onImageSubmit.length - 1);
+            : setImageIndex(images.length - 1);
     };
     const nextImage = () => {
         imageIndex !== images.length - 1
