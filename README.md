@@ -1,8 +1,9 @@
 # Loa - Birdwatching app 🦉
 
-## Live at:
+<!-- ## Live at:
 
 https://loa-birds.herokuapp.com
+-->
 
 ## Overview
 
